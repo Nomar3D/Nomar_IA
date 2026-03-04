@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainrotAI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
+
+  :root {
+    --bg: #070710;
+    --bg2: #0d0d1f;
+    --bg3: #12122a;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --gold: #f59e0b;
+    --diamond: #60a5fa;
+    --rainbow: #ec4899;
+    --green: #10b981;
+    --red: #ef4444;
+    --orange: #f97316;
+    --orange2: #fb923c;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --border: rgba(124,58,237,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--accent2), var(--diamond));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+  .logo span { font-weight: 400; opacity: 0.6; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 8px;
+  }
+  .tab {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    box-shadow: 0 0 12px rgba(124,58,237,0.5);
+  }
+  .tab:hover:not(.active) { border-color: var(--accent2); color: var(--accent2); }
+
+  /* PANELS */
+  .panels { flex: 1; overflow: hidden; position: relative; }
+  .panel { display: none; height: 100%; flex-direction: column; }
+  .panel.active { display: flex; }
+
+  /* CHAT PANEL */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .msg {
+    display: flex;
+    gap: 10px;
+    animation: fadeUp 0.3s ease;
+    max-width: 75%;
+  }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg.assistant { align-self: flex-start; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+  }
+  .avatar.ai { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+  .avatar.user { background: linear-gradient(135deg, #0f766e, #0d9488); }
+
+  .bubble {
+    padding: 10px 14px;
+    border-radius: 12px;
+    line-height: 1.5;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+  .msg.user .bubble {
+    background: linear-gradient(135deg, #0f766e, #0d9488);
+    border-bottom-right-radius: 4px;
+  }
+  .msg.assistant .bubble {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+  }
+
+  .redirect-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(245,158,11,0.15);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    margin-top: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .redirect-chip:hover { background: rgba(245,158,11,0.25); }
+
+  .typing { display: flex; align-items: center; gap: 4px; padding: 8px 0; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+  /* INPUT BAR */
+  .input-bar {
+    padding: 16px 24px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .input-bar input {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-bar input:focus { border-color: var(--accent2); }
+  .input-bar input::placeholder { color: var(--muted); }
+
+  .send-btn {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { background: var(--accent2); transform: scale(1.05); }
+  .send-btn svg { width: 18px; height: 18px; fill: white; }
+
+  /* ===== TRADE PANEL ===== */
+  .trade-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+  }
+  .trade-panel::-webkit-scrollbar { width: 4px; }
+  .trade-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .trade-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .brainrot-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+  }
+  .brainrot-card h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+  .brainrot-card.yours h3 { color: var(--diamond); }
+  .brainrot-card.theirs h3 { color: var(--rainbow); }
+
+  .field-group { margin-bottom: 10px; }
+  .field-group label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+  .field-group input, .field-group select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid rgba(100,116,139,0.3);
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .field-group input:focus, .field-group select:focus { border-color: var(--accent2); }
+  .field-group select option { background: var(--bg3); }
+
+  .mutation-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .mut-none { background: rgba(100,116,139,0.2); color: var(--muted); }
+  .mut-gold { background: rgba(245,158,11,0.2); color: var(--gold); }
+  .mut-diamond { background: rgba(96,165,250,0.2); color: var(--diamond); }
+  .mut-rainbow { background: rgba(236,72,153,0.2); color: var(--rainbow); }
+  .mut-galaxy { background: rgba(139,92,246,0.2); color: var(--accent2); }
+
+  .analyze-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .analyze-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
+  .analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .result-box {
+    background: var(--bg2);
+    border-radius: 12px;
+    padding: 20px;
+    display: none;
+    animation: fadeUp 0.3s ease;
+  }
+  .result-box.show { display: block; }
+
+  .verdict {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .verdict-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+  .verdict-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    font-weight: 900;
+  }
+  .verdict-label.win { color: var(--green); }
+  .verdict-label.lose { color: var(--red); }
+  .verdict-label.fair { color: var(--gold); }
+
+  .stats-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .stat-box {
+    flex: 1;
+    background: var(--bg3);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+  .stat-box .val {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+  .stat-box .lbl {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  .ai-analysis {
+    background: var(--bg3);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+
+  .loading-analysis {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  /* ===== URBEX PANEL ===== */
+  .urbex-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .urbex-panel::-webkit-scrollbar { width: 4px; }
+  .urbex-panel::-webkit-scrollbar-thumb { background: rgba(249,115,22,0.3); border-radius: 2px; }
+  .urbex-header {
+    background: linear-gradient(135deg, rgba(249,115,22,0.1), rgba(251,146,60,0.05));
+    border: 1px solid rgba(249,115,22,0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .urbex-icon { font-size: 2rem; }
+  .urbex-header h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .urbex-header p { font-size: 0.82rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+  .urbex-search-row { display: flex; gap: 10px; align-items: stretch; }
+  .urbex-search-row input {
+    flex: 1;
+    background: var(--bg2);
+    border: 1px solid rgba(249,115,22,0.3);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .urbex-search-row input:focus { border-color: var(--orange); }
+  .urbex-search-row input::placeholder { color: var(--muted); }
+  .urbex-btn {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, var(--orange), var(--orange2));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .urbex-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(249,115,22,0.4); }
+  .urbex-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .urbex-quick-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .urbex-tag {
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(249,115,22,0.3);
+    background: transparent;
+    color: var(--orange2);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .urbex-tag:hover { background: rgba(249,115,22,0.15); border-color: var(--orange); }
+  .urbex-result {
+    background: var(--bg2);
+    border: 1px solid rgba(249,115,22,0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    display: none;
+    animation: fadeUp 0.3s ease;
+  }
+  .urbex-result.show { display: block; }
+  .urbex-result-header {
+    background: linear-gradient(135deg, rgba(249,115,22,0.15), transparent);
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(249,115,22,0.15);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    color: var(--orange);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .danger-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .danger-high { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+  .danger-med { background: rgba(245,158,11,0.2); color: var(--gold); border: 1px solid rgba(245,158,11,0.3); }
+  .danger-low { background: rgba(16,185,129,0.2); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .urbex-danger-bar { display: flex; gap: 8px; padding: 10px 16px; border-bottom: 1px solid rgba(249,115,22,0.1); flex-wrap: wrap; }
+  .urbex-content { padding: 16px; font-size: 0.9rem; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
+  .dot-orange { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); animation: bounce 1.2s infinite; }
+  .dot-orange:nth-child(2) { animation-delay: 0.2s; }
+  .dot-orange:nth-child(3) { animation-delay: 0.4s; }
+  .urbex-loading { padding: 20px 16px; display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 0.85rem; }
+
+  /* Particle background */
+  .particles {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: var(--accent2);
+    border-radius: 50%;
+    opacity: 0;
+    animation: float linear infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 0.4; }
+    90% { opacity: 0.2; }
+    100% { transform: translateY(-10px) translateX(20px); opacity: 0; }
+  }
+
+  .panels, .header { position: relative; z-index: 1; }
+</style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<div class="header">
+  <div class="logo">BRAINROT<span>AI</span></div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('chat')">💬 IA Principale</button>
+    <button class="tab" onclick="switchTab('trade')">🔄 Trade Analyzer</button>
+    <button class="tab" onclick="switchTab('urbex')">🏚️ Urbex</button>
+  </div>
+</div>
+
+<div class="panels">
+  <!-- CHAT PANEL -->
+  <div class="panel active" id="panel-chat">
+    <div class="messages" id="messages">
+      <div class="msg assistant">
+        <div class="avatar ai">AI</div>
+        <div class="bubble">
+          Yo ! Je suis ton IA principale 🤖 Tu peux me parler de n'importe quoi. Si la conversation tourne autour de <strong>Steal a Brainrot</strong>, je te proposerai de switcher vers l'<strong>analyseur de trades</strong> 🔄
+        </div>
+      </div>
+    </div>
+    <div class="input-bar">
+      <input type="text" id="chatInput" placeholder="Écris ton message..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="send-btn" onclick="sendChat()">
+        <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- TRADE PANEL -->
+  <div class="panel" id="panel-trade">
+    <div class="trade-panel">
+      <div class="trade-grid">
+        <!-- TON BRAINROT -->
+        <div class="brainrot-card yours">
+          <h3>🔵 Ton Brainrot</h3>
+          <div class="field-group">
+            <label>Nom du Brainrot</label>
+            <input type="text" id="myName" placeholder="ex: Bombardiro Crocodilo">
+          </div>
+          <div class="field-group">
+            <label>Rareté</label>
+            <select id="myRarity">
+              <option value="Common">Common</option>
+              <option value="Rare">Rare</option>
+              <option value="Epic">Epic</option>
+              <option value="Legendary">Legendary</option>
+              <option value="Mythic">Mythic</option>
+              <option value="Brainrot God">Brainrot God</option>
+              <option value="Secret">Secret</option>
+              <option value="OG">OG</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Revenue/s (base)</label>
+            <input type="text" id="myRps" placeholder="ex: 5000 ou 1.5M ou 100B">
+          </div>
+          <div class="field-group">
+            <label>Mutation</label>
+            <select id="myMutation">
+              <option value="none">Aucune (x1)</option>
+              <option value="Gold">Gold (x1.25)</option>
+              <option value="Diamond">Diamond (x2)</option>
+              <option value="Rainbow">Rainbow (x10)</option>
+              <option value="Galaxy">Galaxy (x5)</option>
+              <option value="Lava">Lava (x6)</option>
+              <option value="Radioactive">Radioactive (x4)</option>
+              <option value="Divine">Divine (x10)</option>
+              <option value="Bloodrot">Bloodrot (x8)</option>
+              <option value="Yin Yang">Yin Yang (x7)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Traits (séparés par virgule)</label>
+            <input type="text" id="myTraits" placeholder="ex: Strawberry, Galactic">
+          </div>
+        </div>
+
+        <!-- BRAINROT ADVERSAIRE -->
+        <div class="brainrot-card theirs">
+          <h3>🔴 Brainrot Adverse</h3>
+          <div class="field-group">
+            <label>Nom du Brainrot</label>
+            <input type="text" id="theirName" placeholder="ex: Tralalero Tralala">
+          </div>
+          <div class="field-group">
+            <label>Rareté</label>
+            <select id="theirRarity">
+              <option value="Common">Common</option>
+              <option value="Rare">Rare</option>
+              <option value="Epic">Epic</option>
+              <option value="Legendary">Legendary</option>
+              <option value="Mythic">Mythic</option>
+              <option value="Brainrot God">Brainrot God</option>
+              <option value="Secret">Secret</option>
+              <option value="OG">OG</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Revenue/s (base)</label>
+            <input type="text" id="theirRps" placeholder="ex: 8000 ou 2M ou 500B">
+          </div>
+          <div class="field-group">
+            <label>Mutation</label>
+            <select id="theirMutation">
+              <option value="none">Aucune (x1)</option>
+              <option value="Gold">Gold (x1.25)</option>
+              <option value="Diamond">Diamond (x2)</option>
+              <option value="Rainbow">Rainbow (x10)</option>
+              <option value="Galaxy">Galaxy (x5)</option>
+              <option value="Lava">Lava (x6)</option>
+              <option value="Radioactive">Radioactive (x4)</option>
+              <option value="Divine">Divine (x10)</option>
+              <option value="Bloodrot">Bloodrot (x8)</option>
+              <option value="Yin Yang">Yin Yang (x7)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label>Traits (séparés par virgule)</label>
+            <input type="text" id="theirTraits" placeholder="ex: Bombardiro, Taco">
+          </div>
+        </div>
+      </div>
+
+      <button class="analyze-btn" onclick="analyzeTrade()" id="analyzeBtn">⚡ Analyser le Trade</button>
+
+      <div class="result-box" id="resultBox">
+        <div class="verdict" id="verdictRow">
+          <div class="verdict-icon" id="verdictIcon"></div>
+          <div>
+            <div class="verdict-label" id="verdictLabel"></div>
+            <div style="font-size:0.8rem; color:var(--muted); margin-top:2px" id="verdictSub"></div>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="val" id="myEffRps">-</div>
+            <div class="lbl">Ton eff. /s</div>
+          </div>
+          <div class="stat-box" style="background:transparent; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">⚔️</div>
+          <div class="stat-box">
+            <div class="val" id="theirEffRps">-</div>
+            <div class="lbl">Leur eff. /s</div>
+          </div>
+        </div>
+        <div class="ai-analysis" id="aiAnalysis"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- URBEX PANEL -->
+  <div class="panel" id="panel-urbex">
+    <div class="urbex-panel">
+      <div class="urbex-header">
+        <div class="urbex-icon">🏚️</div>
+        <div>
+          <h2>Urbex Explorer</h2>
+          <p>Recherche des lieux abandonnés, dangers, accès et infos en temps réel via le web.</p>
+        </div>
+      </div>
+      <div class="urbex-search-row">
+        <input type="text" id="urbexInput" placeholder="Ex: usine abandonnée Nord France, hôpital abandonné Belgique..." onkeydown="if(event.key==='Enter')searchUrbex()">
+        <button class="urbex-btn" onclick="searchUrbex()" id="urbexBtn">🔍 Explorer</button>
+      </div>
+      <div class="urbex-quick-tags">
+        <button class="urbex-tag" onclick="quickSearch('lieux urbex France 2025')">🇫🇷 France</button>
+        <button class="urbex-tag" onclick="quickSearch('urbex Belgique lieux abandonnés')">🇧🇪 Belgique</button>
+        <button class="urbex-tag" onclick="quickSearch('usines abandonnées urbex Europe')">🏭 Usines</button>
+        <button class="urbex-tag" onclick="quickSearch('hôpitaux abandonnés urbex')">🏥 Hôpitaux</button>
+        <button class="urbex-tag" onclick="quickSearch('châteaux abandonnés urbex France')">🏰 Châteaux</button>
+        <button class="urbex-tag" onclick="quickSearch('danger urbex conseils sécurité')">⚠️ Sécurité</button>
+        <button class="urbex-tag" onclick="quickSearch('urbex légalité France loi')">⚖️ Légalité</button>
+      </div>
+      <div class="urbex-result" id="urbexResult">
+        <div class="urbex-result-header">🔦 <span id="urbexResultTitle">Résultats</span></div>
+        <div class="urbex-danger-bar" id="urbexDangerBar"></div>
+        <div class="urbex-content" id="urbexContent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── PARTICLES ───────────────────────────────────────────────
+const container = document.getElementById('particles');
+for(let i=0;i<25;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  p.style.left=Math.random()*100+'%';
+  p.style.animationDuration=(8+Math.random()*12)+'s';
+  p.style.animationDelay=(Math.random()*10)+'s';
+  p.style.width=p.style.height=(1+Math.random()*2)+'px';
+  container.appendChild(p);
+}
+
+// ─── TABS ────────────────────────────────────────────────────
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+// ─── MUTATION MULTIPLIERS ────────────────────────────────────
+const MUTATION_MULT = {
+  none:1, Gold:1.25, Diamond:2, Rainbow:10, Galaxy:5,
+  Lava:6, Radioactive:4, Divine:10, Bloodrot:8, 'Yin Yang':7
+};
+const TRAIT_MULT = {
+  Strawberry:8, Galactic:4, Bombardiro:4, Orcalero:4,
+  'La Vacca':4, Taco:2, Festivo:3, Sleepy:0.5
+};
+
+function parseRps(str){
+  if(!str) return 0;
+  str=str.trim().replace(',','.');
+  const m=str.match(/([\d.]+)\s*([KMBTkmbq]?)/i);
+  if(!m) return parseFloat(str)||0;
+  let v=parseFloat(m[1]);
+  const s=m[2].toUpperCase();
+  if(s==='K')v*=1e3;
+  else if(s==='M')v*=1e6;
+  else if(s==='B')v*=1e9;
+  else if(s==='T')v*=1e12;
+  return v;
+}
+
+function formatRps(n){
+  if(n>=1e12) return (n/1e12).toFixed(2)+'T/s';
+  if(n>=1e9) return (n/1e9).toFixed(2)+'B/s';
+  if(n>=1e6) return (n/1e6).toFixed(2)+'M/s';
+  if(n>=1e3) return (n/1e3).toFixed(1)+'K/s';
+  return n.toFixed(1)+'/s';
+}
+
+function calcEffective(baseRps, mutation, traitsStr){
+  const mutMult = MUTATION_MULT[mutation]||1;
+  const traits = traitsStr.split(',').map(t=>t.trim()).filter(Boolean);
+  
+  // First trait is full, each additional trait loses 1x
+  let traitMult = 0;
+  traits.forEach((t,i) => {
+    const base = TRAIT_MULT[t] || 1;
+    traitMult += Math.max(0, base - i);
+  });
+  
+  // Total multiplier: mutation + traits - 1 (if both present, subtract 1)
+  let totalMult;
+  if(traits.length > 0){
+    totalMult = mutMult + traitMult - 1;
+  } else {
+    totalMult = mutMult;
+  }
+  
+  return baseRps * Math.max(1, totalMult);
+}
+
+// ─── CHAT ────────────────────────────────────────────────────
+const chatHistory = [];
+const BRAINROT_KEYWORDS = ['brainrot','steal a brainrot','trade','mutation','rareté','rarity','legendary','mythic','rainbow','diamond','gold','galaxy','secret','og tier','$/s','/s','bombardiro','tralalero','tung tung'];
+
+async function sendChat(){
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value='';
+
+  addMsg('user', msg);
+  chatHistory.push({role:'user', content:msg});
+
+  const typingEl = addTyping();
+
+  try {
+    const response = await fetch('https://nomar-ai-proxy.lucas-nomme29.workers.dev',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: `Tu es une IA de conversation générale stylée et détendue, qui parle en français. Tu es sympa, drôle et direct.
+
+RÈGLE IMPORTANTE :
+- Si la conversation porte sur le jeu Roblox "Steal a Brainrot" (trades, brainrots, mutations, rarities, revenue par seconde, etc.), tu réponds brièvement PUIS ajoute [REDIRECT_TRADE] à la fin.
+- Si la conversation porte sur l'urbex, l'exploration urbaine, les lieux abandonnés, les bâtiments désaffectés, les dangers ou conseils d'exploration, tu réponds brièvement PUIS ajoute [REDIRECT_URBEX] à la fin.
+- Pour les autres sujets, réponds normalement sans redirection.`,
+        messages: chatHistory
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.[0]?.text || "Désolé, une erreur s'est produite.";
+    
+    typingEl.remove();
+    
+    const hasTradeRedirect = text.includes('[REDIRECT_TRADE]');
+    const hasUrbexRedirect = text.includes('[REDIRECT_URBEX]');
+    const cleanText = text.replace('[REDIRECT_TRADE]','').replace('[REDIRECT_URBEX]','').trim();
+    const redirectType = hasTradeRedirect ? 'trade' : hasUrbexRedirect ? 'urbex' : false;
+    
+    addMsg('assistant', cleanText, redirectType);
+    chatHistory.push({role:'assistant', content:cleanText});
+  } catch(e){
+    typingEl.remove();
+    addMsg('assistant', 'Oups, erreur de connexion ! 😅');
+  }
+}
+
+function addMsg(role, text, showRedirect=false){
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  
+  const avatar = document.createElement('div');
+  avatar.className = `avatar ${role==='user'?'user':'ai'}`;
+  avatar.textContent = role==='user'?'T':'AI';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+
+  if(showRedirect==='trade'||showRedirect===true){
+    const chip = document.createElement('div');
+    chip.innerHTML = '🔄 Ouvrir le Trade Analyzer';
+    chip.className = 'redirect-chip';
+    chip.onclick = () => switchTabDirect('trade');
+    bubble.appendChild(document.createElement('br'));
+    bubble.appendChild(chip);
+  }
+  if(showRedirect==='urbex'){
+    const chip = document.createElement('div');
+    chip.innerHTML = '🏚️ Ouvrir Urbex Explorer';
+    chip.className = 'redirect-chip';
+    chip.style.borderColor = '#f97316';
+    chip.style.color = '#f97316';
+    chip.style.background = 'rgba(249,115,22,0.1)';
+    chip.onclick = () => switchTabDirect('urbex');
+    bubble.appendChild(document.createElement('br'));
+    bubble.appendChild(chip);
+  }
+
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function switchTabDirect(tab){
+  const tabs = ['chat','trade','urbex'];
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('active', tabs[i]===tab);
+  });
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+document.querySelectorAll('.tab')[0].onclick = ()=>switchTabDirect('chat');
+document.querySelectorAll('.tab')[1].onclick = ()=>switchTabDirect('trade');
+document.querySelectorAll('.tab')[2].onclick = ()=>switchTabDirect('urbex');
+
+function addTyping(){
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg assistant';
+  div.innerHTML = `<div class="avatar ai">AI</div><div class="bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+// ─── TRADE ANALYZER ──────────────────────────────────────────
+async function analyzeTrade(){
+  const btn = document.getElementById('analyzeBtn');
+  const resultBox = document.getElementById('resultBox');
+  
+  const myBase = parseRps(document.getElementById('myRps').value);
+  const theirBase = parseRps(document.getElementById('theirRps').value);
+  
+  if(!myBase || !theirBase){
+    alert('Entre les revenue/s pour les deux brainrots !');
+    return;
+  }
+
+  const myMut = document.getElementById('myMutation').value;
+  const theirMut = document.getElementById('theirMutation').value;
+  const myTraits = document.getElementById('myTraits').value;
+  const theirTraits = document.getElementById('theirTraits').value;
+
+  const myEff = calcEffective(myBase, myMut, myTraits);
+  const theirEff = calcEffective(theirBase, theirMut, theirTraits);
+
+  document.getElementById('myEffRps').textContent = formatRps(myEff);
+  document.getElementById('theirEffRps').textContent = formatRps(theirEff);
+
+  const ratio = theirEff / myEff;
+  let verdict, icon, color;
+  if(ratio >= 1.15){ verdict='WIN'; icon='✅'; color='win'; }
+  else if(ratio <= 0.85){ verdict='LOSS'; icon='❌'; color='lose'; }
+  else { verdict='FAIR'; icon='⚖️'; color='fair'; }
+
+  document.getElementById('verdictIcon').textContent = icon;
+  document.getElementById('verdictLabel').textContent = verdict==='WIN'?'Trade Rentable !':verdict==='LOSS'?'Trade Défavorable !':'Trade Équitable';
+  document.getElementById('verdictLabel').className = `verdict-label ${color}`;
+  document.getElementById('verdictSub').textContent = `Ratio: x${ratio.toFixed(2)} en ta faveur`;
+
+  resultBox.classList.add('show');
+  document.getElementById('aiAnalysis').innerHTML = '<div class="loading-analysis"><div class="dot"></div><div class="dot"></div><div class="dot"></div> Analyse IA en cours...</div>';
+
+  btn.disabled = true;
+
+  const myName = document.getElementById('myName').value || 'Ton brainrot';
+  const theirName = document.getElementById('theirName').value || 'Leur brainrot';
+  const myRarity = document.getElementById('myRarity').value;
+  const theirRarity = document.getElementById('theirRarity').value;
+
+  try {
+    const res = await fetch('https://nomar-ai-proxy.lucas-nomme29.workers.dev',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`Tu es un expert en trades du jeu Roblox "Steal a Brainrot". Tu analyses si un trade est avantageux ou non. Tu réponds en français, de façon directe et claire. Tu connais les mécaniques du jeu : mutations (Gold x1.25, Diamond x2, Rainbow x10, Galaxy x5, Lava x6, Radioactive x4, Divine x10, Bloodrot x8, Yin Yang x7), traits (Strawberry x8, Galactic x4, Bombardiro x4, etc.), et les rarités (Common → OG). Le calcul est déjà fait, donne ton avis qualitatif.`,
+        messages:[{
+          role:'user',
+          content:`Analyse ce trade dans Steal a Brainrot:
+
+MON BRAINROT:
+- Nom: ${myName}
+- Rareté: ${myRarity}
+- Revenue/s base: ${formatRps(myBase)}
+- Mutation: ${myMut}
+- Traits: ${myTraits||'aucun'}
+- Revenue/s effectif: ${formatRps(myEff)}
+
+BRAINROT ADVERSE:
+- Nom: ${theirName}
+- Rareté: ${theirRarity}
+- Revenue/s base: ${formatRps(theirBase)}
+- Mutation: ${theirMut}
+- Traits: ${theirTraits||'aucun'}
+- Revenue/s effectif: ${formatRps(theirEff)}
+
+Ratio: x${ratio.toFixed(2)} en ma faveur.
+Verdict calculé: ${verdict}
+
+Donne une analyse courte (3-4 lignes max) : est-ce que ce trade vaut le coup ? Prends en compte la rareté, les mutations, la valeur marchande dans le jeu. Sois direct et donne un conseil clair.`
+        }]
+      })
+    });
+    const data = await res.json();
+    document.getElementById('aiAnalysis').textContent = data.content?.[0]?.text || 'Analyse indisponible.';
+  } catch(e){
+    document.getElementById('aiAnalysis').textContent = 'Erreur lors de l\'analyse IA.';
+  }
+
+  btn.disabled = false;
+}
+
+// ─── URBEX EXPLORER ──────────────────────────────────────────
+function quickSearch(query){
+  document.getElementById('urbexInput').value = query;
+  searchUrbex();
+}
+
+async function searchUrbex(){
+  const input = document.getElementById('urbexInput');
+  const query = input.value.trim();
+  if(!query) return;
+
+  const btn = document.getElementById('urbexBtn');
+  const result = document.getElementById('urbexResult');
+  const content = document.getElementById('urbexContent');
+  const dangerBar = document.getElementById('urbexDangerBar');
+  const titleEl = document.getElementById('urbexResultTitle');
+
+  btn.disabled = true;
+  result.classList.add('show');
+  titleEl.textContent = query;
+  dangerBar.innerHTML = '';
+  content.innerHTML = '<div class="urbex-loading"><div class="dot-orange"></div><div class="dot-orange"></div><div class="dot-orange"></div> Recherche en cours sur le web...</div>';
+
+  try {
+    const res = await fetch('https://nomar-ai-proxy.lucas-nomme29.workers.dev',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        tools:[{"type":"web_search_20250305","name":"web_search"}],
+        system:`Tu es un expert en urbex (exploration urbaine). Tu parles en français, tu es précis et utile. 
+Quand on te demande des infos sur des lieux abandonnés ou l'urbex en général, tu recherches sur le web et tu fournis :
+1. Des lieux spécifiques si c'est une recherche de lieu (noms, localisations approximatives, type de bâtiment)
+2. Les dangers présents (amiante, effondrement, légalité, gardiens, etc.)
+3. Des conseils pratiques (équipement, horaires, précautions)
+4. La situation légale en France/Belgique si pertinent
+5. Des liens ou sources utiles si disponibles
+
+IMPORTANT : Au début de ta réponse, indique le niveau de danger général sur une ligne avec ce format exact :
+DANGER_LEVEL: HIGH|MEDIUM|LOW
+LEGAL_STATUS: ILLEGAL|GRAY|LEGAL
+Puis une ligne vide, puis le contenu.
+
+Sois informatif et pratique. Ne moralise pas excessivement mais mentionne les risques honnêtement.`,
+        messages:[{role:'user', content: query}]
+      })
+    });
+    const data = await res.json();
+    
+    // Extract text from all content blocks
+    let fullText = data.content
+      .map(item => item.type === 'text' ? item.text : '')
+      .filter(Boolean)
+      .join('\n');
+
+    // Parse danger level
+    const dangerMatch = fullText.match(/DANGER_LEVEL:\s*(HIGH|MEDIUM|LOW)/i);
+    const legalMatch = fullText.match(/LEGAL_STATUS:\s*(ILLEGAL|GRAY|LEGAL)/i);
+    
+    // Remove metadata lines
+    fullText = fullText.replace(/DANGER_LEVEL:.*\n?/i,'').replace(/LEGAL_STATUS:.*\n?/i,'').trim();
+
+    // Build danger badges
+    if(dangerMatch){
+      const level = dangerMatch[1].toUpperCase();
+      const badge = document.createElement('span');
+      badge.className = 'danger-badge ' + (level==='HIGH'?'danger-high':level==='MEDIUM'?'danger-med':'danger-low');
+      badge.innerHTML = level==='HIGH'?'⚠️ Danger élevé':level==='MEDIUM'?'⚡ Danger modéré':'✅ Danger faible';
+      dangerBar.appendChild(badge);
+    }
+    if(legalMatch){
+      const status = legalMatch[1].toUpperCase();
+      const badge = document.createElement('span');
+      badge.className = 'danger-badge ' + (status==='ILLEGAL'?'danger-high':status==='GRAY'?'danger-med':'danger-low');
+      badge.innerHTML = status==='ILLEGAL'?'🚫 Illégal':status==='GRAY'?'⚖️ Zone grise':'✅ Légal';
+      dangerBar.appendChild(badge);
+    }
+
+    content.textContent = fullText;
+  } catch(e){
+    content.textContent = 'Erreur lors de la recherche. Réessaie !';
+  }
+
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
