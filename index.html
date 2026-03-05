@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BrainrotAI</title>
+<title>Nomar_IA</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
 
@@ -42,10 +42,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 24px;
+    padding: 10px 14px;
     background: var(--bg2);
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+    gap: 10px;
+    min-width: 0;
   }
   .logo {
     font-family: 'Orbitron', monospace;
@@ -59,34 +61,97 @@
   .logo span { font-weight: 400; opacity: 0.6; }
 
   /* TABS */
-  .tabs {
-    display: flex;
-    gap: 8px;
+  /* HAMBURGER MENU */
+  .hamburger {
+    position: relative;
+    flex-shrink: 0;
   }
-  .tab {
-    padding: 6px 16px;
-    border-radius: 20px;
+  .hamburger-btn {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--bg3);
     border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
     transition: all 0.2s;
-    letter-spacing: 1px;
+    padding: 0;
+  }
+  .hamburger-btn:hover { border-color: var(--accent2); }
+  .hamburger-btn.open { border-color: var(--accent); background: rgba(124,58,237,0.15); }
+  .burger-line {
+    width: 18px; height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all 0.3s;
+  }
+  .hamburger-btn.open .burger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger-btn.open .burger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger-btn.open .burger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    min-width: 200px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    display: none;
+    z-index: 9999;
+    animation: dropDown 0.2s ease;
+  }
+  .dropdown-menu.open { display: block; }
+  @keyframes dropDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
     text-transform: uppercase;
   }
-  .tab.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: white;
-    box-shadow: 0 0 12px rgba(124,58,237,0.5);
+  .dropdown-item:hover { background: rgba(124,58,237,0.1); color: var(--text); }
+  .dropdown-item.active { color: var(--accent2); background: rgba(124,58,237,0.08); }
+  .dropdown-item .item-icon { font-size: 1.1rem; width: 20px; text-align: center; }
+  .dropdown-item .active-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent2);
+    margin-left: auto;
+    box-shadow: 0 0 6px var(--accent2);
+    display: none;
   }
-  .tab:hover:not(.active) { border-color: var(--accent2); color: var(--accent2); }
+  .dropdown-item.active .active-dot { display: block; }
+  .dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+  .current-tab-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    color: var(--accent2);
+    letter-spacing: 1px;
+    margin-left: 8px;
+  }
 
   /* PANELS */
-  .panels { flex: 1; overflow: hidden; position: relative; }
+  .panels { flex: 1; overflow: hidden; position: relative; z-index: 0; }
   .panel { display: none; height: 100%; flex-direction: column; }
   .panel.active { display: flex; }
 
@@ -522,7 +587,7 @@
     100% { transform: translateY(-10px) translateX(20px); opacity: 0; }
   }
 
-  .panels, .header { position: relative; z-index: 1; }
+  .panels { position: relative; z-index: 0; } .header { position: relative; z-index: 200; }
 </style>
 </head>
 <body>
@@ -530,11 +595,29 @@
 <div class="particles" id="particles"></div>
 
 <div class="header">
-  <div class="logo">BRAINROT<span>AI</span></div>
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('chat')">💬 IA Principale</button>
-    <button class="tab" onclick="switchTab('trade')">🔄 Trade Analyzer</button>
-    <button class="tab" onclick="switchTab('urbex')">🏚️ Urbex</button>
+  <div class="logo">NOMAR_<span>IA</span></div>
+  <div class="hamburger" id="hamburger">
+    <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMenu()">
+      <div class="burger-line"></div>
+      <div class="burger-line"></div>
+      <div class="burger-line"></div>
+    </button>
+    <div class="dropdown-menu" id="dropdownMenu">
+      <button class="dropdown-item active" id="item-chat" onclick="selectTab('chat')">
+        <span class="item-icon">💬</span> IA Principale
+        <span class="active-dot"></span>
+      </button>
+      <div class="dropdown-divider"></div>
+      <button class="dropdown-item" id="item-trade" onclick="selectTab('trade')">
+        <span class="item-icon">🔄</span> Trade Analyzer
+        <span class="active-dot"></span>
+      </button>
+      <div class="dropdown-divider"></div>
+      <button class="dropdown-item" id="item-urbex" onclick="selectTab('urbex')">
+        <span class="item-icon">🏚️</span> Urbex
+        <span class="active-dot"></span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -851,7 +934,7 @@ function addMsg(role, text, showRedirect=false){
     const chip = document.createElement('div');
     chip.innerHTML = '🔄 Ouvrir le Trade Analyzer';
     chip.className = 'redirect-chip';
-    chip.onclick = () => switchTabDirect('trade');
+    chip.onclick = () => selectTab('trade');
     bubble.appendChild(document.createElement('br'));
     bubble.appendChild(chip);
   }
@@ -862,7 +945,7 @@ function addMsg(role, text, showRedirect=false){
     chip.style.borderColor = '#f97316';
     chip.style.color = '#f97316';
     chip.style.background = 'rgba(249,115,22,0.1)';
-    chip.onclick = () => switchTabDirect('urbex');
+    chip.onclick = () => selectTab('urbex');
     bubble.appendChild(document.createElement('br'));
     bubble.appendChild(chip);
   }
@@ -874,17 +957,35 @@ function addMsg(role, text, showRedirect=false){
   return div;
 }
 
+function toggleMenu(){
+  const btn = document.getElementById('hamburgerBtn');
+  const menu = document.getElementById('dropdownMenu');
+  btn.classList.toggle('open');
+  menu.classList.toggle('open');
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(e){
+  const hamburger = document.getElementById('hamburger');
+  if(!hamburger.contains(e.target)){
+    document.getElementById('hamburgerBtn').classList.remove('open');
+    document.getElementById('dropdownMenu').classList.remove('open');
+  }
+});
+
+function selectTab(tab){
+  switchTabDirect(tab);
+  document.getElementById('hamburgerBtn').classList.remove('open');
+  document.getElementById('dropdownMenu').classList.remove('open');
+}
+
 function switchTabDirect(tab){
-  const tabs = ['chat','trade','urbex'];
-  document.querySelectorAll('.tab').forEach((t,i)=>{
-    t.classList.toggle('active', tabs[i]===tab);
+  ['chat','trade','urbex'].forEach(t => {
+    document.getElementById('item-'+t).classList.toggle('active', t===tab);
   });
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
 }
-document.querySelectorAll('.tab')[0].onclick = ()=>switchTabDirect('chat');
-document.querySelectorAll('.tab')[1].onclick = ()=>switchTabDirect('trade');
-document.querySelectorAll('.tab')[2].onclick = ()=>switchTabDirect('urbex');
 
 function addTyping(){
   const msgs = document.getElementById('messages');
