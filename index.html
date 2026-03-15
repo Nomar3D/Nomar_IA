@@ -1,0 +1,2211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nomar_IA</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
+
+:root {
+  --bg: #070710;
+  --bg2: #0d0d1f;
+  --bg3: #12122a;
+  --accent: #7c3aed;
+  --accent2: #a855f7;
+  --gold: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --border: rgba(124,58,237,0.25);
+  --sidebar-w: 280px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  height: 100dvh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+  z-index: 100;
+  position: relative;
+}
+
+.sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-small {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: var(--accent2);
+  flex: 1;
+}
+.logo-small span { color: var(--text); }
+
+.new-chat-btn {
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.new-chat-btn:hover { background: var(--accent2); transform: scale(1.05); }
+
+/* Nav tabs */
+.sidebar-nav {
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.15s;
+  text-align: left;
+  width: 100%;
+}
+.nav-item:hover { background: rgba(124,58,237,0.1); color: var(--text); }
+.nav-item.active { background: rgba(124,58,237,0.2); color: var(--accent2); }
+.nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+/* Conversations list */
+.conversations {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+.conversations::-webkit-scrollbar { width: 3px; }
+.conversations::-webkit-scrollbar-thumb { background: var(--border); }
+
+.conv-section-title {
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 8px 4px;
+  font-family: 'Orbitron', monospace;
+}
+
+.conv-item {
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--muted);
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  group: true;
+}
+.conv-item:hover { background: rgba(124,58,237,0.1); color: var(--text); }
+.conv-item.active-conv { background: rgba(124,58,237,0.15); color: var(--text); }
+.conv-item .conv-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.conv-delete {
+  opacity: 0;
+  background: none;
+  border: none;
+  color: var(--red);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+.conv-item:hover .conv-delete { opacity: 1; }
+
+/* Sidebar footer */
+.sidebar-footer {
+  padding: 12px 8px;
+  border-top: 1px solid var(--border);
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.user-card:hover { background: rgba(124,58,237,0.1); }
+.user-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 0.88rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 0.72rem; color: var(--muted); }
+.user-settings-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.15s;
+}
+.user-settings-btn:hover { color: var(--text); }
+
+/* ═══════════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════════ */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* Mobile header */
+.mobile-header {
+  display: none;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  z-index: 50;
+}
+.mobile-menu-btn {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px;
+}
+.mobile-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent2);
+  flex: 1;
+}
+.mobile-new-btn {
+  background: none;
+  border: none;
+  color: var(--accent2);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Panels */
+.panels { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.panel { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.panel.active { display: flex; }
+
+/* ═══════════════════════════════════════════
+   CHAT PANEL
+═══════════════════════════════════════════ */
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.messages::-webkit-scrollbar { width: 4px; }
+.messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.msg { display: flex; gap: 10px; animation: fadeUp 0.25s ease; max-width: 100%; }
+.msg.user { flex-direction: row-reverse; }
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700;
+  flex-shrink: 0;
+}
+.avatar.ai { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+.avatar.user-av {
+  background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+  font-size: 0.8rem;
+}
+.img-loading { color: var(--muted); font-size: 0.92rem; }
+.web-badge { margin-top:8px; padding:4px 10px; background:rgba(139,92,246,0.15); border:1px solid rgba(139,92,246,0.4); border-radius:6px; font-size:0.78rem; color:#a78bfa; display:inline-block; }
+.bubble {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  max-width: min(75%, 500px);
+  word-break: break-word;
+}
+.msg.assistant .bubble {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-top-left-radius: 4px;
+}
+.msg.user .bubble {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  border-top-right-radius: 4px;
+}
+
+/* Typing */
+.typing-dots { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent2); animation: bounce 1.2s infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-8px)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* Redirect chips */
+.redirect-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.redirect-chip {
+  background: rgba(124,58,237,0.2);
+  border: 1px solid var(--accent);
+  color: var(--accent2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.redirect-chip:hover { background: rgba(124,58,237,0.4); transform: translateY(-1px); }
+
+/* Input */
+.input-bar {
+  padding: 12px 16px;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.input-bar input {
+  flex: 1;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 16px;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input-bar input:focus { border-color: var(--accent2); }
+.attach-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 42px; height: 42px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: color 0.2s, background 0.2s;
+}
+.attach-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.attach-btn svg { width: 18px; height: 18px; }
+.send-btn {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.send-btn:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(124,58,237,0.4); }
+.send-btn svg { width: 18px; height: 18px; fill: white; }
+
+/* ═══════════════════════════════════════════
+   TRADE PANEL
+═══════════════════════════════════════════ */
+.trade-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.trade-panel::-webkit-scrollbar { width: 3px; }
+.trade-panel::-webkit-scrollbar-thumb { background: var(--border); }
+
+.offers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.offer-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.offer-header { font-family: 'Orbitron', monospace; font-size: 0.82rem; font-weight: 900; letter-spacing: 1px; }
+.offer-header.your { color: var(--green); }
+.offer-header.their { color: var(--red); }
+.offer-subtitle { font-size: 0.72rem; color: var(--muted); }
+.offer-slots { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.offer-slot {
+  background: var(--bg3);
+  border: 1px solid rgba(100,116,139,0.2);
+  border-radius: 8px;
+  padding: 7px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  animation: fadeUp 0.2s ease;
+}
+.slot-name { font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
+.slot-tag { font-size: 0.62rem; padding: 1px 5px; border-radius: 6px; font-weight: 700; }
+.slot-remove {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: rgba(239,68,68,0.2);
+  border: none;
+  color: var(--red);
+  cursor: pointer;
+  font-size: 0.7rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-left: 6px;
+  transition: background 0.15s;
+}
+.slot-remove:hover { background: rgba(239,68,68,0.4); }
+.add-brainrot-btn {
+  border: 2px dashed rgba(100,116,139,0.3);
+  background: transparent;
+  border-radius: 10px;
+  padding: 9px;
+  color: var(--muted);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.add-brainrot-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+.add-brainrot-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.offer-value {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-align: center;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+.analyze-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+.analyze-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(124,58,237,0.4); }
+.analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Result */
+.result-box { display: none; background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+.result-box.show { display: block; animation: fadeUp 0.3s ease; }
+.verdict { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.verdict-icon { font-size: 2rem; }
+.verdict-label { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; }
+.verdict-label.win { color: var(--green); }
+.verdict-label.lose { color: var(--red); }
+.verdict-label.fair { color: var(--gold); }
+.stats-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; margin-bottom: 12px; }
+.stat-box { background: var(--bg3); border-radius: 10px; padding: 10px; text-align: center; }
+.stat-box .val { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; color: var(--accent2); }
+.stat-box .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+.ai-analysis {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--muted);
+  border-left: 3px solid var(--accent);
+  padding-left: 12px;
+  white-space: pre-wrap;
+}
+.loading-analysis { display: flex; gap: 6px; align-items: center; color: var(--muted); font-size: 0.85rem; }
+
+/* Rarity colors */
+.rarity-common { background: rgba(100,116,139,0.2); color: #94a3b8; }
+.rarity-rare { background: rgba(59,130,246,0.2); color: #60a5fa; }
+.rarity-epic { background: rgba(139,92,246,0.2); color: #a78bfa; }
+.rarity-legendary { background: rgba(245,158,11,0.2); color: #f59e0b; }
+.rarity-mythic { background: rgba(239,68,68,0.2); color: #f87171; }
+.rarity-god { background: rgba(236,72,153,0.2); color: #f472b6; }
+.rarity-secret { background: rgba(6,182,212,0.2); color: #22d3ee; }
+.rarity-og { background: rgba(16,185,129,0.2); color: #34d399; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 460px;
+  max-height: 85dvh;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeUp 0.25s ease;
+}
+.modal-box::-webkit-scrollbar { width: 3px; }
+.modal-box::-webkit-scrollbar-thumb { background: var(--border); }
+.modal-header { display: flex; align-items: flex-start; justify-content: space-between; }
+.modal-title { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; }
+.modal-subtitle { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+.modal-close {
+  width: 28px; height: 28px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.modal-close:hover { background: rgba(239,68,68,0.2); color: var(--red); }
+.modal-section { display: flex; flex-direction: column; gap: 6px; }
+.modal-label { font-family: 'Orbitron', monospace; font-size: 0.62rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+.search-input {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--accent2); }
+.searchable-select { position: relative; }
+.select-dropdown {
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 9999;
+  display: none;
+  margin-top: 4px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.select-dropdown.open { display: block; }
+.select-dropdown::-webkit-scrollbar { width: 3px; }
+.select-dropdown::-webkit-scrollbar-thumb { background: var(--border); }
+.dropdown-option {
+  padding: 9px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  transition: background 0.1s;
+}
+.dropdown-option:hover { background: rgba(124,58,237,0.15); }
+.opt-rarity { font-size: 0.65rem; padding: 2px 7px; border-radius: 8px; font-weight: 700; }
+.traits-chips-grid {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  max-height: 130px;
+  overflow-y: auto;
+  padding: 2px 0;
+}
+.traits-chips-grid::-webkit-scrollbar { width: 3px; }
+.traits-chips-grid::-webkit-scrollbar-thumb { background: var(--border); }
+.trait-chip-select {
+  padding: 4px 11px;
+  border-radius: 20px;
+  border: 1px solid rgba(100,116,139,0.3);
+  background: var(--bg3);
+  color: var(--muted);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.trait-chip-select:hover { border-color: var(--accent2); color: var(--accent2); }
+.trait-chip-select.selected { background: rgba(124,58,237,0.25); border-color: var(--accent); color: var(--accent2); }
+.modal-actions { display: flex; gap: 10px; padding-top: 4px; }
+.modal-cancel {
+  flex: 1; padding: 11px;
+  border-radius: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.modal-cancel:hover { border-color: var(--accent2); }
+.modal-add {
+  flex: 2; padding: 11px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--gold), #d97706);
+  border: none;
+  color: #000;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 1px;
+}
+.modal-add:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(245,158,11,0.4); }
+
+/* ═══════════════════════════════════════════
+   URBEX PANEL
+═══════════════════════════════════════════ */
+.urbex-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.urbex-panel::-webkit-scrollbar { width: 3px; }
+.urbex-panel::-webkit-scrollbar-thumb { background: var(--border); }
+.urbex-title { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; color: var(--gold); }
+.urbex-subtitle { font-size: 0.85rem; color: var(--muted); }
+.urbex-input-row { display: flex; gap: 10px; }
+.urbex-input-row input {
+  flex: 1;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 16px;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.urbex-input-row input:focus { border-color: var(--gold); }
+.urbex-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: none;
+  border-radius: 12px;
+  color: #000;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 11px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.urbex-btn:hover { transform: translateY(-1px); }
+.urbex-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.quick-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.quick-tag {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 600;
+}
+.quick-tag:hover { border-color: var(--gold); color: var(--gold); }
+.urbex-result {
+  display: none;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.urbex-result.show { display: block; animation: fadeUp 0.3s ease; }
+.urbex-result-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.urbex-result-title { font-family: 'Orbitron', monospace; font-size: 0.88rem; font-weight: 700; }
+.urbex-danger-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+.danger-badge {
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+.danger-high { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+.danger-med { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+.danger-low { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+.urbex-content {
+  padding: 16px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.urbex-loading { display: flex; gap: 6px; align-items: center; color: var(--gold); font-size: 0.85rem; }
+.dot-orange { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); animation: bounce 1.2s infinite; }
+.dot-orange:nth-child(2) { animation-delay: 0.2s; }
+.dot-orange:nth-child(3) { animation-delay: 0.4s; }
+
+/* ═══════════════════════════════════════════
+   AUTH MODAL
+═══════════════════════════════════════════ */
+.auth-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(6px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.auth-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 400px;
+  padding: 28px;
+  animation: fadeUp 0.3s ease;
+}
+.auth-logo {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--accent2);
+  text-align: center;
+  margin-bottom: 6px;
+}
+.auth-logo span { color: var(--text); }
+.auth-tagline { text-align: center; font-size: 0.82rem; color: var(--muted); margin-bottom: 24px; }
+.auth-tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--bg3); border-radius: 10px; padding: 4px; }
+.auth-tab {
+  flex: 1; padding: 8px;
+  background: none; border: none;
+  color: var(--muted);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem; font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+.auth-tab.active { background: var(--accent); color: white; }
+.auth-field { margin-bottom: 14px; }
+.auth-field label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+.auth-field input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 14px;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.auth-field input:focus { border-color: var(--accent2); }
+.auth-submit {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+.auth-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,58,237,0.4); }
+.auth-error { color: var(--red); font-size: 0.82rem; margin-top: 8px; text-align: center; }
+.auth-guest {
+  text-align: center;
+  margin-top: 14px;
+}
+.auth-guest button {
+  background: none; border: none;
+  color: var(--muted); font-size: 0.82rem;
+  cursor: pointer; text-decoration: underline;
+  font-family: 'Rajdhani', sans-serif;
+}
+.auth-guest button:hover { color: var(--text); }
+
+/* ═══════════════════════════════════════════
+   SETTINGS MODAL
+═══════════════════════════════════════════ */
+.settings-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.settings-overlay.open { display: flex; }
+.settings-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85dvh;
+  overflow-y: auto;
+  animation: fadeUp 0.25s ease;
+}
+.settings-box::-webkit-scrollbar { width: 3px; }
+.settings-box::-webkit-scrollbar-thumb { background: var(--border); }
+.settings-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.settings-title { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; }
+.settings-close {
+  width: 28px; height: 28px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.settings-close:hover { background: rgba(239,68,68,0.2); color: var(--red); }
+.settings-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; }
+.settings-section-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.persona-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.persona-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  color: var(--muted);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.persona-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+.persona-btn.selected { background: rgba(124,58,237,0.2); border-color: var(--accent); color: var(--accent2); }
+.persona-emoji { font-size: 1.3rem; display: block; margin-bottom: 4px; }
+.custom-prompt-area {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 14px;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.2s;
+}
+.custom-prompt-area:focus { border-color: var(--accent2); }
+.settings-save {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+  width: 100%;
+}
+.settings-save:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(124,58,237,0.4); }
+.logout-btn {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 10px;
+  color: var(--red);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+}
+.logout-btn:hover { background: rgba(239,68,68,0.2); }
+
+/* Sidebar overlay on mobile */
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 99;
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE MOBILE
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    transform: translateX(-100%);
+    z-index: 100;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+  }
+  .sidebar-overlay.show { display: block; }
+  .mobile-header { display: flex; }
+  .offers-grid { grid-template-columns: 1fr; }
+  .messages { padding: 14px 12px; }
+  .input-bar { padding: 10px 12px; }
+  .bubble { max-width: 85%; font-size: 0.9rem; }
+  .urbex-input-row { flex-direction: column; }
+  .trade-panel { padding: 12px; }
+  .persona-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR OVERLAY (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-small">NOMAR_<span>IA</span></div>
+    <button class="new-chat-btn" onclick="newConversation()" title="Nouvelle conversation">✏️</button>
+  </div>
+
+  <div class="sidebar-nav">
+    <button class="nav-item" id="nav-trade" onclick="selectTab('trade')">
+      <span class="nav-icon">🔄</span> Trade Analyzer
+    </button>
+    <button class="nav-item" id="nav-urbex" onclick="selectTab('urbex')">
+      <span class="nav-icon">🏚️</span> Urbex Explorer
+    </button>
+  </div>
+
+  <div class="conversations" id="conversationList">
+    <div class="conv-section-title">Conversations</div>
+    <div id="convItems"></div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-card" id="userCard" onclick="openSettings()">
+      <div class="user-avatar" id="userAvatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">Invité</div>
+        <div class="user-role" id="userRole">Connexion pour sauvegarder</div>
+      </div>
+      <button class="user-settings-btn" onclick="openSettings(); event.stopPropagation()">⚙️</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- Mobile header -->
+  <div class="mobile-header">
+    <button class="mobile-menu-btn" onclick="openSidebar()">☰</button>
+    <div class="mobile-title" id="mobileTitle">IA Principale</div>
+    <button class="mobile-new-btn" onclick="newConversation()">✏️</button>
+  </div>
+
+  <div class="panels">
+    <!-- CHAT PANEL -->
+    <div class="panel active" id="panel-chat">
+      <div class="messages" id="messages">
+        <div class="msg assistant">
+          <div class="avatar ai">AI</div>
+          <div class="bubble">
+            Yo ! Je suis ton IA principale 🤖 Tu peux me parler de n'importe quoi. Si la conversation tourne autour de <strong>Steal a Brainrot</strong>, je te proposerai de switcher vers l'<strong>analyseur de trades</strong> 🔄
+          </div>
+        </div>
+      </div>
+      <div class="input-bar">
+        <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.csv,.json,.md" style="display:none" onchange="handleFileUpload(event)">
+        <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Joindre un fichier">
+          <span style="font-size:1.4rem;font-weight:300;line-height:1;">+</span>
+        </button>
+        <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+          <div id="filePreview" style="display:none;padding:6px 8px;background:rgba(139,92,246,0.15);border-radius:8px;font-size:0.78rem;color:#a78bfa;align-items:center;gap:8px;">
+            <img id="filePreviewImg" style="display:none;width:48px;height:48px;object-fit:cover;border-radius:6px;border:1px solid rgba(139,92,246,0.4);">
+            <span id="filePreviewName" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+            <button onclick="clearFile()" style="background:none;border:none;color:#a78bfa;cursor:pointer;font-size:0.9rem;padding:0;flex-shrink:0;">✕</button>
+          </div>
+          <input type="text" id="chatInput" placeholder="Écris ton message..." onkeydown="if(event.key==='Enter')sendChat()">
+        </div>
+        <button class="send-btn" onclick="sendChat()">
+          <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- TRADE PANEL -->
+    <div class="panel" id="panel-trade">
+      <div class="trade-panel">
+        <div id="brainrotLoading" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);font-size:0.8rem;color:var(--muted);">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <span id="loadingText">Chargement des brainrots...</span>
+        </div>
+        <div class="offers-grid">
+          <div class="offer-card">
+            <div class="offer-header your">Your Offer</div>
+            <div class="offer-subtitle">Add up to 4 brainrots</div>
+            <div class="offer-slots" id="yourSlots"></div>
+            <button class="add-brainrot-btn" onclick="openModal('your')" id="yourAddBtn"><span>+</span> Add Brainrot</button>
+            <div class="offer-value" id="yourValue">Value: ---</div>
+          </div>
+          <div class="offer-card">
+            <div class="offer-header their">Their Offer</div>
+            <div class="offer-subtitle">Add up to 4 brainrots</div>
+            <div class="offer-slots" id="theirSlots"></div>
+            <button class="add-brainrot-btn" onclick="openModal('their')" id="theirAddBtn"><span>+</span> Add Brainrot</button>
+            <div class="offer-value" id="theirValue">Value: ---</div>
+          </div>
+        </div>
+        <button class="analyze-btn" onclick="analyzeTrade()" id="analyzeBtn">⚡ Analyser le Trade</button>
+        <div class="result-box" id="resultBox">
+          <div class="verdict">
+            <div class="verdict-icon" id="verdictIcon"></div>
+            <div>
+              <div class="verdict-label" id="verdictLabel"></div>
+              <div style="font-size:0.78rem;color:var(--muted);margin-top:2px" id="verdictSub"></div>
+            </div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-box"><div class="val" id="myEffRps">-</div><div class="lbl">Ton offre</div></div>
+            <div class="stat-box" style="background:transparent;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">⚔️</div>
+            <div class="stat-box"><div class="val" id="theirEffRps">-</div><div class="lbl">Leur offre</div></div>
+          </div>
+          <div class="ai-analysis" id="aiAnalysis"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- URBEX PANEL -->
+    <div class="panel" id="panel-urbex">
+      <div class="urbex-panel">
+        <div>
+          <div class="urbex-title">🏚️ Urbex Explorer</div>
+          <div class="urbex-subtitle">Explore des lieux abandonnés, dangers et légalité</div>
+        </div>
+        <div class="urbex-input-row">
+          <input type="text" id="urbexInput" placeholder="Ex: usine abandonnée Nord France..." onkeydown="if(event.key==='Enter')searchUrbex()">
+          <button class="urbex-btn" onclick="searchUrbex()" id="urbexBtn">🔍 Explorer</button>
+        </div>
+        <div class="quick-tags">
+          <span class="quick-tag" onclick="quickSearch('lieux abandonnés France')">🇫🇷 France</span>
+          <span class="quick-tag" onclick="quickSearch('lieux abandonnés Belgique')">🇧🇪 Belgique</span>
+          <span class="quick-tag" onclick="quickSearch('usines abandonnées')">🏭 Usines</span>
+          <span class="quick-tag" onclick="quickSearch('hôpitaux abandonnés')">🏥 Hôpitaux</span>
+          <span class="quick-tag" onclick="quickSearch('châteaux abandonnés')">🏰 Châteaux</span>
+          <span class="quick-tag" onclick="quickSearch('conseils sécurité urbex')">🦺 Sécurité</span>
+          <span class="quick-tag" onclick="quickSearch('légalité urbex France')">⚖️ Légalité</span>
+        </div>
+        <div class="urbex-result" id="urbexResult">
+          <div class="urbex-result-header">
+            <div class="urbex-result-title" id="urbexResultTitle"></div>
+            <div class="urbex-danger-bar" id="urbexDangerBar"></div>
+          </div>
+          <div class="urbex-content" id="urbexContent"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADD BRAINROT -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Add Brainrot</div>
+        <div class="modal-subtitle" id="modalSide">Your Offer</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">BRAINROT</div>
+      <div class="searchable-select">
+        <input type="text" class="search-input" id="modalBrainrotInput" placeholder="Search brainrot..." oninput="filterModalDropdown()" onfocus="openModalDropdown()" autocomplete="off">
+        <div class="select-dropdown" id="modalBrainrotDropdown"></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">MUTATION (MAX 1)</div>
+      <select class="search-input" id="modalMutation" style="cursor:pointer;">
+        <option value="none">🚫 No mutation</option>
+        <option value="Gold">🟡 Gold (x1.25)</option>
+        <option value="Diamond">💎 Diamond (x2)</option>
+        <option value="Rainbow">🌈 Rainbow (x10)</option>
+        <option value="Bloodrot">🩸 Bloodrot (x8)</option>
+        <option value="Candy">🍬 Candy (x3)</option>
+        <option value="Lava">🔥 Lava (x6)</option>
+        <option value="Radioactive">☢️ Radioactive (x4)</option>
+        <option value="Divine">✨ Divine (x10)</option>
+        <option value="Galaxy">🌌 Galaxy (x5)</option>
+        <option value="Yin Yang">☯️ Yin Yang (x7)</option>
+      </select>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">TRAITS</div>
+      <input type="text" class="search-input" id="modalTraitFilter" placeholder="Filter traits..." oninput="filterModalTraits()" style="margin-bottom:8px;">
+      <div class="traits-chips-grid" id="modalTraitsGrid"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-add" onclick="addBrainrotToOffer()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authOverlay" style="display:none;">
+  <div class="auth-box">
+    <div class="auth-logo">NOMAR_<span>IA</span></div>
+    <div class="auth-tagline">Connecte-toi pour sauvegarder tes conversations</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="loginTab" onclick="switchAuthTab('login')">Connexion</button>
+      <button class="auth-tab" id="registerTab" onclick="switchAuthTab('register')">Inscription</button>
+    </div>
+    <div id="authForm">
+      <div class="auth-field">
+        <label>Nom d'utilisateur</label>
+        <input type="text" id="authUsername" placeholder="Ton pseudo...">
+      </div>
+      <div class="auth-field" id="authEmailField" style="display:none;">
+        <label>Email *</label>
+        <input type="email" id="authEmail" placeholder="ton@email.com">
+      </div>
+      <div class="auth-field">
+        <label>Mot de passe</label>
+        <input type="password" id="authPassword" placeholder="••••••••">
+      </div>
+      <div class="auth-error" id="authError"></div>
+      <button class="auth-submit" onclick="submitAuth()">Se connecter</button>
+    </div>
+    <div class="auth-guest">
+      <button onclick="continueAsGuest()">Continuer sans compte →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-box">
+    <div class="settings-header">
+      <div class="settings-title">⚙️ Paramètres</div>
+      <button class="settings-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-body">
+
+      <div>
+        <div class="settings-section-title">Compte</div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border-radius:10px;border:1px solid var(--border);">
+          <div class="user-avatar" id="settingsAvatar" style="width:42px;height:42px;font-size:1rem;">?</div>
+          <div>
+            <div style="font-weight:600" id="settingsName">Invité</div>
+            <div style="font-size:0.78rem;color:var(--muted)" id="settingsEmail">Non connecté</div>
+          </div>
+        </div>
+        <button id="authActionBtn" onclick="openAuthFromSettings()" style="width:100%;margin-top:10px;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;">🔐 Se connecter / S'inscrire</button>
+        <button id="proActionBtn" onclick="openProModal()" style="width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;display:none;">⚡ Passer Pro - 4€/mois</button>
+      </div>
+
+      <div>
+        <div class="settings-section-title">Personnalité de l'IA</div>
+        <div class="persona-grid" id="personaGrid">
+          <button class="persona-btn selected" data-persona="cool" onclick="selectPersona(this)">
+            <span class="persona-emoji">😎</span>Cool & Détendu
+          </button>
+          <button class="persona-btn" data-persona="ado" onclick="selectPersona(this)">
+            <span class="persona-emoji">🔥</span>Ado / Gamer
+          </button>
+          <button class="persona-btn" data-persona="formel" onclick="selectPersona(this)">
+            <span class="persona-emoji">👔</span>Formel
+          </button>
+          <button class="persona-btn" data-persona="humour" onclick="selectPersona(this)">
+            <span class="persona-emoji">😂</span>Humouristique
+          </button>
+          <button class="persona-btn" data-persona="sage" onclick="selectPersona(this)">
+            <span class="persona-emoji">🧙</span>Sage & Profond
+          </button>
+          <button class="persona-btn" data-persona="custom" onclick="selectPersona(this)">
+            <span class="persona-emoji">✏️</span>Personnalisé
+          </button>
+        </div>
+        <div id="customPromptDiv" style="margin-top:10px;display:none;">
+          <textarea class="custom-prompt-area" id="customPrompt" placeholder="Décris le comportement de l'IA... Ex: Tu es un expert en crypto qui parle de façon directe et technique."></textarea>
+        </div>
+      </div>
+
+      <button class="settings-save" onclick="saveSettings()">💾 Sauvegarder</button>
+
+      <div>
+        <button class="logout-btn" onclick="logout()" id="logoutBtn">🚪 Se déconnecter</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal Connect -->
+<div id="connectOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:400px;width:90%;text-align:center;position:relative;">
+    <button onclick="closeConnectPopup()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;">✕</button>
+    <div style="font-size:2.5rem;margin-bottom:12px;">😎</div>
+    <h2 style="margin:0 0 8px;color:var(--text);">Tu kiffes Nomar ?</h2>
+    <p style="color:var(--muted);font-size:0.9rem;margin:0 0 20px;line-height:1.5;">Connecte-toi pour une meilleure expérience et sauvegarder tes conversations !</p>
+    <button onclick="openAuthFromConnectPopup()" style="width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:10px;">🔐 Se connecter / S'inscrire</button>
+    <button onclick="closeConnectPopup()" style="width:100%;padding:10px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:10px;font-size:0.9rem;cursor:pointer;">Continuer sans compte</button>
+  </div>
+</div>
+
+<!-- Modal Pro -->
+<div id="proOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;position:relative;">
+    <button onclick="closeProModal()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;">✕</button>
+    <div style="font-size:2.5rem;margin-bottom:12px;">⚡</div>
+    <h2 style="color:var(--accent);margin:0 0 8px;">Nomar Pro</h2>
+    <p style="color:var(--muted);font-size:0.9rem;margin:0 0 20px;">Débloque toutes les fonctionnalités premium</p>
+    <div style="background:var(--bg3);border-radius:10px;padding:16px;text-align:left;margin-bottom:20px;">
+      <div style="margin-bottom:8px;">🔍 <strong>Recherche web en temps réel</strong></div>
+      <div style="margin-bottom:8px;">💬 <strong>Messages illimités</strong></div>
+      <div style="margin-bottom:8px;">🎭 <strong>Tous les personas</strong></div>
+      <div style="margin-bottom:8px;">📚 <strong>Conversations illimitées</strong></div>
+      <div>🚀 <strong>Réponses plus longues et détaillées</strong></div>
+    </div>
+    <div style="font-size:1.8rem;font-weight:800;color:var(--accent);margin-bottom:4px;">4€ <span style="font-size:1rem;font-weight:400;color:var(--muted);">/ mois</span></div>
+    <p style="color:var(--muted);font-size:0.78rem;margin:0 0 20px;">Résiliable à tout moment</p>
+    <button onclick="closeProModal()" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;">Bientôt disponible 🚀</button>
+  </div>
+</div>
+
+<script>
+const WORKER = 'https://nomar-ai-proxy.lucas-nomme29.workers.dev';
+
+// ─── PERSONAS ────────────────────────────────────────────────
+const PERSONAS = {
+  cool: "Tu t'appelles Nomar. Tu es un pote sympa et stylé, tu parles en français avec un ton naturel et détendu. Tu réponds comme un ami qui sait tout, jamais comme un robot ou un assistant. Tu ne dis JAMAIS que tu es une IA. Tu écris toujours en français correct, sans fautes d'orthographe.",
+  ado: "Tu t'appelles Nomar. Tu parles comme un ado gamer français, tu utilises le verlan, les expressions gaming, des emojis. T'es enthousiaste, tu connais tous les mèmes et les jeux vidéo. Tu ne dis JAMAIS que tu es une IA. Malgré le style familier, tu fais attention à l'orthographe.",
+  formel: "Tu t'appelles Nomar. Tu es un conseiller compétent et professionnel, tu parles en français avec un vocabulaire soutenu. Tu vouvoies l'utilisateur. Tu ne mentionnes JAMAIS être une IA. Tu écris toujours en français parfait, sans aucune faute.",
+  humour: "Tu t'appelles Nomar. T'es un pote marrant, tu fais des blagues et des jeux de mots. T'es drôle mais utile. Tu ne dis JAMAIS que tu es une IA. Tu écris en français correct malgré le ton décontracté.",
+  sage: "Tu t'appelles Nomar. Tu es quelqu'un de sage et réfléchi, tu parles avec profondeur et calme. Tu ne mentionnes JAMAIS être une IA. Tu écris toujours en français parfait.",
+  custom: ""
+};
+
+// ─── STATE ───────────────────────────────────────────────────
+let currentUser = null;
+let currentPersona = 'cool';
+let customPersonaText = '';
+let chatHistory = [];
+let conversations = [];
+let currentConvId = null;
+let currentTab = 'chat';
+
+// ─── LOCAL STORAGE HELPERS ───────────────────────────────────
+function saveToStorage(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+function loadFromStorage(key){ try{ const v=localStorage.getItem(key); return v?JSON.parse(v):null; }catch(e){ return null; } }
+
+// ─── BACKEND ─────────────────────────────────────────────────
+const BACKEND = 'https://nomar-ia-backend-production.up.railway.app';
+
+// ─── AUTH ────────────────────────────────────────────────────
+function initAuth(){
+  const saved = loadFromStorage('nomar_user');
+  if(saved){
+    currentUser = saved;
+    currentUser.is_pro = currentUser.is_pro === true || currentUser.is_pro === 'true';
+    onLogin();
+  } else {
+    onGuest();
+    // Pas de popup au démarrage — on laisse l'utilisateur parler librement
+  }
+}
+
+function switchAuthTab(tab){
+  document.getElementById('loginTab').classList.toggle('active', tab==='login');
+  document.getElementById('registerTab').classList.toggle('active', tab==='register');
+  document.getElementById('authEmailField').style.display = tab==='register' ? 'block' : 'none';
+  document.getElementById('authError').textContent = '';
+  const btn = document.querySelector('.auth-submit');
+  btn.textContent = tab==='login' ? 'Se connecter' : "S'inscrire";
+  btn.dataset.mode = tab;
+}
+
+async function submitAuth(){
+  const username = document.getElementById('authUsername').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const mode = document.querySelector('.auth-submit').dataset.mode || 'login';
+  const errEl = document.getElementById('authError');
+  const btn = document.querySelector('.auth-submit');
+  const email = document.getElementById('authEmail')?.value?.trim() || '';
+  if(!username || !password){ errEl.textContent = 'Remplis tous les champs !'; return; }
+  if(mode === 'register'){
+    if(!email){ errEl.textContent = 'L\'adresse mail est obligatoire !'; return; }
+    if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){ errEl.textContent = 'Adresse mail invalide !'; return; }
+    if(password.length < 5){ errEl.textContent = 'Mot de passe trop court (min 5 caractères)'; return; }
+    if(!/[a-zA-Z]/.test(password)){ errEl.textContent = 'Le mot de passe doit contenir des lettres'; return; }
+    if(!/[0-9]/.test(password)){ errEl.textContent = 'Le mot de passe doit contenir des chiffres'; return; }
+  }
+  btn.textContent = '⏳...'; btn.disabled = true;
+  try {
+    const res = await fetch(BACKEND + (mode==='register' ? '/register' : '/login'), {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({username, password, email: mode==='register' ? email : undefined})
+    });
+    const data = await res.json();
+    if(data.error){ errEl.textContent = data.error; btn.textContent = mode==='login'?'Se connecter':"S'inscrire"; btn.disabled=false; return; }
+    currentUser = data.user;
+    saveToStorage('nomar_user', currentUser);
+    saveToStorage('nomar_visited', true);
+    document.getElementById('authOverlay').style.display = 'none';
+    onLogin();
+  } catch(e) {
+    errEl.textContent = 'Erreur serveur'; btn.textContent = mode==='login'?'Se connecter':"S'inscrire"; btn.disabled=false;
+  }
+}
+
+// ─── FILE UPLOAD ─────────────────────────────────────────────
+let attachedFile = null;
+let attachedFileContent = null;
+
+function handleFileUpload(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  attachedFile = file;
+  const preview = document.getElementById('filePreview');
+  const nameEl = document.getElementById('filePreviewName');
+  const imgEl = document.getElementById('filePreviewImg');
+  preview.style.display = 'flex';
+
+  if(file.type.startsWith('image/')){
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      attachedFileContent = e.target.result; // base64 data URL
+      imgEl.src = e.target.result;
+      imgEl.style.display = 'block';
+      nameEl.textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    imgEl.style.display = 'none';
+    nameEl.textContent = '📎 ' + file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => { attachedFileContent = e.target.result; };
+    reader.readAsText(file);
+  }
+}
+
+function clearFile(){
+  attachedFile = null;
+  attachedFileContent = null;
+  document.getElementById('filePreview').style.display = 'none';
+  document.getElementById('filePreviewImg').style.display = 'none';
+  document.getElementById('filePreviewImg').src = '';
+  document.getElementById('fileInput').value = '';
+}
+
+// ─── IMAGE GENERATION (Pollinations.ai) ──────────────────────
+async function generateImage(prompt){
+  const msgs = document.getElementById('messages');
+  const uid = 'imgbubble_' + Date.now();
+  const loadDiv = document.createElement('div');
+  loadDiv.className = 'msg assistant';
+  loadDiv.innerHTML = '<div class="avatar ai">AI</div><div class="bubble" id="' + uid + '"><span class="img-loading">🎨 Génération en cours<span class="dots">.</span></span></div>';
+  msgs.appendChild(loadDiv);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  let dotCount = 1;
+  const dotInterval = setInterval(() => {
+    const dotsEl = document.querySelector('#' + uid + ' .dots');
+    if(dotsEl){ dotCount = (dotCount % 3) + 1; dotsEl.textContent = '.'.repeat(dotCount); }
+    else clearInterval(dotInterval);
+  }, 500);
+
+  const timeout = setTimeout(() => {
+    clearInterval(dotInterval);
+    const bubble = document.getElementById(uid);
+    if(bubble && bubble.querySelector('.img-loading')){
+      bubble.innerHTML = '❌ Génération trop longue. Réessaie !';
+    }
+  }, 90000);
+
+  try {
+    const resp = await fetch(WORKER, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ generateImage: true, prompt })
+    });
+    if(!resp.ok) throw new Error('Worker error ' + resp.status);
+    const data = await resp.json();
+    clearInterval(dotInterval);
+    clearTimeout(timeout);
+    const bubble = document.getElementById(uid);
+    if(!bubble) return;
+
+    if(data.error === 'loading'){
+      bubble.innerHTML = '⏳ ' + (data.message || 'Modèle en chargement, réessaie dans 20s !');
+      return;
+    }
+    if(data.error){
+      bubble.innerHTML = '❌ Erreur : ' + (data.message || 'Réessaie dans quelques secondes !');
+      return;
+    }
+    if(data.imageBase64){
+      bubble.innerHTML = '<img src="' + data.imageBase64 + '" style="max-width:100%;border-radius:10px;display:block;margin-bottom:6px;"><div style="font-size:0.75rem;color:var(--muted);">🎨 ' + escHtml(prompt) + '</div>';
+      msgs.scrollTop = msgs.scrollHeight;
+    } else {
+      bubble.innerHTML = '❌ Aucune image reçue. Réessaie !';
+    }
+  } catch(e) {
+    clearInterval(dotInterval);
+    clearTimeout(timeout);
+    const bubble = document.getElementById(uid);
+    if(bubble) bubble.innerHTML = '❌ Erreur de génération. Réessaie dans quelques secondes !';
+  }
+}
+
+function addMsgWithImage(role, text, imgSrc){
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role==='user'?'user':'assistant');
+  const avatarHtml = role==='user'
+    ? `<div class="avatar user-av">${currentUser?currentUser.username[0].toUpperCase():'T'}</div>`
+    : '<div class="avatar ai">AI</div>';
+  div.innerHTML = avatarHtml + `<div class="bubble"><img src="${imgSrc}" style="max-width:200px;max-height:200px;border-radius:8px;display:block;margin-bottom:${text?'6px':'0'}">${text ? renderMarkdown(text) : ''}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addMsg(role, content){
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role==='user'?'user':'assistant');
+  const letter = currentUser ? currentUser.username[0].toUpperCase() : 'T';
+  div.innerHTML = role==='user'
+    ? `<div class="avatar user-av">${letter}</div><div class="bubble">${escHtml(content)}</div>`
+    : `<div class="avatar ai">AI</div><div class="bubble">${content}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function addTyping(){
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg assistant';
+  div.innerHTML = `<div class="avatar ai">AI</div><div class="bubble"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function sendChat(){
+  // Popup après 5 messages en mode invité
+  if(!currentUser){
+    const guestCount = (loadFromStorage('nomar_guest_msg_count') || 0) + 1;
+    saveToStorage('nomar_guest_msg_count', guestCount);
+    if(guestCount === 5){
+      setTimeout(showConnectPopup, 800);
+    }
+  }
+  const input = document.getElementById('chatInput');
+  let msg = input.value.trim();
+  if(!msg && !attachedFile) return;
+  if(!msg) msg = '(fichier joint)';
+  input.value = '';
+
+  // Détection côté client : si c'est une demande d'image → générer directement
+  const imageKeywords = ['génère', 'crée', 'fais', 'dessine', 'montre', 'génerer', 'créer', 'dessiner', 'image', 'photo', 'dessin', 'illustration', 'génère-moi', 'fais-moi'];
+  const isImageRequest = imageKeywords.some(k => msg.toLowerCase().includes(k)) && 
+    ['image', 'photo', 'dessin', 'illustration', 'pic', 'picture'].some(k => msg.toLowerCase().includes(k));
+  if(isImageRequest){
+    addMsg('user', msg);
+    chatHistory.push({role:'user', content:msg});
+    // Extraire la description de l'image depuis le message
+    const imagePrompt = msg.replace(/tu peux|peux-tu|est-ce que tu peux|génère|crée|fais|dessine|montre|moi|une|un|de|stp|svp|s'il te plaît/gi, '').trim() || msg;
+    generateImage(imagePrompt);
+    return;
+  }
+
+  let fullMsg = msg;
+  let pendingImage = null;
+  if(attachedFile && attachedFileContent){
+    if(attachedFile.type.startsWith('image/')){
+      pendingImage = attachedFileContent; // base64 data URL
+      fullMsg = msg !== '(fichier joint)' ? msg : '';
+    } else {
+      fullMsg = msg + '\n\n[FICHIER: ' + attachedFile.name + ']\n' + attachedFileContent.slice(0, 3000);
+    }
+    clearFile();
+  }
+
+  // Show user message with image preview if any
+  if(pendingImage){
+    addMsgWithImage('user', msg || '(image)', pendingImage);
+  } else {
+    addMsg('user', msg);
+  }
+  chatHistory.push({role:'user', content:fullMsg || msg});
+
+  const typingEl = addTyping();
+
+  try {
+    const response = await fetch(WORKER, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        max_tokens: currentUser?.is_pro ? 2000 : 1000,
+        system: getSystemPrompt(),
+        messages: chatHistory,
+        userId: currentUser?.id || null,
+        isPro: currentUser?.is_pro || false,
+        imageData: pendingImage || null
+      })
+    });
+    const data = await response.json();
+    let text = data.content?.[0]?.text || 'Désolé, je n\'ai pas pu répondre.';
+
+    // Handle redirects
+    let redirectType = null;
+    if(text.includes('[REDIRECT_TRADE]')){ redirectType='trade'; text=text.replace('[REDIRECT_TRADE]','').trim(); }
+    if(text.includes('[REDIRECT_URBEX]')){ redirectType='urbex'; text=text.replace('[REDIRECT_URBEX]','').trim(); }
+    // Détecter si l'IA parle de recherche internet → ouvrir modal Pro
+    const searchKeywords = ['passe à **Nomar Pro**', 'Nomar Pro** pour accéder à la recherche', 'version gratuite. Passe'];
+    if(searchKeywords.some(k => text.includes(k))){ setTimeout(openProModal, 800); }
+
+    // Détecter demande de génération d'image → [GENERATE_IMAGE: prompt]
+    const imgMatch = text.match(/\[GENERATE_IMAGE:\s*(.+?)\]/i);
+    if(imgMatch){
+      text = text.replace(imgMatch[0], '').trim();
+      if(text) addMsg('assistant', text);
+      generateImage(imgMatch[1].trim());
+      return;
+    }
+
+    // Détecter tag [GENERATE_IMAGE: prompt]
+    const imgGenMatch = text.match(/\[GENERATE_IMAGE:[\s\S]*?\]/);
+    if(imgGenMatch){
+      const imgPrompt = imgGenMatch[0].replace('[GENERATE_IMAGE:','').replace(']','').trim();
+      text = text.replace(imgGenMatch[0], '').trim();
+      generateImage(imgPrompt);
+    }
+
+    // Détecter tag [GENERATE_IMAGE: prompt]
+    // Handle image generation BEFORE displaying text
+    const imgMatch2 = text.match(/\[GENERATE_IMAGE:\s*([^\]]+)\]/i);
+    if(imgMatch2){
+      text = text.replace(imgMatch2[0], '').trim();
+    }
+    typingEl.remove();
+    if(text) {
+      const msgEl = addMsg('assistant', text);
+    }
+    chatHistory.push({role:'assistant', content:text});
+    if(imgMatch2){
+      generateImage(imgMatch2[1].trim());
+    }
+
+    // Add redirect chips
+    if(redirectType){
+      const chipsDiv = document.createElement('div');
+      chipsDiv.className = 'redirect-chips';
+      if(redirectType==='trade'){
+        chipsDiv.innerHTML = `<button class="redirect-chip" onclick="selectTab('trade')">🔄 Ouvrir le Trade Analyzer</button>`;
+      } else {
+        chipsDiv.innerHTML = `<button class="redirect-chip" onclick="selectTab('urbex')">🏚️ Ouvrir l'Urbex Explorer</button>`;
+      }
+      msgEl.querySelector('.bubble').appendChild(chipsDiv);
+    }
+
+    // Auto-save conversation
+    const conv = conversations.find(c => c.id === currentConvId);
+    if(conv){
+      conv.messages = [...chatHistory];
+      conv.title = getConvTitle();
+      saveConversations();
+      renderConvList();
+    }
+
+  } catch(e){
+    typingEl.remove();
+    addMsg('ai', 'Erreur : ' + (e.message||e));
+  }
+}
+
+</script>
+<script>
+// ─── BRAINROT DATABASE ───────────────────────────────────────
+let brainrotDB = [];
+let traitDB = [
+  'Meowl','Halloween','Rain','Snowy','Starfall','Hat','Water','Galactic',
+  'Bombardiro','Extinct','Spider','Paint','Tie','Strawberry','Taco',
+  'Tung Tung','Crab','Rap Concert','Sombrero','Glitch','Divine','Bloodrot',
+  'Orcalero','La Vacca','Festivo','Sleepy','Radioactive'
+];
+
+const MUTATION_MULT = {
+  none:1, Gold:1.25, Diamond:2, Rainbow:10, Galaxy:5,
+  Lava:6, Radioactive:4, Divine:10, Bloodrot:8, 'Yin Yang':7, Candy:3
+};
+const TRAIT_MULT = {
+  Strawberry:8, Galactic:4, Bombardiro:4, Orcalero:4,
+  'La Vacca':4, Taco:2, Festivo:3, Sleepy:0.5,
+  Meowl:6, 'Tung Tung':3, Glitch:5, Spider:3, Extinct:4
+};
+const RARITY_COLORS = {
+  'Common':'rarity-common','Rare':'rarity-rare','Epic':'rarity-epic',
+  'Legendary':'rarity-legendary','Mythic':'rarity-mythic','Brainrot God':'rarity-god',
+  'Secret':'rarity-secret','OG':'rarity-og'
+};
+
+let yourOffer = [];
+let theirOffer = [];
+let currentModalSide = 'your';
+let modalSelectedTraits = [];
+let modalSelectedBrainrot = null;
+
+function parseRps(str){ if(!str) return 0; str=String(str).trim().replace(',','.'); const m=str.match(/([\d.]+)\s*([KMBTkmbq]?)/i); if(!m) return parseFloat(str)||0; let v=parseFloat(m[1]); const s=m[2].toUpperCase(); if(s==='K')v*=1e3; else if(s==='M')v*=1e6; else if(s==='B')v*=1e9; else if(s==='T')v*=1e12; return v; }
+function formatRps(n){ if(n>=1e12) return (n/1e12).toFixed(2)+'T'; if(n>=1e9) return (n/1e9).toFixed(2)+'B'; if(n>=1e6) return (n/1e6).toFixed(2)+'M'; if(n>=1e3) return (n/1e3).toFixed(1)+'K'; return n.toFixed(0); }
+
+function calcEffective(baseRps, mutation, traits){
+  const mutMult = MUTATION_MULT[mutation]||1;
+  let traitMult = 0;
+  traits.forEach((t,i) => { const base = TRAIT_MULT[t]||1; traitMult += Math.max(0, base - i); });
+  let totalMult = traits.length > 0 ? mutMult + traitMult - 1 : mutMult;
+  return baseRps * Math.max(1, totalMult);
+}
+function calcOfferValue(offer){ return offer.reduce((sum, item) => sum + calcEffective(item.brainrot.rps, item.mutation, item.traits), 0); }
+
+async function fetchBrainrotList(){
+  const loading = document.getElementById('brainrotLoading');
+    const BASE_DB = [
+    // ── COMMON (rps réels wiki) ──────────────────────────────
+    {name:'Noobini Pizzanini',rarity:'Common',rps:1},
+    {name:'Lirilì Larilà',rarity:'Common',rps:3},
+    {name:'Tim Cheese',rarity:'Common',rps:5},
+    {name:'Fluriflura',rarity:'Common',rps:7},
+    {name:'Talpa Di Fero',rarity:'Common',rps:9},
+    {name:'Noobini Santanini',rarity:'Common',rps:11},
+    {name:'Svinina Bombardino',rarity:'Common',rps:10},
+    {name:'Raccooni Jandelini',rarity:'Common',rps:12},
+    {name:'Pipi Kiwi',rarity:'Common',rps:13},
+    {name:'Tartaragno',rarity:'Common',rps:13},
+    {name:'Pipi Corni',rarity:'Common',rps:14},
+    // ── RARE ────────────────────────────────────────────────
+    {name:'Trippi Troppi',rarity:'Rare',rps:15},
+    {name:'Gangster Footera',rarity:'Rare',rps:30},
+    {name:'Bandito Bobritto',rarity:'Rare',rps:35},
+    {name:'Boneca Ambalabu',rarity:'Rare',rps:40},
+    {name:'Cacto Hipopotamo',rarity:'Rare',rps:50},
+    {name:'Ta Ta Ta Ta Sahur',rarity:'Rare',rps:55},
+    {name:'Tric Trac Baraboom',rarity:'Rare',rps:65},
+    {name:'Frogo Elfo',rarity:'Rare',rps:67},
+    {name:'Pipi Avocado',rarity:'Rare',rps:70},
+    {name:'Pinealotto Fruttarino',rarity:'Rare',rps:75},
+    // ── EPIC ────────────────────────────────────────────────
+    {name:'Cappuccino Assassino',rarity:'Epic',rps:75},
+    {name:'Bandito Axolito',rarity:'Epic',rps:90},
+    {name:'Brr Brr Patapim',rarity:'Epic',rps:100},
+    {name:'Avocadini Antilopini',rarity:'Epic',rps:115},
+    {name:'Trulimero Trulicina',rarity:'Epic',rps:125},
+    {name:'Bambini Crostini',rarity:'Epic',rps:135},
+    {name:'Malame Amarele',rarity:'Epic',rps:140},
+    {name:'Bananita Dolphinita',rarity:'Epic',rps:150},
+    {name:'Perochello Lemonchello',rarity:'Epic',rps:160},
+    {name:'Brri Brri Bicus Dicus Bombicus',rarity:'Epic',rps:175},
+    {name:'Avocadini Guffo',rarity:'Epic',rps:225},
+    {name:'Ti Ti Ti Sahur',rarity:'Epic',rps:225},
+    {name:'Mangolini Parrocini',rarity:'Epic',rps:235},
+    {name:'Frogato Pirato',rarity:'Epic',rps:240},
+    {name:'Salamino-Penguino',rarity:'Epic',rps:250},
+    {name:'Doi Doi Do',rarity:'Epic',rps:260},
+    {name:'Penguin Tree',rarity:'Epic',rps:270},
+    {name:'Wombo Rollo',rarity:'Epic',rps:275},
+    {name:'Penguino Cocosino',rarity:'Epic',rps:300},
+    {name:'Mummio Rappitto',rarity:'Epic',rps:325},
+    // ── LEGENDARY ───────────────────────────────────────────
+    {name:'Chimpanzini Bananini',rarity:'Legendary',rps:300},
+    {name:'Tirilikalika Tirilikalako',rarity:'Legendary',rps:450},
+    {name:'Ballerina Cappuccina',rarity:'Legendary',rps:500},
+    {name:'Burbaloni Loliloli',rarity:'Legendary',rps:600},
+    {name:'Chef Crabracadabra',rarity:'Legendary',rps:600},
+    {name:'Lionel Cactuseli',rarity:'Legendary',rps:650},
+    {name:'Glorbo Fruttodrillo',rarity:'Legendary',rps:750},
+    {name:'Quivoli Ameleoni',rarity:'Legendary',rps:900},
+    {name:'Blueberrinni Octopusini',rarity:'Legendary',rps:1000},
+    {name:'Caramello Filtrello',rarity:'Legendary',rps:1000},
+    {name:'Pipi Potato',rarity:'Legendary',rps:1100},
+    {name:'Strawberrelli Flamingelli',rarity:'Legendary',rps:1100},
+    {name:'Cocosini Mama',rarity:'Legendary',rps:1200},
+    {name:'Pandaccini Bananini',rarity:'Legendary',rps:1250},
+    {name:'Quackula',rarity:'Legendary',rps:1200},
+    {name:'Pi Pi Watermelon',rarity:'Legendary',rps:1300},
+    {name:'Signore Carapace',rarity:'Legendary',rps:1300},
+    {name:'Sigma Boy',rarity:'Legendary',rps:1350},
+    {name:'Chocco Bunny',rarity:'Legendary',rps:1400},
+    {name:'Puffaball',rarity:'Legendary',rps:1500},
+    {name:'Sigma Girl',rarity:'Legendary',rps:1600},
+    {name:'Sealo Regalo',rarity:'Legendary',rps:1700},
+    {name:'Buho de Fuego',rarity:'Legendary',rps:1800},
+    // ── MYTHIC ──────────────────────────────────────────────
+    {name:'Frigo Camelo',rarity:'Mythic',rps:1900},
+    {name:'Orangutini Ananassini',rarity:'Mythic',rps:2500},
+    {name:'Rhino Toasterino',rarity:'Mythic',rps:3000},
+    {name:'Bombardiro Crocodilo',rarity:'Mythic',rps:3500},
+    {name:'Bombombini Gusini',rarity:'Mythic',rps:4000},
+    {name:'Cavallo Virtuoso',rarity:'Mythic',rps:4500},
+    {name:'Gorillo Watermelondrillo',rarity:'Mythic',rps:5000},
+    {name:'Lerulerulerule',rarity:'Mythic',rps:5500},
+    {name:'Te Te Te Sahur',rarity:'Mythic',rps:6000},
+    {name:'Tracoducotulu Delapeladustuz',rarity:'Mythic',rps:6500},
+    {name:'Cachorrito Melonito',rarity:'Mythic',rps:7000},
+    {name:'Toiletto Focaccino',rarity:'Mythic',rps:7500},
+    {name:'Avocadorilla',rarity:'Mythic',rps:8000},
+    {name:'Spioniro Golubiro',rarity:'Mythic',rps:8000},
+    {name:'Zibra Zubra Zibralini',rarity:'Mythic',rps:8000},
+    {name:'Tigrilini Watermelini',rarity:'Mythic',rps:8000},
+    {name:'Gorillo Subwoofero',rarity:'Mythic',rps:8500},
+    {name:'Tob Tobi Tobi',rarity:'Mythic',rps:9000},
+    {name:'Ganganzelli Trulala',rarity:'Mythic',rps:9000},
+    {name:'Carloo',rarity:'Mythic',rps:9500},
+    {name:'Carrotini Brainini',rarity:'Mythic',rps:10000},
+    {name:'Centrucci Nuclucci',rarity:'Mythic',rps:10500},
+    {name:'Jacko Spaventosa',rarity:'Mythic',rps:11000},
+    {name:'Bananito Bandito',rarity:'Mythic',rps:11500},
+    {name:'Tree Tree Tree Sahur',rarity:'Mythic',rps:12000},
+    {name:'Elefanto Frigo',rarity:'Mythic',rps:13000},
+    {name:'Jingle Jingle Sahur',rarity:'Mythic',rps:13500},
+    {name:'Fizzy Soda',rarity:'Mythic',rps:17200},
+    // ── BRAINROT GOD ────────────────────────────────────────
+    {name:'Cocofanto Elefanto',rarity:'Brainrot God',rps:17500},
+    {name:'Girafa Celestre',rarity:'Brainrot God',rps:25000},
+    {name:'Tralalero Tralala',rarity:'Brainrot God',rps:40000},
+    {name:'Odin Din Din Dun',rarity:'Brainrot God',rps:50000},
+    {name:'Tralalita Tralala',rarity:'Brainrot God',rps:55000},
+    {name:'Trenostruzzo Turbo 3000',rarity:'Brainrot God',rps:60000},
+    {name:'Trippi Troppi Troppa Trippa',rarity:'Brainrot God',rps:65000},
+    {name:'Ballerino Lololo',rarity:'Brainrot God',rps:70000},
+    {name:'Pakrahmatmamat',rarity:'Brainrot God',rps:75000},
+    {name:'Piccione Macchina',rarity:'Brainrot God',rps:225000},
+    {name:'Tractoro Dinosauro',rarity:'Brainrot God',rps:80000},
+    {name:'Cacasito Satalito',rarity:'Brainrot God',rps:85000},
+    {name:'Aquanaut',rarity:'Brainrot God',rps:90000},
+    {name:'Tartaruga Cisterna',rarity:'Brainrot God',rps:95000},
+    {name:'Gyattatino Nyanino',rarity:'Brainrot God',rps:100000},
+    {name:'Chihuanini Taconini',rarity:'Brainrot God',rps:105000},
+    {name:'Matteo',rarity:'Brainrot God',rps:110000},
+    {name:'Los Crocodilitos',rarity:'Brainrot God',rps:115000},
+    {name:'Tigroligre Frutonni',rarity:'Brainrot God',rps:120000},
+    {name:'Alessio',rarity:'Brainrot God',rps:130000},
+    {name:'Tipi Topi Taco',rarity:'Brainrot God',rps:135000},
+    {name:'Tukanno Bananno',rarity:'Brainrot God',rps:140000},
+    {name:'Vampira Cappuccina',rarity:'Brainrot God',rps:150000},
+    {name:'Espresso Signora',rarity:'Brainrot God',rps:160000},
+    {name:'Orcalero Orcala',rarity:'Brainrot God',rps:165000},
+    {name:'Urubini Flamenguini',rarity:'Brainrot God',rps:175000},
+    {name:'Capi Taco',rarity:'Brainrot God',rps:180000},
+    {name:'Los Chihuaninis',rarity:'Brainrot God',rps:185000},
+    {name:'Gattito Tacoto',rarity:'Brainrot God',rps:190000},
+    {name:'Bulbito Bandito Traktorito',rarity:'Brainrot God',rps:200000},
+    {name:'Los Tungtungtungcitos',rarity:'Brainrot God',rps:205000},
+    {name:'Ballerina Peppermintina',rarity:'Brainrot God',rps:210000},
+    {name:'Los Bombinitos',rarity:'Brainrot God',rps:225000},
+    {name:'Los Orcalitos',rarity:'Brainrot God',rps:230000},
+    {name:'Corn Corn Corn Sahur',rarity:'Brainrot God',rps:240000},
+    {name:'Squalanana',rarity:'Brainrot God',rps:255000},
+    {name:'Dug Dug Dug',rarity:'Brainrot God',rps:260000},
+    {name:'Ginger Globo',rarity:'Brainrot God',rps:265000},
+    {name:'Yeti Claus',rarity:'Brainrot God',rps:270000},
+    {name:'Los Tipi Tacos',rarity:'Brainrot God',rps:275000},
+    {name:'Frio Ninja',rarity:'Brainrot God',rps:280000},
+    {name:'Ginger Cisterna',rarity:'Brainrot God',rps:285000},
+    {name:'Bombardini Tortinii',rarity:'Brainrot God',rps:290000},
+    {name:'Pop Pop Sahur',rarity:'Brainrot God',rps:295000},
+    // ── SECRET ──────────────────────────────────────────────
+    {name:'La Vacca Saturno Saturnita',rarity:'Secret',rps:300000},
+    {name:'Bisonte Giuppitere',rarity:'Secret',rps:350000},
+    {name:'Los Matteos',rarity:'Secret',rps:400000},
+    {name:'Karkerkar Kurkur',rarity:'Secret',rps:450000},
+    {name:'Trenostruzzo Turbo 4000',rarity:'Secret',rps:500000},
+    {name:'Jackorilla',rarity:'Secret',rps:550000},
+    {name:'Chimpanzini Spiderini',rarity:'Secret',rps:600000},
+    {name:'Sammyni Spyderini',rarity:'Secret',rps:650000},
+    {name:'Torrtuginni Dragonfrutini',rarity:'Secret',rps:700000},
+    {name:'Dul Dul Dul',rarity:'Secret',rps:750000},
+    {name:'Blackhole Goat',rarity:'Secret',rps:800000},
+    {name:'Chachechi',rarity:'Secret',rps:850000},
+    {name:'Agarrini La Palini',rarity:'Secret',rps:900000},
+    {name:'Los Spyderinis',rarity:'Secret',rps:950000},
+    {name:'Extinct Tralalero',rarity:'Secret',rps:1000000},
+    {name:'Fragola La La La',rarity:'Secret',rps:1050000},
+    {name:'La Cucaracha',rarity:'Secret',rps:1100000},
+    {name:'Los Tortus',rarity:'Secret',rps:1150000},
+    {name:'Vulturino Skeletono',rarity:'Secret',rps:1200000},
+    {name:'Los Tralaleritos',rarity:'Secret',rps:1250000},
+    {name:'Zombie Tralala',rarity:'Secret',rps:1300000},
+    {name:'Boatito Auratito',rarity:'Secret',rps:1350000},
+    {name:'Guerriro Digitale',rarity:'Secret',rps:1400000},
+    {name:'Yess my examine',rarity:'Secret',rps:1450000},
+    {name:'La Karkerkar Combinasion',rarity:'Secret',rps:1500000},
+    {name:'Reindeer Tralala',rarity:'Secret',rps:1600000},
+    {name:'Extinct Matteo',rarity:'Secret',rps:1700000},
+    {name:'Pumpkini Spyderini',rarity:'Secret',rps:1800000},
+    {name:'Rocco Disco',rarity:'Secret',rps:1900000},
+    {name:'Frankentteo',rarity:'Secret',rps:2000000},
+    {name:'Job Job Job Sahur',rarity:'Secret',rps:2100000},
+    {name:'Los Trios',rarity:'Secret',rps:2200000},
+    {name:'Karker Sahur',rarity:'Secret',rps:2300000},
+    {name:'Los Karkeritos',rarity:'Secret',rps:2400000},
+    {name:'Las Vaquitas Saturnitas',rarity:'Secret',rps:2500000},
+    {name:'Ho Ho Ho Sahur',rarity:'Secret',rps:2600000},
+    {name:'67',rarity:'Secret',rps:2800000},
+    {name:'Rang Ring Bus',rarity:'Secret',rps:2900000},
+    {name:'Noo my Present',rarity:'Secret',rps:3000000},
+    {name:'Los Nooo My Hotspotsitos',rarity:'Secret',rps:5500000},
+    {name:'Arcadopus',rarity:'Secret',rps:4000000},
+    {name:'Noo my Candy',rarity:'Secret',rps:3500000},
+    {name:'Pot Hotspot',rarity:'Secret',rps:3600000},
+    {name:'Los Quesadillas',rarity:'Secret',rps:3700000},
+    {name:'Burrito Bandito',rarity:'Secret',rps:3800000},
+    {name:'Chill Puppy',rarity:'Secret',rps:3900000},
+    {name:'Quesadillo Vampiro',rarity:'Secret',rps:4100000},
+    {name:'Los Mobilis',rarity:'Secret',rps:4200000},
+    {name:'Chimnino',rarity:'Secret',rps:4500000},
+    {name:'Chicleteirina Bicicleteirina',rarity:'Secret',rps:4700000},
+    {name:'Los Combinasionas',rarity:'Secret',rps:5000000},
+    {name:'Chicleteira Noelteira',rarity:'Secret',rps:5200000},
+    {name:'Los 67',rarity:'Secret',rps:5400000},
+    {name:'La Grande Combinasion',rarity:'Secret',rps:5600000},
+    {name:'Los Spooky Combinasionas',rarity:'Secret',rps:5800000},
+    {name:'La Spooky Grande',rarity:'Secret',rps:6000000},
+    {name:'Mieteteira Bicicleteira',rarity:'Secret',rps:6200000},
+    {name:'Chicleteira Bicicleteira',rarity:'Secret',rps:6500000},
+    {name:'Noo my Heart',rarity:'Secret',rps:7000000},
+    {name:'Los 25',rarity:'Secret',rps:7500000},
+    {name:'Chicleteira Cupideira',rarity:'Secret',rps:8000000},
+    {name:'W or L',rarity:'Secret',rps:8500000},
+    {name:'Esok Sekolah',rarity:'Secret',rps:9000000},
+    {name:'Tuff Toucan',rarity:'Secret',rps:9500000},
+    {name:'Spinny Hammy',rarity:'Secret',rps:10000000},
+    {name:'Gobblino Uniciclino',rarity:'Secret',rps:10500000},
+    {name:'Los Puggies',rarity:'Secret',rps:11000000},
+    {name:'Brunito Marsito',rarity:'Secret',rps:11500000},
+    {name:'Money Money Reindeer',rarity:'Secret',rps:12000000},
+    {name:'Eviledon',rarity:'Secret',rps:12500000},
+    {name:'La Extinct Grande',rarity:'Secret',rps:13000000},
+    {name:'Las Sis',rarity:'Secret',rps:13500000},
+    {name:'Swaggy Bros',rarity:'Secret',rps:14000000},
+    {name:'Money Money Puggy',rarity:'Secret',rps:14500000},
+    {name:'La Jolly Grande',rarity:'Secret',rps:15000000},
+    {name:'Los Jolly Combinasionas',rarity:'Secret',rps:15500000},
+    {name:'Los Candies',rarity:'Secret',rps:16000000},
+    {name:'La Romantic Grande',rarity:'Secret',rps:16500000},
+    {name:'List List List Sahur',rarity:'Secret',rps:17000000},
+    {name:'Nuclearo Dinossauro',rarity:'Secret',rps:15000000},
+    {name:'Orcaledon',rarity:'Secret',rps:17500000},
+    {name:'Spaghetti Tualetti',rarity:'Secret',rps:18000000},
+    {name:'Tictac Sahur',rarity:'Secret',rps:18500000},
+    {name:'La Taco Combinasion',rarity:'Secret',rps:19000000},
+    {name:'Los Spaghettis',rarity:'Secret',rps:20000000},
+    {name:'Los Bros',rarity:'Secret',rps:24000000},
+    {name:'Chipso and Queso',rarity:'Secret',rps:22000000},
+    {name:'Tralaledon',rarity:'Secret',rps:27500000},
+    {name:'Tang Tang Keletang',rarity:'Secret',rps:33500000},
+    {name:'Ketupat Kepat',rarity:'Secret',rps:35000000},
+    {name:'Chillin Chili',rarity:'Secret',rps:25000000},
+    {name:'La Ginger Sekolah',rarity:'Secret',rps:26000000},
+    {name:'La Secret Combinasion',rarity:'Secret',rps:30000000},
+    {name:'Jolly Jolly Sahur',rarity:'Secret',rps:32000000},
+    {name:'Rosetti Tualetti',rarity:'Secret',rps:35000000},
+    {name:'Popcuru and Fizzuru',rarity:'Secret',rps:40000000},
+    {name:'La Casa Boo',rarity:'Secret',rps:45000000},
+    {name:'Garama and Madundung',rarity:'Secret',rps:50000000},
+    {name:'Los Primos',rarity:'Secret',rps:55000000},
+    {name:'Fragrama and Chocrama',rarity:'Secret',rps:60000000},
+    {name:'Spooky and Pumpky',rarity:'Secret',rps:65000000},
+    {name:'Burguro And Fryuro',rarity:'Secret',rps:70000000},
+    {name:'Cooki and Milki',rarity:'Secret',rps:80000000},
+    {name:'Reinito Sleighito',rarity:'Secret',rps:90000000},
+    {name:'Capitano Moby',rarity:'Secret',rps:100000000},
+    {name:'La Supreme Combinasion',rarity:'Secret',rps:120000000},
+    {name:'Ginger Gerat',rarity:'Secret',rps:150000000},
+    {name:'Ketupat Bros',rarity:'Secret',rps:200000000},
+    {name:'Rosey and Teddy',rarity:'Secret',rps:220000000},
+    {name:'Cerberus',rarity:'Secret',rps:250000000},
+    {name:'Hydra Dragon Cannelloni',rarity:'Secret',rps:280000000},
+    {name:'Dragon Cannelloni',rarity:'Secret',rps:300000000},
+    {name:'Dragon Gingerini',rarity:'Secret',rps:350000000},
+    // ── OG ──────────────────────────────────────────────────
+    {name:'Skibidi Toilet',rarity:'OG',rps:450000000},
+    {name:'Meowl',rarity:'OG',rps:550000000},
+    {name:'Headless Horseman',rarity:'OG',rps:500000000},
+    {name:'Strawberry Elephant',rarity:'OG',rps:750000000},
+  ];
+  brainrotDB = [...BASE_DB];
+  buildModalDropdown();
+  if(loading){ loading.innerHTML = '<span style="font-size:0.8rem;color:var(--green);">✅ '+brainrotDB.length+' brainrots chargés</span>'; }
+  setTimeout(()=>{ if(loading) loading.style.display='none'; }, 2000);
+}
+
+function openModal(side){
+  currentModalSide = side;
+  const offer = side==='your' ? yourOffer : theirOffer;
+  if(offer.length >= 4) return;
+  modalSelectedBrainrot = null;
+  modalSelectedTraits = [];
+  document.getElementById('modalBrainrotInput').value = '';
+  document.getElementById('modalMutation').value = 'none';
+  document.getElementById('modalSide').textContent = side==='your' ? 'Your Offer' : 'Their Offer';
+  buildModalTraits();
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+function closeModalOutside(e){ if(e.target===document.getElementById('modalOverlay')) closeModal(); }
+
+function buildModalDropdown(){
+  const dd = document.getElementById('modalBrainrotDropdown');
+  dd.innerHTML = '';
+  brainrotDB.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'dropdown-option';
+    const rarClass = RARITY_COLORS[b.rarity]||'rarity-common';
+    div.innerHTML = `<span class="opt-name">${b.name}</span><span class="opt-rarity ${rarClass}">${b.rarity}</span>`;
+    div.onclick = () => selectModalBrainrot(b);
+    dd.appendChild(div);
+  });
+  const notFound = document.createElement('div');
+  notFound.id = 'notFoundBtn';
+  notFound.className = 'dropdown-option';
+  notFound.style.cssText = 'border-top:1px solid var(--border);color:var(--gold);font-style:italic;';
+  notFound.innerHTML = '🔍 Mon brainrot n\'est pas dans la liste...';
+  notFound.onclick = () => searchNewBrainrot(document.getElementById('modalBrainrotInput').value);
+  dd.appendChild(notFound);
+}
+
+function filterModalDropdown(){
+  const query = document.getElementById('modalBrainrotInput').value.toLowerCase();
+  const dd = document.getElementById('modalBrainrotDropdown');
+  dd.classList.add('open');
+  Array.from(dd.children).forEach(el => {
+    if(el.id==='notFoundBtn'){ el.style.display=''; return; }
+    el.style.display = el.querySelector('.opt-name').textContent.toLowerCase().includes(query) ? '' : 'none';
+  });
+}
+function openModalDropdown(){ document.getElementById('modalBrainrotDropdown').classList.add('open'); }
+function selectModalBrainrot(b){
+  modalSelectedBrainrot = b;
+  document.getElementById('modalBrainrotInput').value = b.name;
+  document.getElementById('modalBrainrotDropdown').classList.remove('open');
+}
+function buildModalTraits(){
+  const grid = document.getElementById('modalTraitsGrid');
+  grid.innerHTML = '';
+  modalSelectedTraits = [];
+  traitDB.forEach(t => {
+    const chip = document.createElement('button');
+    chip.className = 'trait-chip-select';
+    chip.textContent = t;
+    chip.onclick = () => toggleModalTrait(t, chip);
+    grid.appendChild(chip);
+  });
+}
+function filterModalTraits(){
+  const q = document.getElementById('modalTraitFilter').value.toLowerCase();
+  document.querySelectorAll('#modalTraitsGrid .trait-chip-select').forEach(el => {
+    el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+function toggleModalTrait(t, el){
+  if(modalSelectedTraits.includes(t)){ modalSelectedTraits=modalSelectedTraits.filter(x=>x!==t); el.classList.remove('selected'); }
+  else { modalSelectedTraits.push(t); el.classList.add('selected'); }
+}
+function addBrainrotToOffer(){
+  if(!modalSelectedBrainrot){ alert('Sélectionne un brainrot !'); return; }
+  const mutation = document.getElementById('modalMutation').value;
+  const item = { brainrot: modalSelectedBrainrot, mutation, traits: [...modalSelectedTraits] };
+  if(currentModalSide==='your') yourOffer.push(item);
+  else theirOffer.push(item);
+  renderOffers();
+  closeModal();
+}
+function removeFromOffer(side, idx){
+  if(side==='your') yourOffer.splice(idx,1);
+  else theirOffer.splice(idx,1);
+  renderOffers();
+}
+function renderOffers(){
+  ['your','their'].forEach(side => {
+    const offer = side==='your' ? yourOffer : theirOffer;
+    const slots = document.getElementById(side+'Slots');
+    const addBtn = document.getElementById(side+'AddBtn');
+    const valueEl = document.getElementById(side+'Value');
+    slots.innerHTML = '';
+    offer.forEach((item, idx) => {
+      const rarClass = RARITY_COLORS[item.brainrot.rarity]||'rarity-common';
+      const mutLabel = item.mutation!=='none' ? `<span class="slot-tag" style="background:rgba(245,158,11,0.2);color:var(--gold)">${item.mutation}</span>` : '';
+      const traitTags = item.traits.map(t=>`<span class="slot-tag" style="background:rgba(124,58,237,0.2);color:var(--accent2)">${t}</span>`).join('');
+      const div = document.createElement('div');
+      div.className = 'offer-slot';
+      div.innerHTML = `<div style="flex:1;min-width:0"><div class="slot-name">${item.brainrot.name}</div><div class="slot-tags"><span class="slot-tag ${rarClass}">${item.brainrot.rarity}</span>${mutLabel}${traitTags}</div></div><button class="slot-remove" onclick="removeFromOffer('${side}',${idx})">✕</button>`;
+      slots.appendChild(div);
+    });
+    addBtn.disabled = offer.length >= 4;
+    const val = calcOfferValue(offer);
+    valueEl.textContent = val > 0 ? 'Value: ' + formatRps(val) : 'Value: ---';
+    valueEl.style.color = val > 0 ? 'var(--text)' : 'var(--muted)';
+  });
+}
+async function searchNewBrainrot(query){
+  if(!query.trim()){ alert('Tape un nom de brainrot !'); return; }
+  const dd = document.getElementById('modalBrainrotDropdown');
+  dd.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:0.85rem;">🔍 Recherche en cours...</div>';
+  dd.classList.add('open');
+  try {
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:300,
+        system:'Réponds UNIQUEMENT en JSON valide sans backticks ni commentaires: {"found":true,"name":"NomExact","rarity":"Rarity","rps":1234} ou {"found":false}. Rarity: Common/Rare/Epic/Legendary/Mythic/Brainrot God/Secret/OG.',
+        messages:[{role:'user',content:`Donne-moi les stats du brainrot "${query}" dans le jeu Roblox Steal a Brainrot. JSON uniquement.`}]})});
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    buildModalDropdown();
+    if(parsed.found){
+      const b = {name:parsed.name, rarity:parsed.rarity, rps:parsed.rps};
+      brainrotDB.unshift(b);
+      buildModalDropdown();
+      selectModalBrainrot(b);
+    } else {
+      dd.innerHTML = '<div style="padding:12px;color:var(--red);font-size:0.85rem;">❌ Brainrot introuvable !</div>';
+      setTimeout(()=>{ buildModalDropdown(); dd.classList.remove('open'); }, 2000);
+    }
+  } catch(e){
+    dd.innerHTML = '<div style="padding:12px;color:var(--red);font-size:0.85rem;">❌ Erreur de connexion</div>';
+    setTimeout(()=>{ buildModalDropdown(); dd.classList.remove('open'); }, 2000);
+  }
+}
+</script>
+<script>
+// ─── TRADE ANALYZER ──────────────────────────────────────────
+async function analyzeTrade(){
+  const btn = document.getElementById('analyzeBtn');
+  const resultBox = document.getElementById('resultBox');
+  if(yourOffer.length===0 || theirOffer.length===0){ alert('Ajoute au moins un brainrot dans chaque offre !'); return; }
+  const myEff = calcOfferValue(yourOffer);
+  const theirEff = calcOfferValue(theirOffer);
+  document.getElementById('myEffRps').textContent = formatRps(myEff);
+  document.getElementById('theirEffRps').textContent = formatRps(theirEff);
+  const ratio = theirEff / myEff;
+  let verdict, icon, color;
+  if(ratio >= 1.15){ verdict='WIN'; icon='✅'; color='win'; }
+  else if(ratio <= 0.85){ verdict='LOSS'; icon='❌'; color='lose'; }
+  else { verdict='FAIR'; icon='⚖️'; color='fair'; }
+  document.getElementById('verdictIcon').textContent = icon;
+  document.getElementById('verdictLabel').textContent = verdict==='WIN'?'Trade Rentable !':verdict==='LOSS'?'Trade Défavorable !':'Trade Équitable';
+  document.getElementById('verdictLabel').className = `verdict-label ${color}`;
+  document.getElementById('verdictSub').textContent = `Ratio: x${ratio.toFixed(2)} en ta faveur`;
+  resultBox.classList.add('show');
+  document.getElementById('aiAnalysis').innerHTML = '<div class="loading-analysis"><div class="dot"></div><div class="dot"></div><div class="dot"></div> Analyse IA en cours...</div>';
+  btn.disabled = true;
+  const myName = yourOffer.map(i=>i.brainrot.name).join(', ');
+  const theirName = theirOffer.map(i=>i.brainrot.name).join(', ');
+  try {
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1000,
+        system:`Tu es un expert en trades du jeu Roblox "Steal a Brainrot". Tu analyses si un trade est avantageux ou non. Tu réponds en français, de façon directe et claire.`,
+        messages:[{role:'user',content:`Analyse ce trade:\nMON OFFRE: ${myName} (valeur: ${formatRps(myEff)})\nLEUR OFFRE: ${theirName} (valeur: ${formatRps(theirEff)})\nRatio: x${ratio.toFixed(2)}\nVerdicts: ${verdict}\nDonne une analyse courte (3-4 lignes max).`}]})});
+    const data = await res.json();
+    document.getElementById('aiAnalysis').textContent = data.content?.[0]?.text || 'Analyse indisponible.';
+  } catch(e){
+    document.getElementById('aiAnalysis').textContent = 'Erreur lors de l\'analyse IA.';
+  }
+  btn.disabled = false;
+}
+
+// ─── URBEX EXPLORER ──────────────────────────────────────────
+function quickSearch(query){ document.getElementById('urbexInput').value = query; searchUrbex(); }
+
+async function searchUrbex(){
+  const input = document.getElementById('urbexInput');
+  const query = input.value.trim();
+  if(!query) return;
+  const btn = document.getElementById('urbexBtn');
+  const result = document.getElementById('urbexResult');
+  const content = document.getElementById('urbexContent');
+  const dangerBar = document.getElementById('urbexDangerBar');
+  const titleEl = document.getElementById('urbexResultTitle');
+  btn.disabled = true;
+  result.classList.add('show');
+  titleEl.textContent = query;
+  dangerBar.innerHTML = '';
+  content.innerHTML = '<div class="urbex-loading"><div class="dot-orange"></div><div class="dot-orange"></div><div class="dot-orange"></div> Recherche en cours...</div>';
+  try {
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1000,
+        system:`Tu es un expert en urbex (exploration urbaine). Tu parles en français, tu es précis et utile.\nFournis des infos sur les lieux abandonnés : noms, localisations, dangers, légalité, conseils.\nAu début de ta réponse, indique sur deux lignes:\nDANGER_LEVEL: HIGH|MEDIUM|LOW\nLEGAL_STATUS: ILLEGAL|GRAY|LEGAL\nPuis une ligne vide, puis le contenu détaillé.`,
+        messages:[{role:'user',content:query}]})});
+    const data = await res.json();
+    let fullText = data.content?.[0]?.text || 'Aucun résultat.';
+    const dangerMatch = fullText.match(/DANGER_LEVEL:\s*(HIGH|MEDIUM|LOW)/i);
+    const legalMatch = fullText.match(/LEGAL_STATUS:\s*(ILLEGAL|GRAY|LEGAL)/i);
+    fullText = fullText.replace(/DANGER_LEVEL:.*\n?/i,'').replace(/LEGAL_STATUS:.*\n?/i,'').trim();
+    if(dangerMatch){
+      const level = dangerMatch[1].toUpperCase();
+      const badge = document.createElement('span');
+      badge.className = 'danger-badge ' + (level==='HIGH'?'danger-high':level==='MEDIUM'?'danger-med':'danger-low');
+      badge.innerHTML = level==='HIGH'?'⚠️ Danger élevé':level==='MEDIUM'?'⚡ Danger modéré':'✅ Danger faible';
+      dangerBar.appendChild(badge);
+    }
+    if(legalMatch){
+      const status = legalMatch[1].toUpperCase();
+      const badge = document.createElement('span');
+      badge.className = 'danger-badge ' + (status==='ILLEGAL'?'danger-high':status==='GRAY'?'danger-med':'danger-low');
+      badge.innerHTML = status==='ILLEGAL'?'🚫 Illégal':status==='GRAY'?'⚖️ Zone grise':'✅ Légal';
+      dangerBar.appendChild(badge);
+    }
+    content.textContent = fullText;
+  } catch(e){ content.textContent = 'Erreur lors de la recherche.'; }
+  btn.disabled = false;
+}
+
+// ─── CLICK OUTSIDE CLOSE ────────────────────────────────────
+document.addEventListener('click', function(e){
+  const modalDD = document.getElementById('modalBrainrotDropdown');
+  const modalInput = document.getElementById('modalBrainrotInput');
+  if(modalDD && modalInput && !modalInput.contains(e.target) && !modalDD.contains(e.target)){
+    modalDD.classList.remove('open');
+  }
+});
+
+// ─── INIT ────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  initAuth();
+  fetchBrainrotList();
+});
+</script>
+</body>
+</html>
