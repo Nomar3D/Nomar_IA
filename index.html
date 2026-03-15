@@ -1332,6 +1332,136 @@ function loadFromStorage(key){ try{ const v=localStorage.getItem(key); return v?
 // ─── BACKEND ─────────────────────────────────────────────────
 const BACKEND = 'https://nomar-ia-backend-production.up.railway.app';
 
+
+// ─── UTILS ───────────────────────────────────────────────────
+function escHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderMarkdown(text){
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code>$1</code>')
+    .replace(/\n/g,'<br>');
+}
+
+// ─── SIDEBAR / TABS ──────────────────────────────────────────
+function openSidebar(){
+  const s = document.getElementById('sidebar');
+  const o = document.getElementById('sidebarOverlay');
+  if(s) s.classList.add('open');
+  if(o) o.style.display = 'block';
+}
+function closeSidebar(){
+  const s = document.getElementById('sidebar');
+  const o = document.getElementById('sidebarOverlay');
+  if(s) s.classList.remove('open');
+  if(o) o.style.display = 'none';
+}
+
+function selectTab(tab){
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const panel = document.getElementById('panel-' + tab);
+  if(panel) panel.classList.add('active');
+  const titles = { chat: 'NOMAR_IA', trade: 'TRADE ANALYZER', urbex: 'URBEX EXPLORER' };
+  const titleEl = document.getElementById('mobileTitle');
+  if(titleEl) titleEl.textContent = titles[tab] || 'NOMAR_IA';
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + tab + "'")){
+      n.classList.add('active');
+    }
+  });
+  closeSidebar();
+}
+
+// ─── CONVERSATIONS ────────────────────────────────────────────
+let currentConvId = null;
+let conversations = [];
+
+function newConversation(){
+  currentConvId = null;
+  const msgs = document.getElementById('messages');
+  if(msgs) msgs.innerHTML = '';
+  addMsg('assistant', 'Yo ! Je suis ton IA principale 🎮 Tu peux me parler de n'importe quoi. Si la conversation tourne autour de **Steal a Brainrot**, je te proposerai de switcher vers l'**analyseur de trades** 📊');
+  selectTab('chat');
+  renderConversations();
+}
+
+function renderConversations(){
+  const container = document.getElementById('convList');
+  if(!container) return;
+  container.innerHTML = '';
+  if(!conversations.length){
+    container.innerHTML = '<div style="padding:8px 12px;font-size:0.78rem;color:var(--muted)">Aucune conversation</div>';
+    return;
+  }
+  conversations.forEach((conv) => {
+    const item = document.createElement('div');
+    item.className = 'conv-item' + (conv.id === currentConvId ? ' active-conv' : '');
+    item.innerHTML = '<span class="conv-title">' + escHtml(conv.title || 'Conversation') + '</span><button class="conv-delete" onclick="deleteConv(\'' + conv.id + '\');event.stopPropagation()">✕</button>';
+    item.onclick = () => loadConv(conv.id);
+    container.appendChild(item);
+  });
+}
+
+function loadConv(id){
+  const conv = conversations.find(c => c.id === id);
+  if(!conv) return;
+  currentConvId = id;
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = '';
+  (conv.messages || []).forEach(m => addMsg(m.role === 'user' ? 'user' : 'assistant', m.content));
+  selectTab('chat');
+  renderConversations();
+}
+
+function deleteConv(id){
+  conversations = conversations.filter(c => c.id !== id);
+  if(currentConvId === id){ currentConvId = null; const m = document.getElementById('messages'); if(m) m.innerHTML = ''; }
+  renderConversations();
+  saveConversationsToSupabase();
+}
+
+async function saveConversationsToSupabase(){
+  if(!currentUser) return;
+  try {
+    await fetch(BACKEND + '/save-conversations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: currentUser.id, conversations })
+    });
+  } catch(e) {}
+}
+
+// ─── SETTINGS / POPUPS ───────────────────────────────────────
+function openSettings(){
+  const modal = document.getElementById('settingsModal');
+  if(modal) modal.classList.add('open');
+}
+function closeSettings(){
+  const modal = document.getElementById('settingsModal');
+  if(modal) modal.classList.remove('open');
+}
+function showConnectPopup(){
+  const popup = document.getElementById('connectPopup');
+  if(popup) popup.classList.add('open');
+}
+function closeConnectPopup(){
+  const popup = document.getElementById('connectPopup');
+  if(popup) popup.classList.remove('open');
+}
+function showProPopup(){
+  const popup = document.getElementById('proPopup');
+  if(popup) popup.classList.add('open');
+}
+function closeProPopup(){
+  const popup = document.getElementById('proPopup');
+  if(popup) popup.classList.remove('open');
+}
+
 // ─── AUTH ────────────────────────────────────────────────────
 function initAuth(){
   const saved = loadFromStorage('nomar_user');
@@ -1451,7 +1581,7 @@ async function generateImage(prompt){
     if(bubble && bubble.querySelector('.img-loading')){
       bubble.innerHTML = '❌ Génération trop longue. Réessaie !';
     }
-  }, 90000);
+  }, 60000);
 
   try {
     const resp = await fetch(WORKER, {
@@ -1465,7 +1595,6 @@ async function generateImage(prompt){
     clearTimeout(timeout);
     const bubble = document.getElementById(uid);
     if(!bubble) return;
-
     if(data.error === 'loading'){
       bubble.innerHTML = '⏳ ' + (data.message || 'Modèle en chargement, réessaie dans 20s !');
       return;
@@ -1484,7 +1613,7 @@ async function generateImage(prompt){
     clearInterval(dotInterval);
     clearTimeout(timeout);
     const bubble = document.getElementById(uid);
-    if(bubble) bubble.innerHTML = '❌ Erreur de génération. Réessaie dans quelques secondes !';
+    if(bubble) bubble.innerHTML = "❌ Erreur de génération. Réessaie dans quelques secondes !";
   }
 }
 
