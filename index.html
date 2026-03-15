@@ -1388,7 +1388,7 @@ function newConversation(){
 }
 
 function renderConversations(){
-  const container = document.getElementById('convList');
+  const container = document.getElementById('convItems');
   if(!container) return;
   container.innerHTML = '';
   if(!conversations.length){
@@ -1435,27 +1435,27 @@ async function saveConversationsToSupabase(){
 
 // ─── SETTINGS / POPUPS ───────────────────────────────────────
 function openSettings(){
-  const modal = document.getElementById('settingsModal');
+  const modal = document.getElementById('settingsOverlay');
   if(modal) modal.classList.add('open');
 }
 function closeSettings(){
-  const modal = document.getElementById('settingsModal');
+  const modal = document.getElementById('settingsOverlay');
   if(modal) modal.classList.remove('open');
 }
 function showConnectPopup(){
-  const popup = document.getElementById('connectPopup');
+  const popup = document.getElementById('connectOverlay');
   if(popup) popup.classList.add('open');
 }
 function closeConnectPopup(){
-  const popup = document.getElementById('connectPopup');
+  const popup = document.getElementById('connectOverlay');
   if(popup) popup.classList.remove('open');
 }
 function showProPopup(){
-  const popup = document.getElementById('proPopup');
+  const popup = document.getElementById('proOverlay');
   if(popup) popup.classList.add('open');
 }
 function closeProPopup(){
-  const popup = document.getElementById('proPopup');
+  const popup = document.getElementById('proOverlay');
   if(popup) popup.classList.remove('open');
 }
 
