@@ -1460,6 +1460,65 @@ function closeProPopup(){
 }
 
 // ─── AUTH ────────────────────────────────────────────────────
+
+// ─── LOGIN / GUEST HANDLERS ──────────────────────────────────
+function onLogin(){
+  updateUserCard();
+  document.getElementById('authOverlay').style.display = 'none';
+  closeConnectPopup();
+  newConversation();
+  loadUserConversations();
+}
+
+function onGuest(){
+  const avatar = document.getElementById('userAvatar');
+  const name = document.getElementById('userName');
+  const role = document.getElementById('userRole');
+  if(avatar) avatar.textContent = '?';
+  if(name) name.textContent = 'Invité';
+  if(role) role.textContent = 'Connexion pour sauvegarder';
+  newConversation();
+}
+
+function updateUserCard(){
+  if(!currentUser) return;
+  const avatar = document.getElementById('userAvatar');
+  const name = document.getElementById('userName');
+  const role = document.getElementById('userRole');
+  const initial = (currentUser.username || '?')[0].toUpperCase();
+  if(avatar) avatar.textContent = initial;
+  if(name) name.textContent = currentUser.username || 'Utilisateur';
+  if(role) role.textContent = currentUser.is_pro ? '⭐ Pro' : 'Gratuit';
+  // Remplir les settings
+  const sAvatar = document.getElementById('settingsAvatar');
+  const sName = document.getElementById('settingsName');
+  const sEmail = document.getElementById('settingsEmail');
+  if(sAvatar) sAvatar.textContent = initial;
+  if(sName) sName.textContent = currentUser.username || '';
+  if(sEmail) sEmail.textContent = currentUser.email || '';
+}
+
+function logout(){
+  currentUser = null;
+  conversations = [];
+  currentConvId = null;
+  saveToStorage('nomar_user', null);
+  document.getElementById('settingsOverlay').classList.remove('open');
+  onGuest();
+}
+
+async function loadUserConversations(){
+  if(!currentUser) return;
+  try {
+    const res = await fetch(BACKEND + '/get-conversations?userId=' + currentUser.id);
+    const data = await res.json();
+    if(data.conversations) {
+      conversations = data.conversations;
+      renderConversations();
+    }
+  } catch(e) {}
+}
+
 function initAuth(){
   const saved = loadFromStorage('nomar_user');
   if(saved){
@@ -1586,25 +1645,32 @@ async function generateImage(prompt){
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ generateImage: true, prompt })
     });
-    if(!resp.ok) throw new Error('Worker error ' + resp.status);
-    const data = await resp.json();
     clearInterval(dotInterval);
     clearTimeout(timeout);
     const bubble = document.getElementById(uid);
     if(!bubble) return;
-    if(data.error === 'loading'){
-      bubble.innerHTML = '⏳ ' + (data.message || 'Modèle en chargement, réessaie dans 20s !');
+    if(!resp.ok) {
+      const errData = await resp.json().catch(()=>({}));
+      if(errData.error === 'loading'){
+        bubble.innerHTML = '⏳ ' + (errData.message || 'Modèle en chargement, réessaie dans 20s !');
+      } else {
+        bubble.innerHTML = '❌ Erreur ' + resp.status + '. Réessaie dans quelques secondes !';
+      }
       return;
     }
-    if(data.error){
-      bubble.innerHTML = '❌ Erreur : ' + (data.message || 'Réessaie dans quelques secondes !');
-      return;
-    }
-    if(data.imageBase64){
-      bubble.innerHTML = '<img src="' + data.imageBase64 + '" style="max-width:100%;border-radius:10px;display:block;margin-bottom:6px;"><div style="font-size:0.75rem;color:var(--muted);">🎨 ' + escHtml(prompt) + '</div>';
+    const contentType = resp.headers.get('Content-Type') || '';
+    if(contentType.startsWith('image/')){
+      const blob = await resp.blob();
+      const imageUrl = URL.createObjectURL(blob);
+      bubble.innerHTML = '<img src="' + imageUrl + '" style="max-width:100%;border-radius:10px;display:block;margin-bottom:6px;"><div style="font-size:0.75rem;color:var(--muted);">🎨 ' + escHtml(prompt) + '</div>';
       msgs.scrollTop = msgs.scrollHeight;
     } else {
-      bubble.innerHTML = '❌ Aucune image reçue. Réessaie !';
+      const data = await resp.json().catch(()=>({}));
+      if(data.error === 'loading'){
+        bubble.innerHTML = '⏳ ' + (data.message || 'Modèle en chargement, réessaie dans 20s !');
+      } else {
+        bubble.innerHTML = '❌ ' + (data.message || 'Aucune image reçue. Réessaie !');
+      }
     }
   } catch(e) {
     clearInterval(dotInterval);
