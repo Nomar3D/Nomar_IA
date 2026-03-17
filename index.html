@@ -1841,6 +1841,32 @@ function addTyping(){
 let attachedFile = null;
 let attachedFileContent = null;
 
+async function generateImage(prompt){
+  const msgs = document.getElementById('messages');
+  const uid = 'imgbubble_' + Date.now();
+  const loadDiv = document.createElement('div');
+  loadDiv.className = 'msg assistant';
+  loadDiv.innerHTML = '<div class="avatar ai">AI</div><div class="bubble" id="' + uid + '">🎨 Génération en cours<span id="dots_' + uid + '">.</span></div>';
+  msgs.appendChild(loadDiv);
+  msgs.scrollTop = msgs.scrollHeight;
+  let dc = 1;
+  const di = setInterval(() => { const d = document.getElementById('dots_' + uid); if(d){ dc=(dc%3)+1; d.textContent='.'.repeat(dc); } else clearInterval(di); }, 500);
+  const to = setTimeout(() => { clearInterval(di); const b = document.getElementById(uid); if(b) b.innerHTML = '❌ Génération trop longue. Réessaie !'; }, 60000);
+  try {
+    const resp = await fetch(WORKER, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ generateImage: true, prompt: prompt + ', high quality, detailed' }) });
+    if(!resp.ok) throw new Error('error ' + resp.status);
+    const data = await resp.json();
+    if(!data.imageUrl) throw new Error('no image');
+    clearInterval(di); clearTimeout(to);
+    const b = document.getElementById(uid);
+    if(b){ b.innerHTML = '<img src="' + data.imageUrl + '" style="max-width:100%;border-radius:10px;display:block;margin-bottom:6px;"><div style="font-size:0.75rem;color:var(--muted);">🎨 ' + escHtml(prompt) + '</div>'; msgs.scrollTop = msgs.scrollHeight; }
+  } catch(e) {
+    clearInterval(di); clearTimeout(to);
+    const b = document.getElementById(uid);
+    if(b) b.innerHTML = "❌ Erreur de génération. Réessaie dans quelques secondes !";
+  }
+}
+
 async function sendChat(){
   const input = document.getElementById('chatInput');
   let msg = input.value.trim();
