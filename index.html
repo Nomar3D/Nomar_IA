@@ -1838,6 +1838,9 @@ function addTyping(){
   return div;
 }
 
+let attachedFile = null;
+let attachedFileContent = null;
+
 async function sendChat(){
   const input = document.getElementById('chatInput');
   let msg = input.value.trim();
