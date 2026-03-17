@@ -283,8 +283,6 @@ body {
   background: linear-gradient(135deg, #0ea5e9, #06b6d4);
   font-size: 0.8rem;
 }
-.img-loading { color: var(--muted); font-size: 0.92rem; }
-.web-badge { margin-top:8px; padding:4px 10px; background:rgba(139,92,246,0.15); border:1px solid rgba(139,92,246,0.4); border-radius:6px; font-size:0.78rem; color:#a78bfa; display:inline-block; }
 .bubble {
   padding: 10px 14px;
   border-radius: 14px;
@@ -350,21 +348,6 @@ body {
   transition: border-color 0.2s;
 }
 .input-bar input:focus { border-color: var(--accent2); }
-.attach-btn {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  width: 42px; height: 42px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--muted);
-  transition: color 0.2s, background 0.2s;
-}
-.attach-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-.attach-btn svg { width: 18px; height: 18px; }
 .send-btn {
   width: 42px; height: 42px;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -998,6 +981,9 @@ body {
   </div>
 
   <div class="sidebar-nav">
+    <button class="nav-item active" id="nav-chat" onclick="selectTab('chat')">
+      <span class="nav-icon">💬</span> IA Principale
+    </button>
     <button class="nav-item" id="nav-trade" onclick="selectTab('trade')">
       <span class="nav-icon">🔄</span> Trade Analyzer
     </button>
@@ -1045,14 +1031,14 @@ body {
       </div>
       <div class="input-bar">
         <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.csv,.json,.md" style="display:none" onchange="handleFileUpload(event)">
-        <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Joindre un fichier">
+        <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Joindre">
           <span style="font-size:1.4rem;font-weight:300;line-height:1;">+</span>
         </button>
         <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
           <div id="filePreview" style="display:none;padding:6px 8px;background:rgba(139,92,246,0.15);border-radius:8px;font-size:0.78rem;color:#a78bfa;align-items:center;gap:8px;">
-            <img id="filePreviewImg" style="display:none;width:48px;height:48px;object-fit:cover;border-radius:6px;border:1px solid rgba(139,92,246,0.4);">
+            <img id="filePreviewImg" style="display:none;width:48px;height:48px;object-fit:cover;border-radius:6px;">
             <span id="filePreviewName" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-            <button onclick="clearFile()" style="background:none;border:none;color:#a78bfa;cursor:pointer;font-size:0.9rem;padding:0;flex-shrink:0;">✕</button>
+            <button onclick="clearFile()" style="background:none;border:none;color:#a78bfa;cursor:pointer;">✕</button>
           </div>
           <input type="text" id="chatInput" placeholder="Écris ton message..." onkeydown="if(event.key==='Enter')sendChat()">
         </div>
@@ -1196,7 +1182,7 @@ body {
         <input type="text" id="authUsername" placeholder="Ton pseudo...">
       </div>
       <div class="auth-field" id="authEmailField" style="display:none;">
-        <label>Email *</label>
+        <label>Email (optionnel)</label>
         <input type="email" id="authEmail" placeholder="ton@email.com">
       </div>
       <div class="auth-field">
@@ -1230,8 +1216,6 @@ body {
             <div style="font-size:0.78rem;color:var(--muted)" id="settingsEmail">Non connecté</div>
           </div>
         </div>
-        <button id="authActionBtn" onclick="openAuthFromSettings()" style="width:100%;margin-top:10px;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;">🔐 Se connecter / S'inscrire</button>
-        <button id="proActionBtn" onclick="openProModal()" style="width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;display:none;">⚡ Passer Pro - 4€/mois</button>
       </div>
 
       <div>
@@ -1271,18 +1255,18 @@ body {
   </div>
 </div>
 
+
 <!-- Modal Connect -->
 <div id="connectOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;">
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:400px;width:90%;text-align:center;position:relative;">
     <button onclick="closeConnectPopup()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;">✕</button>
     <div style="font-size:2.5rem;margin-bottom:12px;">😎</div>
     <h2 style="margin:0 0 8px;color:var(--text);">Tu kiffes Nomar ?</h2>
-    <p style="color:var(--muted);font-size:0.9rem;margin:0 0 20px;line-height:1.5;">Connecte-toi pour une meilleure expérience et sauvegarder tes conversations !</p>
+    <p style="color:var(--muted);font-size:0.9rem;margin:0 0 20px;">Connecte-toi pour sauvegarder tes conversations !</p>
     <button onclick="openAuthFromConnectPopup()" style="width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:10px;">🔐 Se connecter / S'inscrire</button>
     <button onclick="closeConnectPopup()" style="width:100%;padding:10px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:10px;font-size:0.9rem;cursor:pointer;">Continuer sans compte</button>
   </div>
 </div>
-
 <!-- Modal Pro -->
 <div id="proOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;">
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;position:relative;">
@@ -1295,16 +1279,15 @@ body {
       <div style="margin-bottom:8px;">💬 <strong>Messages illimités</strong></div>
       <div style="margin-bottom:8px;">🎭 <strong>Tous les personas</strong></div>
       <div style="margin-bottom:8px;">📚 <strong>Conversations illimitées</strong></div>
-      <div>🚀 <strong>Réponses plus longues et détaillées</strong></div>
+      <div>🚀 <strong>Réponses plus longues</strong></div>
     </div>
     <div style="font-size:1.8rem;font-weight:800;color:var(--accent);margin-bottom:4px;">4€ <span style="font-size:1rem;font-weight:400;color:var(--muted);">/ mois</span></div>
-    <p style="color:var(--muted);font-size:0.78rem;margin:0 0 20px;">Résiliable à tout moment</p>
     <button onclick="closeProModal()" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;">Bientôt disponible 🚀</button>
   </div>
 </div>
-
 <script>
 const WORKER = 'https://nomar-ai-proxy.lucas-nomme29.workers.dev';
+const BACKEND = 'https://nomar-ia-backend-production.up.railway.app';
 
 // ─── PERSONAS ────────────────────────────────────────────────
 const PERSONAS = {
@@ -1329,9 +1312,6 @@ let currentTab = 'chat';
 function saveToStorage(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
 function loadFromStorage(key){ try{ const v=localStorage.getItem(key); return v?JSON.parse(v):null; }catch(e){ return null; } }
 
-// ─── BACKEND ─────────────────────────────────────────────────
-const BACKEND = 'https://nomar-ia-backend-production.up.railway.app';
-
 // ─── AUTH ────────────────────────────────────────────────────
 function initAuth(){
   const saved = loadFromStorage('nomar_user');
@@ -1341,7 +1321,6 @@ function initAuth(){
     onLogin();
   } else {
     onGuest();
-    // Pas de popup au démarrage — on laisse l'utilisateur parler librement
   }
 }
 
@@ -1364,8 +1343,8 @@ async function submitAuth(){
   const email = document.getElementById('authEmail')?.value?.trim() || '';
   if(!username || !password){ errEl.textContent = 'Remplis tous les champs !'; return; }
   if(mode === 'register'){
-    if(!email){ errEl.textContent = 'L\'adresse mail est obligatoire !'; return; }
-    if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){ errEl.textContent = 'Adresse mail invalide !'; return; }
+    if(!email){ errEl.textContent = 'Email obligatoire !'; return; }
+    if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){ errEl.textContent = 'Email invalide !'; return; }
     if(password.length < 5){ errEl.textContent = 'Mot de passe trop court (min 5 caractères)'; return; }
     if(!/[a-zA-Z]/.test(password)){ errEl.textContent = 'Le mot de passe doit contenir des lettres'; return; }
     if(!/[0-9]/.test(password)){ errEl.textContent = 'Le mot de passe doit contenir des chiffres'; return; }
@@ -1379,6 +1358,7 @@ async function submitAuth(){
     const data = await res.json();
     if(data.error){ errEl.textContent = data.error; btn.textContent = mode==='login'?'Se connecter':"S'inscrire"; btn.disabled=false; return; }
     currentUser = data.user;
+    currentUser.is_pro = currentUser.is_pro === true || currentUser.is_pro === 'true';
     saveToStorage('nomar_user', currentUser);
     saveToStorage('nomar_visited', true);
     document.getElementById('authOverlay').style.display = 'none';
@@ -1388,109 +1368,453 @@ async function submitAuth(){
   }
 }
 
-// ─── FILE UPLOAD ─────────────────────────────────────────────
-let attachedFile = null;
-let attachedFileContent = null;
+function continueAsGuest(){
+  saveToStorage('nomar_visited', true);
+  document.getElementById('authOverlay').style.display = 'none';
+  onGuest();
+}
 
-function handleFileUpload(event){
-  const file = event.target.files[0];
-  if(!file) return;
-  attachedFile = file;
-  const preview = document.getElementById('filePreview');
-  const nameEl = document.getElementById('filePreviewName');
-  const imgEl = document.getElementById('filePreviewImg');
-  preview.style.display = 'flex';
+function onLogin(){
+  currentUser.is_pro = currentUser.is_pro === true || currentUser.is_pro === 'true';
+  currentPersona = currentUser.persona || 'cool';
+  customPersonaText = currentUser.custom_prompt || '';
+  updateUserUI();
+  loadConversations();
+}
 
-  if(file.type.startsWith('image/')){
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      attachedFileContent = e.target.result; // base64 data URL
-      imgEl.src = e.target.result;
-      imgEl.style.display = 'block';
-      nameEl.textContent = file.name;
-    };
-    reader.readAsDataURL(file);
+function onGuest(){
+  currentPersona = loadFromStorage('nomar_persona') || 'cool';
+  customPersonaText = loadFromStorage('nomar_custom_prompt') || '';
+  updateUserUI();
+  renderConvList();
+}
+
+function logout(){
+  currentUser = null;
+  conversations = [];
+  chatHistory = [];
+  saveToStorage('nomar_user', null);
+  closeSettings();
+  renderConvList();
+  updateUserUI();
+  newConversation();
+  document.getElementById('authOverlay').style.display = 'flex';
+}
+
+function updateUserUI(){
+  const name = currentUser ? currentUser.username : 'Invité';
+  const role = currentUser ? (currentUser.is_pro ? '⚡ Compte Pro' : 'Compte gratuit') : 'Mode invité';
+  const proBtn = document.getElementById('proActionBtn');
+  if(proBtn) proBtn.style.display = (currentUser && !currentUser.is_pro) ? 'block' : 'none';
+  const authBtn = document.getElementById('authActionBtn');
+  if(authBtn) authBtn.style.display = currentUser ? 'none' : 'block';
+  const letter = name[0].toUpperCase();
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userRole').textContent = role;
+  document.getElementById('userAvatar').textContent = letter;
+  document.getElementById('settingsAvatar').textContent = letter;
+  document.getElementById('settingsName').textContent = name;
+  document.getElementById('settingsEmail').textContent = currentUser ? 'Connecté' : 'Non connecté';
+  document.getElementById('logoutBtn').style.display = currentUser ? 'block' : 'none';
+}
+
+// ─── CONVERSATIONS ───────────────────────────────────────────
+function loadConversations(){
+  if(currentUser){
+    const users = loadFromStorage('nomar_users') || {};
+    const userData = users[currentUser.username];
+    conversations = userData?.conversations || [];
   } else {
-    imgEl.style.display = 'none';
-    nameEl.textContent = '📎 ' + file.name;
-    const reader = new FileReader();
-    reader.onload = (e) => { attachedFileContent = e.target.result; };
-    reader.readAsText(file);
+    conversations = loadFromStorage('nomar_guest_convs') || [];
+  }
+  renderConvList();
+  if(conversations.length > 0){
+    loadConversation(conversations[0].id);
+  } else {
+    newConversation();
   }
 }
 
-function clearFile(){
-  attachedFile = null;
-  attachedFileContent = null;
-  document.getElementById('filePreview').style.display = 'none';
-  document.getElementById('filePreviewImg').style.display = 'none';
-  document.getElementById('filePreviewImg').src = '';
-  document.getElementById('fileInput').value = '';
-}
-
-// ─── IMAGE GENERATION (Pollinations.ai) ──────────────────────
-async function generateImage(prompt){
-  const msgs = document.getElementById('messages');
-  const uid = 'imgbubble_' + Date.now();
-  const loadDiv = document.createElement('div');
-  loadDiv.className = 'msg assistant';
-  loadDiv.innerHTML = '<div class="avatar ai">AI</div><div class="bubble" id="' + uid + '"><span class="img-loading">🎨 Génération en cours<span class="dots">.</span></span></div>';
-  msgs.appendChild(loadDiv);
-  msgs.scrollTop = msgs.scrollHeight;
-
-  let dotCount = 1;
-  const dotInterval = setInterval(() => {
-    const dotsEl = document.querySelector('#' + uid + ' .dots');
-    if(dotsEl){ dotCount = (dotCount % 3) + 1; dotsEl.textContent = '.'.repeat(dotCount); }
-    else clearInterval(dotInterval);
-  }, 500);
-
-  const timeout = setTimeout(() => {
-    clearInterval(dotInterval);
-    const bubble = document.getElementById(uid);
-    if(bubble && bubble.querySelector('.img-loading')){
-      bubble.innerHTML = '❌ Génération trop longue. Réessaie !';
-    }
-  }, 60000);
-
-  try {
-    // Appel via le Worker Cloudflare (la clé HF est stockée côté serveur)
-    const resp = await fetch(WORKER, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ generateImage: true, prompt: prompt + ', high quality, detailed' })
-    });
-    if(!resp.ok) throw new Error('Worker error ' + resp.status);
-    const data = await resp.json();
-    if(!data.imageUrl) throw new Error('No image');
-    const imageUrl = data.imageUrl;
-    clearInterval(dotInterval);
-    clearTimeout(timeout);
-    const bubble = document.getElementById(uid);
-    if(bubble){
-      bubble.innerHTML = '<img src="' + imageUrl + '" style="max-width:100%;border-radius:10px;display:block;margin-bottom:6px;"><div style="font-size:0.75rem;color:var(--muted);">🎨 ' + escHtml(prompt) + '</div>';
-      msgs.scrollTop = msgs.scrollHeight;
-    }
-  } catch(e) {
-    clearInterval(dotInterval);
-    clearTimeout(timeout);
-    const bubble = document.getElementById(uid);
-    if(bubble) bubble.innerHTML = "❌ Erreur de génération. Réessaie dans quelques secondes !";
+async function saveConversations(){
+  if(currentUser && currentUser.id){
+    try {
+      await fetch(BACKEND + '/conversations/save', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({userId: currentUser.id, conversations: conversations.slice(0,20)})
+      });
+    } catch(e) {}
+  } else {
+    saveToStorage('nomar_guest_convs', conversations.slice(0,10));
   }
 }
 
-function addMsgWithImage(role, text, imgSrc){
+function newConversation(){
+  if(currentUser && !currentUser.is_pro && conversations.length >= 5){ openProModal(); return; }
+  if(currentConvId && chatHistory.length > 0){
+    const conv = conversations.find(c => c.id === currentConvId);
+    if(conv){ conv.messages = [...chatHistory]; conv.title = getConvTitle(); saveConversations(); }
+  }
+  currentConvId = 'conv_' + Date.now();
+  chatHistory = [];
   const msgs = document.getElementById('messages');
-  const div = document.createElement('div');
-  div.className = 'msg ' + (role==='user'?'user':'assistant');
-  const avatarHtml = role==='user'
-    ? `<div class="avatar user-av">${currentUser?currentUser.username[0].toUpperCase():'T'}</div>`
-    : '<div class="avatar ai">AI</div>';
-  div.innerHTML = avatarHtml + `<div class="bubble"><img src="${imgSrc}" style="max-width:200px;max-height:200px;border-radius:8px;display:block;margin-bottom:${text?'6px':'0'}">${text ? renderMarkdown(text) : ''}</div>`;
-  msgs.appendChild(div);
+  msgs.innerHTML = `<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Je suis ton IA principale 🤖 Tu peux me parler de n'importe quoi. Si la conversation tourne autour de <strong>Steal a Brainrot</strong>, je te proposerai de switcher vers l'<strong>analyseur de trades</strong> 🔄</div></div>`;
+  const newConv = { id: currentConvId, title: 'Nouvelle conversation', messages: [], date: Date.now() };
+  conversations.unshift(newConv);
+  saveConversations();
+  renderConvList();
+  closeSidebar();
+}
+
+function loadConversation(id){
+  const conv = conversations.find(c => c.id === id);
+  if(!conv) return;
+  // Save current first
+  if(currentConvId && currentConvId !== id && chatHistory.length > 0){
+    const cur = conversations.find(c => c.id === currentConvId);
+    if(cur){ cur.messages = [...chatHistory]; cur.title = getConvTitle(); saveConversations(); }
+  }
+  currentConvId = id;
+  chatHistory = conv.messages || [];
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-chat').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  currentTab = 'chat';
+  renderMessages();
+  renderConvList();
+  closeSidebar();
+}
+
+function deleteConversation(id, e){
+  e.stopPropagation();
+  conversations = conversations.filter(c => c.id !== id);
+  saveConversations();
+  if(currentConvId === id){ newConversation(); return; }
+  renderConvList();
+}
+
+function getConvTitle(){
+  const first = chatHistory.find(m => m.role === 'user');
+  if(first) return first.content.slice(0,30) + (first.content.length > 30 ? '...' : '');
+  return 'Conversation';
+}
+
+function renderConvList(){
+  const el = document.getElementById('convItems');
+  if(conversations.length === 0){
+    el.innerHTML = '<div style="padding:8px 8px;font-size:0.78rem;color:var(--muted);">Aucune conversation</div>';
+    return;
+  }
+  el.innerHTML = conversations.slice(0,20).map(c => `
+    <div class="conv-item ${c.id===currentConvId?'active-conv':''}" onclick="loadConversation('${c.id}')">
+      <span class="conv-title">💬 ${escHtml(c.title||'Conversation')}</span>
+      <button class="conv-delete" onclick="deleteConversation('${c.id}',event)">✕</button>
+    </div>
+  `).join('');
+}
+
+function renderMarkdown(text){
+  let h = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/[*][*](.*?)[*][*]/g, '<strong>$1</strong>');
+  h = h.replace(/[*](.*?)[*]/g, '<em>$1</em>');
+  h = h.replace(/`(.*?)`/g, '<code>$1</code>');
+  h = h.split('\n').join('<br>');
+  if(text.indexOf('Réponse basée sur une recherche web') !== -1){
+    var parts = h.split('<br>');
+    h = parts.map(function(p){ return p.indexOf('Réponse basée sur une recherche web') !== -1 ? '<div class="web-badge">🔍 Réponse basée sur une recherche web</div>' : p; }).join('<br>');
+  }
+  return h;
+}
+
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderMessages(){
+  const msgs = document.getElementById('messages');
+  if(chatHistory.length === 0){
+    msgs.innerHTML = `<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Je suis ton IA principale 🤖</div></div>`;
+    return;
+  }
+  msgs.innerHTML = chatHistory.map(m => `
+    <div class="msg ${m.role==='user'?'user':'assistant'}">
+      ${m.role==='user' ? `<div class="avatar user-av">${currentUser?currentUser.username[0].toUpperCase():'T'}</div>` : '<div class="avatar ai">AI</div>'}
+      <div class="bubble">${escHtml(m.content)}</div>
+    </div>
+  `).join('');
   msgs.scrollTop = msgs.scrollHeight;
 }
 
+// ─── SETTINGS ────────────────────────────────────────────────
+function openSettings(){
+  // Sync UI with current state
+  document.querySelectorAll('.persona-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.persona === currentPersona);
+  });
+  document.getElementById('customPrompt').value = customPersonaText;
+  document.getElementById('customPromptDiv').style.display = currentPersona==='custom' ? 'block' : 'none';
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+
+function closeSettings(){ document.getElementById('settingsOverlay').classList.remove('open'); }
+
+function selectPersona(btn){
+  const p = btn.dataset.persona;
+  if(!currentUser?.is_pro && p !== 'cool'){ openProModal(); return; }
+  document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  currentPersona = p;
+  document.getElementById('customPromptDiv').style.display = currentPersona==='custom' ? 'block' : 'none';
+}
+
+async function saveSettings(){
+  customPersonaText = document.getElementById('customPrompt').value;
+  if(currentUser && currentUser.id){
+    try {
+      await fetch(BACKEND + '/settings/save', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({userId: currentUser.id, persona: currentPersona, custom_prompt: customPersonaText})
+      });
+    } catch(e) {}
+    currentUser.persona = currentPersona;
+    currentUser.custom_prompt = customPersonaText;
+    saveToStorage('nomar_user', currentUser);
+  } else {
+    saveToStorage('nomar_persona', currentPersona);
+    saveToStorage('nomar_custom_prompt', customPersonaText);
+  }
+  closeSettings();
+}
+function logout(){
+  currentUser = null;
+  conversations = [];
+  chatHistory = [];
+  saveToStorage('nomar_user', null);
+  closeSettings();
+  renderConvList();
+  updateUserUI();
+  newConversation();
+  document.getElementById('authOverlay').style.display = 'flex';
+}
+
+function updateUserUI(){
+  const name = currentUser ? currentUser.username : 'Invité';
+  const role = currentUser ? (currentUser.is_pro ? '⚡ Compte Pro' : 'Compte gratuit') : 'Mode invité';
+  const proBtn = document.getElementById('proActionBtn');
+  if(proBtn) proBtn.style.display = (currentUser && !currentUser.is_pro) ? 'block' : 'none';
+  const authBtn = document.getElementById('authActionBtn');
+  if(authBtn) authBtn.style.display = currentUser ? 'none' : 'block';
+  const letter = name[0].toUpperCase();
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userRole').textContent = role;
+  document.getElementById('userAvatar').textContent = letter;
+  document.getElementById('settingsAvatar').textContent = letter;
+  document.getElementById('settingsName').textContent = name;
+  document.getElementById('settingsEmail').textContent = currentUser ? 'Connecté' : 'Non connecté';
+  document.getElementById('logoutBtn').style.display = currentUser ? 'block' : 'none';
+}
+
+// ─── CONVERSATIONS ───────────────────────────────────────────
+function loadConversations(){
+  if(currentUser){
+    const users = loadFromStorage('nomar_users') || {};
+    const userData = users[currentUser.username];
+    conversations = userData?.conversations || [];
+  } else {
+    conversations = loadFromStorage('nomar_guest_convs') || [];
+  }
+  renderConvList();
+  if(conversations.length > 0){
+    loadConversation(conversations[0].id);
+  } else {
+    newConversation();
+  }
+}
+
+async function saveConversations(){
+  if(currentUser && currentUser.id){
+    try {
+      await fetch(BACKEND + '/conversations/save', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({userId: currentUser.id, conversations: conversations.slice(0,20)})
+      });
+    } catch(e) {}
+  } else {
+    saveToStorage('nomar_guest_convs', conversations.slice(0,10));
+  }
+}
+
+function newConversation(){
+  if(currentUser && !currentUser.is_pro && conversations.length >= 5){ openProModal(); return; }
+  if(currentConvId && chatHistory.length > 0){
+    const conv = conversations.find(c => c.id === currentConvId);
+    if(conv){ conv.messages = [...chatHistory]; conv.title = getConvTitle(); saveConversations(); }
+  }
+  currentConvId = 'conv_' + Date.now();
+  chatHistory = [];
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = `<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Je suis ton IA principale 🤖 Tu peux me parler de n'importe quoi. Si la conversation tourne autour de <strong>Steal a Brainrot</strong>, je te proposerai de switcher vers l'<strong>analyseur de trades</strong> 🔄</div></div>`;
+  const newConv = { id: currentConvId, title: 'Nouvelle conversation', messages: [], date: Date.now() };
+  conversations.unshift(newConv);
+  saveConversations();
+  renderConvList();
+  closeSidebar();
+}
+
+function loadConversation(id){
+  const conv = conversations.find(c => c.id === id);
+  if(!conv) return;
+  // Save current first
+  if(currentConvId && currentConvId !== id && chatHistory.length > 0){
+    const cur = conversations.find(c => c.id === currentConvId);
+    if(cur){ cur.messages = [...chatHistory]; cur.title = getConvTitle(); saveConversations(); }
+  }
+  currentConvId = id;
+  chatHistory = conv.messages || [];
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-chat').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  currentTab = 'chat';
+  renderMessages();
+  renderConvList();
+  closeSidebar();
+}
+
+function deleteConversation(id, e){
+  e.stopPropagation();
+  conversations = conversations.filter(c => c.id !== id);
+  saveConversations();
+  if(currentConvId === id){ newConversation(); return; }
+  renderConvList();
+}
+
+function getConvTitle(){
+  const first = chatHistory.find(m => m.role === 'user');
+  if(first) return first.content.slice(0,30) + (first.content.length > 30 ? '...' : '');
+  return 'Conversation';
+}
+
+function renderConvList(){
+  const el = document.getElementById('convItems');
+  if(conversations.length === 0){
+    el.innerHTML = '<div style="padding:8px 8px;font-size:0.78rem;color:var(--muted);">Aucune conversation</div>';
+    return;
+  }
+  el.innerHTML = conversations.slice(0,20).map(c => `
+    <div class="conv-item ${c.id===currentConvId?'active-conv':''}" onclick="loadConversation('${c.id}')">
+      <span class="conv-title">💬 ${escHtml(c.title||'Conversation')}</span>
+      <button class="conv-delete" onclick="deleteConversation('${c.id}',event)">✕</button>
+    </div>
+  `).join('');
+}
+
+function renderMarkdown(text){
+  let h = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h = h.replace(/[*][*](.*?)[*][*]/g, '<strong>$1</strong>');
+  h = h.replace(/[*](.*?)[*]/g, '<em>$1</em>');
+  h = h.replace(/`(.*?)`/g, '<code>$1</code>');
+  h = h.split('\n').join('<br>');
+  if(text.indexOf('Réponse basée sur une recherche web') !== -1){
+    var parts = h.split('<br>');
+    h = parts.map(function(p){ return p.indexOf('Réponse basée sur une recherche web') !== -1 ? '<div class="web-badge">🔍 Réponse basée sur une recherche web</div>' : p; }).join('<br>');
+  }
+  return h;
+}
+
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderMessages(){
+  const msgs = document.getElementById('messages');
+  if(chatHistory.length === 0){
+    msgs.innerHTML = `<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Je suis ton IA principale 🤖</div></div>`;
+    return;
+  }
+  msgs.innerHTML = chatHistory.map(m => `
+    <div class="msg ${m.role==='user'?'user':'assistant'}">
+      ${m.role==='user' ? `<div class="avatar user-av">${currentUser?currentUser.username[0].toUpperCase():'T'}</div>` : '<div class="avatar ai">AI</div>'}
+      <div class="bubble">${escHtml(m.content)}</div>
+    </div>
+  `).join('');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ─── SETTINGS ────────────────────────────────────────────────
+function openSettings(){
+  // Sync UI with current state
+  document.querySelectorAll('.persona-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.persona === currentPersona);
+  });
+  document.getElementById('customPrompt').value = customPersonaText;
+  document.getElementById('customPromptDiv').style.display = currentPersona==='custom' ? 'block' : 'none';
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+
+function closeSettings(){ document.getElementById('settingsOverlay').classList.remove('open'); }
+
+function selectPersona(btn){
+  const p = btn.dataset.persona;
+  if(!currentUser?.is_pro && p !== 'cool'){ openProModal(); return; }
+  document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  currentPersona = p;
+  document.getElementById('customPromptDiv').style.display = currentPersona==='custom' ? 'block' : 'none';
+}
+
+function saveSettings(){
+  customPersonaText = document.getElementById('customPrompt').value;
+  if(currentUser){
+    const users = loadFromStorage('nomar_users') || {};
+    if(users[currentUser.username]){
+      users[currentUser.username].persona = currentPersona;
+      users[currentUser.username].customPrompt = customPersonaText;
+      saveToStorage('nomar_users', users);
+    }
+    currentUser.persona = currentPersona;
+    currentUser.customPrompt = customPersonaText;
+    saveToStorage('nomar_user', currentUser);
+  } else {
+    saveToStorage('nomar_persona', currentPersona);
+    saveToStorage('nomar_custom_prompt', customPersonaText);
+  }
+  closeSettings();
+}
+
+function getSystemPrompt(){
+  const base = currentPersona === 'custom' ? (customPersonaText || PERSONAS.cool) : (PERSONAS[currentPersona] || PERSONAS.cool);
+  const imageRule = "\n- Si quelqu'un te demande de générer/créer/dessiner une image, ajoute à la fin : [GENERATE_IMAGE: description en anglais détaillée].";
+  const noSearch = (!currentUser || !currentUser.is_pro)
+    ? "\n\nRÈGLE ABSOLUE SUR INTERNET : Tu n'as PAS accès à internet. Tu ne peux PAS faire de recherches web. Tu ne connais PAS les données en temps réel. Si on te demande une info en temps réel, réponds EXACTEMENT : 'Je ne peux pas faire de recherche internet en version gratuite. Passe à **Nomar Pro** pour accéder à la recherche web en temps réel ! 🚀' Ne jamais inventer des chiffres."
+    : "";
+  return base + "\n\nRÈGLE ABSOLUE : Ne dis JAMAIS que tu es une IA, un assistant, un modèle ou un programme.\n\nRÈGLE IMPORTANTE :\n- Si la conversation porte sur le jeu Roblox \"Steal a Brainrot\", réponds brièvement PUIS ajoute [REDIRECT_TRADE] à la fin.\n- Si la conversation porte sur l'urbex ou des lieux abandonnés, réponds brièvement PUIS ajoute [REDIRECT_URBEX] à la fin." + imageRule + noSearch;
+}
+
+function showConnectPopup(){ if(!currentUser) document.getElementById('connectOverlay').style.display = 'flex'; }
+function closeConnectPopup(){ document.getElementById('connectOverlay').style.display = 'none'; }
+function openAuthFromConnectPopup(){ closeConnectPopup(); document.getElementById('authOverlay').style.display = 'flex'; }
+function openAuthFromSettings(){ closeSettings(); document.getElementById('authOverlay').style.display = 'flex'; }
+function openProModal(){ document.getElementById('proOverlay').style.display = 'flex'; }
+function closeProModal(){ document.getElementById('proOverlay').style.display = 'none'; }
+
+// ─── SIDEBAR MOBILE ──────────────────────────────────────────
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+// ─── TAB NAVIGATION ──────────────────────────────────────────
+const TAB_TITLES = { chat: 'IA Principale', trade: 'Trade Analyzer', urbex: 'Urbex Explorer' };
+function selectTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  const navEl = document.getElementById('nav-'+tab); if(navEl) navEl.classList.add('active');
+  document.getElementById('mobileTitle').textContent = TAB_TITLES[tab];
+  closeSidebar();
+}
+
+// ─── CHAT ─────────────────────────────────────────────────────
 function addMsg(role, content){
   const msgs = document.getElementById('messages');
   const div = document.createElement('div');
@@ -1515,30 +1839,28 @@ function addTyping(){
 }
 
 async function sendChat(){
-  // Popup après 5 messages en mode invité
-  if(!currentUser){
-    const guestCount = (loadFromStorage('nomar_guest_msg_count') || 0) + 1;
-    saveToStorage('nomar_guest_msg_count', guestCount);
-    if(guestCount === 5){
-      setTimeout(showConnectPopup, 800);
-    }
-  }
   const input = document.getElementById('chatInput');
   let msg = input.value.trim();
   if(!msg && !attachedFile) return;
   if(!msg) msg = '(fichier joint)';
   input.value = '';
 
-  // Détection côté client : si c'est une demande d'image → générer directement
-  const imageKeywords = ['génère', 'crée', 'fais', 'dessine', 'montre', 'génerer', 'créer', 'dessiner', 'image', 'photo', 'dessin', 'illustration', 'génère-moi', 'fais-moi'];
-  const isImageRequest = imageKeywords.some(k => msg.toLowerCase().includes(k)) && 
-    ['image', 'photo', 'dessin', 'illustration', 'pic', 'picture'].some(k => msg.toLowerCase().includes(k));
+  // Guest message counter -> popup after 5
+  if(!currentUser){
+    const gc = (loadFromStorage('nomar_guest_msg_count') || 0) + 1;
+    saveToStorage('nomar_guest_msg_count', gc);
+    if(gc === 5) setTimeout(showConnectPopup, 800);
+  }
+
+  // Image request detection
+  const imageKeywords = ['image', 'photo', 'dessin', 'illustration'];
+  const actionKeywords = ['génère', 'crée', 'fais', 'dessine', 'génerer', 'créer'];
+  const isImageRequest = imageKeywords.some(k => msg.toLowerCase().includes(k)) && actionKeywords.some(k => msg.toLowerCase().includes(k));
   if(isImageRequest){
     addMsg('user', msg);
     chatHistory.push({role:'user', content:msg});
-    // Extraire la description de l'image depuis le message
-    const imagePrompt = msg.replace(/tu peux|peux-tu|est-ce que tu peux|génère|crée|fais|dessine|montre|moi|une|un|de|stp|svp|s'il te plaît/gi, '').trim() || msg;
-    generateImage(imagePrompt);
+    const imgPrompt = msg.replace(/tu peux|peux-tu|génère|crée|fais|dessine|moi|une|un|de|stp|svp/gi,'').trim() || msg;
+    generateImage(imgPrompt);
     return;
   }
 
@@ -1546,7 +1868,7 @@ async function sendChat(){
   let pendingImage = null;
   if(attachedFile && attachedFileContent){
     if(attachedFile.type.startsWith('image/')){
-      pendingImage = attachedFileContent; // base64 data URL
+      pendingImage = attachedFileContent;
       fullMsg = msg !== '(fichier joint)' ? msg : '';
     } else {
       fullMsg = msg + '\n\n[FICHIER: ' + attachedFile.name + ']\n' + attachedFileContent.slice(0, 3000);
@@ -1554,12 +1876,8 @@ async function sendChat(){
     clearFile();
   }
 
-  // Show user message with image preview if any
-  if(pendingImage){
-    addMsgWithImage('user', msg || '(image)', pendingImage);
-  } else {
-    addMsg('user', msg);
-  }
+  if(pendingImage){ addMsgWithImage('user', msg || '(image)', pendingImage); }
+  else { addMsg('user', msg); }
   chatHistory.push({role:'user', content:fullMsg || msg});
 
   const typingEl = addTyping();
@@ -1570,7 +1888,7 @@ async function sendChat(){
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         model:'llama-3.3-70b-versatile',
-        max_tokens: currentUser?.is_pro ? 2000 : 1000,
+        max_tokens: currentUser?.is_pro ? 2000 : 500,
         system: getSystemPrompt(),
         messages: chatHistory,
         userId: currentUser?.id || null,
@@ -1585,41 +1903,11 @@ async function sendChat(){
     let redirectType = null;
     if(text.includes('[REDIRECT_TRADE]')){ redirectType='trade'; text=text.replace('[REDIRECT_TRADE]','').trim(); }
     if(text.includes('[REDIRECT_URBEX]')){ redirectType='urbex'; text=text.replace('[REDIRECT_URBEX]','').trim(); }
-    // Détecter si l'IA parle de recherche internet → ouvrir modal Pro
-    const searchKeywords = ['passe à **Nomar Pro**', 'Nomar Pro** pour accéder à la recherche', 'version gratuite. Passe'];
-    if(searchKeywords.some(k => text.includes(k))){ setTimeout(openProModal, 800); }
 
-    // Détecter demande de génération d'image → [GENERATE_IMAGE: prompt]
-    const imgMatch = text.match(/\[GENERATE_IMAGE:\s*(.+?)\]/i);
-    if(imgMatch){
-      text = text.replace(imgMatch[0], '').trim();
-      if(text) addMsg('assistant', text);
-      generateImage(imgMatch[1].trim());
-      return;
-    }
-
-    // Détecter tag [GENERATE_IMAGE: prompt]
-    const imgGenMatch = text.match(/\[GENERATE_IMAGE:[\s\S]*?\]/);
-    if(imgGenMatch){
-      const imgPrompt = imgGenMatch[0].replace('[GENERATE_IMAGE:','').replace(']','').trim();
-      text = text.replace(imgGenMatch[0], '').trim();
-      generateImage(imgPrompt);
-    }
-
-    // Détecter tag [GENERATE_IMAGE: prompt]
-    // Handle image generation BEFORE displaying text
-    const imgMatch2 = text.match(/\[GENERATE_IMAGE:\s*([^\]]+)\]/i);
-    if(imgMatch2){
-      text = text.replace(imgMatch2[0], '').trim();
-    }
     typingEl.remove();
-    if(text) {
-      const msgEl = addMsg('assistant', text);
-    }
+    const msgEl = addMsg('ai', escHtml(text));
+
     chatHistory.push({role:'assistant', content:text});
-    if(imgMatch2){
-      generateImage(imgMatch2[1].trim());
-    }
 
     // Add redirect chips
     if(redirectType){
