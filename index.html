@@ -1880,7 +1880,7 @@ async function generateImage(prompt){
   } catch(e) {
     clearInterval(di); clearTimeout(to);
     const b = document.getElementById(uid);
-    if(b) b.innerHTML = "❌ Erreur de génération. Réessaie dans quelques secondes !";
+    if(b) b.innerHTML = '❌ Erreur de génération. <button onclick="generateImage(\''+escHtml(prompt)+'\');this.parentElement.remove();" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;margin-left:6px;font-size:0.8rem;">🔄 Réessayer</button>';
   }
 }
 
@@ -1950,10 +1950,17 @@ async function sendChat(){
     if(text.includes('[REDIRECT_TRADE]')){ redirectType='trade'; text=text.replace('[REDIRECT_TRADE]','').trim(); }
     if(text.includes('[REDIRECT_URBEX]')){ redirectType='urbex'; text=text.replace('[REDIRECT_URBEX]','').trim(); }
 
-    typingEl.remove();
-    const msgEl = addMsg('ai', escHtml(text));
+    // Strip GENERATE_IMAGE tag and trigger generation
+    const imgTagMatch = text.match(/\[GENERATE_IMAGE:\s*([^\]]+)\]/i);
+    if(imgTagMatch){ text = text.replace(imgTagMatch[0],'').trim(); }
 
-    chatHistory.push({role:'assistant', content:text});
+    // Pro modal trigger
+    if(text.includes('Nomar Pro') && text.includes('gratuite')){ setTimeout(openProModal, 800); }
+
+    typingEl.remove();
+    if(text) addMsg('assistant', text);
+    chatHistory.push({role:'assistant', content: text});
+    if(imgTagMatch){ generateImage(imgTagMatch[1].trim()); }
 
     // Add redirect chips
     if(redirectType){
