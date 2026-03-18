@@ -1795,7 +1795,7 @@ function saveSettings(){
 
 function getSystemPrompt(){
   const base = currentPersona === 'custom' ? (customPersonaText || PERSONAS.cool) : (PERSONAS[currentPersona] || PERSONAS.cool);
-  const imageRule = "\n- Si quelqu'un te demande de générer/créer/dessiner une image, ajoute à la fin : [GENERATE_IMAGE: description en anglais détaillée].";
+  const imageRule = "\n- Tu PEUX générer des images ! Si quelqu'un te demande de créer/générer/dessiner une image, réponds brièvement (ex: 'Voilà !') PUIS ajoute obligatoirement à la fin : [GENERATE_IMAGE: detailed english description]. Ex: [GENERATE_IMAGE: cute grey cat sitting on sofa, photorealistic]. Ne dis JAMAIS que tu ne peux pas créer d'images.";
   const noSearch = (!currentUser || !currentUser.is_pro)
     ? "\n\nRÈGLE ABSOLUE SUR INTERNET : Tu n'as PAS accès à internet. Tu ne peux PAS faire de recherches web. Tu ne connais PAS les données en temps réel. Si on te demande une info en temps réel, réponds EXACTEMENT : 'Je ne peux pas faire de recherche internet en version gratuite. Passe à **Nomar Pro** pour accéder à la recherche web en temps réel ! 🚀' Ne jamais inventer des chiffres."
     : "";
@@ -1887,7 +1887,16 @@ async function generateImage(prompt){
       if(data.imageUrl){
         clearInterval(di); clearTimeout(to);
         const b = document.getElementById(uid);
-        if(b){ b.innerHTML = '<img src="' + data.imageUrl + '" style="max-width:100%;border-radius:10px;display:block;margin-bottom:6px;"><div style="font-size:0.75rem;color:var(--muted);">🎨 ' + escHtml(prompt) + '</div>'; msgs.scrollTop = msgs.scrollHeight; }
+        if(b){
+      b.style.cssText = 'background:transparent;padding:0;';
+      b.innerHTML = '<div style="background:#1a1a2e;border-radius:16px;overflow:hidden;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.4);">'
+        + '<img src="' + data.imageUrl + '" style="width:100%;display:block;border-radius:16px 16px 0 0;">'
+        + '<div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;">'
+        + '<div style="font-size:0.78rem;color:#a78bfa;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">🎨 ' + escHtml(prompt) + '</div>'
+        + '<a href="' + data.imageUrl + '" download="nomar-image.jpg" style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);color:#a78bfa;padding:5px 10px;border-radius:8px;font-size:0.75rem;text-decoration:none;white-space:nowrap;cursor:pointer;">⬇️ Télécharger</a>'
+        + '</div></div>';
+      msgs.scrollTop = msgs.scrollHeight;
+    }
       } else throw new Error('no image');
     } catch(e2) {
       clearInterval(di); clearTimeout(to);
