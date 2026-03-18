@@ -1869,19 +1869,33 @@ async function generateImage(prompt){
   let dc = 1;
   const di = setInterval(() => { const d = document.getElementById('dots_' + uid); if(d){ dc=(dc%3)+1; d.textContent='.'.repeat(dc); } else clearInterval(di); }, 500);
   const to = setTimeout(() => { clearInterval(di); const b = document.getElementById(uid); if(b) b.innerHTML = '❌ Génération trop longue. Réessaie !'; }, 60000);
-  try {
-    const resp = await fetch(WORKER, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ generateImage: true, prompt: prompt + ', high quality, detailed' }) });
-    if(!resp.ok) throw new Error('error ' + resp.status);
-    const data = await resp.json();
-    if(!data.imageUrl) throw new Error('no image');
+
+  const encodedPrompt = encodeURIComponent(prompt + ', high quality, detailed');
+  const seed = Math.floor(Math.random() * 999999);
+  const pollinationsUrl = 'https://image.pollinations.ai/prompt/' + encodedPrompt + '?width=512&height=512&nologo=true&seed=' + seed;
+
+  const img = new Image();
+  img.onload = () => {
     clearInterval(di); clearTimeout(to);
     const b = document.getElementById(uid);
-    if(b){ b.innerHTML = '<img src="' + data.imageUrl + '" style="max-width:100%;border-radius:10px;display:block;margin-bottom:6px;"><div style="font-size:0.75rem;color:var(--muted);">🎨 ' + escHtml(prompt) + '</div>'; msgs.scrollTop = msgs.scrollHeight; }
-  } catch(e) {
-    clearInterval(di); clearTimeout(to);
-    const b = document.getElementById(uid);
-    if(b) b.innerHTML = '❌ Erreur de génération. <button onclick="generateImage(\''+escHtml(prompt)+'\');this.parentElement.remove();" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;margin-left:6px;font-size:0.8rem;">🔄 Réessayer</button>';
-  }
+    if(b){ b.innerHTML = '<img src="' + pollinationsUrl + '" style="max-width:100%;border-radius:10px;display:block;margin-bottom:6px;"><div style="font-size:0.75rem;color:var(--muted);">🎨 ' + escHtml(prompt) + '</div>'; msgs.scrollTop = msgs.scrollHeight; }
+  };
+  img.onerror = async () => {
+    try {
+      const resp = await fetch(WORKER, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ generateImage: true, prompt: prompt + ', high quality' }) });
+      const data = await resp.json();
+      if(data.imageUrl){
+        clearInterval(di); clearTimeout(to);
+        const b = document.getElementById(uid);
+        if(b){ b.innerHTML = '<img src="' + data.imageUrl + '" style="max-width:100%;border-radius:10px;display:block;margin-bottom:6px;"><div style="font-size:0.75rem;color:var(--muted);">🎨 ' + escHtml(prompt) + '</div>'; msgs.scrollTop = msgs.scrollHeight; }
+      } else throw new Error('no image');
+    } catch(e2) {
+      clearInterval(di); clearTimeout(to);
+      const b = document.getElementById(uid);
+      if(b) b.innerHTML = '❌ Erreur de génération. <button onclick="generateImage(\''+escHtml(prompt)+'\');this.parentElement.remove();" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;margin-left:6px;font-size:0.8rem;">🔄 Réessayer</button>';
+    }
+  };
+  img.src = pollinationsUrl;
 }
 
 async function sendChat(){
