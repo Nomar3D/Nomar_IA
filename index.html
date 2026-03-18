@@ -1898,14 +1898,15 @@ async function sendChat(){
     if(gc === 5) setTimeout(showConnectPopup, 800);
   }
 
-  // Image request detection
-  const imageKeywords = ['image', 'photo', 'dessin', 'illustration'];
-  const actionKeywords = ['génère', 'crée', 'fais', 'dessine', 'génerer', 'créer'];
-  const isImageRequest = imageKeywords.some(k => msg.toLowerCase().includes(k)) && actionKeywords.some(k => msg.toLowerCase().includes(k));
+  // Image request detection - only trigger on explicit requests
+  const msgLower = msg.toLowerCase();
+  const hasImageWord = ['image', 'photo', 'dessin', 'illustration'].some(k => msgLower.includes(k));
+  const hasActionWord = ['génère', 'génerer', 'créer', 'dessiner', 'génere', 'cree'].some(k => msgLower.includes(k));
+  const isImageRequest = hasImageWord && hasActionWord && msg.length < 200;
   if(isImageRequest){
     addMsg('user', msg);
     chatHistory.push({role:'user', content:msg});
-    const imgPrompt = msg.replace(/tu peux|peux-tu|génère|crée|fais|dessine|moi|une|un|de|stp|svp/gi,'').trim() || msg;
+    const imgPrompt = msg.replace(/tu peux|peux-tu|est-ce que tu peux|génère|génere|crée|cree|fais|dessine|moi|une|un|de|stp|svp|s'il te plaît/gi,'').trim() || msg;
     generateImage(imgPrompt);
     return;
   }
