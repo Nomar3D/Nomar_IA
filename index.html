@@ -1868,7 +1868,7 @@ async function generateImage(prompt){
   msgs.scrollTop = msgs.scrollHeight;
   let dc = 1;
   const di = setInterval(() => { const d = document.getElementById('dots_' + uid); if(d){ dc=(dc%3)+1; d.textContent='.'.repeat(dc); } else clearInterval(di); }, 500);
-  const to = setTimeout(() => { clearInterval(di); const b = document.getElementById(uid); if(b) b.innerHTML = '❌ Génération trop longue. Réessaie !'; }, 60000);
+  const to = setTimeout(() => { clearInterval(di); const b = document.getElementById(uid); if(b) b.innerHTML = '❌ Génération trop longue. Réessaie !'; }, 90000);
 
   const encodedPrompt = encodeURIComponent(prompt + ', high quality, detailed');
   const seed = Math.floor(Math.random() * 999999);
