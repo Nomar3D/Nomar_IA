@@ -1882,8 +1882,10 @@ async function generateImage(prompt){
   };
   img.onerror = async () => {
     try {
-      const resp = await fetch(WORKER, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ generateImage: true, prompt: prompt + ', high quality' }) });
+      const resp = await fetch(BACKEND + '/generate-image', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt: prompt + ', high quality, detailed' }) });
+      if(!resp.ok) throw new Error('HTTP ' + resp.status);
       const data = await resp.json();
+      if(data.error) throw new Error(data.error);
       if(data.imageUrl){
         clearInterval(di); clearTimeout(to);
         const b = document.getElementById(uid);
