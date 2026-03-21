@@ -934,6 +934,34 @@ body {
   .trade-panel { padding: 12px; }
   .persona-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+.discord-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(6px);
+  z-index: 3000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.discord-overlay.open { display: flex; }
+.discord-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  animation: fadeUp 0.25s ease;
+}
+.discord-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 </style>
 </head>
 <body>
@@ -952,6 +980,12 @@ body {
     </button>
     <button class="nav-item" id="nav-urbex" onclick="selectTab('urbex')">
       <span class="nav-icon">&#127962;</span> Urbex Explorer
+    </button>
+    <button class="nav-item" id="nav-discord" onclick="openDiscordModal()">
+      <span class="nav-icon">&#127760;</span> Discord
+    </button>
+    <button class="nav-item" id="nav-discord" onclick="openDiscordModal()">
+      <span class="nav-icon">&#127908;</span> Discord
     </button>
   </div>
 
@@ -984,7 +1018,7 @@ body {
         <div class="msg assistant">
           <div class="avatar ai">AI</div>
           <div class="bubble">
-            Yo ! Je suis ton IA principale &#129302; Tu peux me parler de n'importe quoi. Si la conversation tourne autour de <strong>Steal a Brainrot</strong>, je te proposerai de switcher vers l'<strong>analyseur de trades</strong> &#128260;
+            Yo ! Moi c'est Nomar &#128293; Pose-moi n'importe quelle question, je suis la pour toi ! &#128640;
           </div>
         </div>
       </div>
@@ -1337,7 +1371,7 @@ function newConversation(){
   currentConvId = 'conv_' + Date.now();
   chatHistory = [];
   const msgs = document.getElementById('messages');
-  msgs.innerHTML = '<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Je suis ton IA principale &#129302; Tu peux me parler de n\'importe quoi. Si la conversation tourne autour de <strong>Steal a Brainrot</strong>, je te proposerai de switcher vers l\'<strong>analyseur de trades</strong> &#128260;</div></div>';
+  msgs.innerHTML = '<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Moi c\'est Nomar &#128293; Pose-moi n\'importe quelle question, je suis la pour toi ! &#128640;</div></div>';
   const newConv = { id: currentConvId, title: 'Nouvelle conversation', messages: [], date: Date.now() };
   conversations.unshift(newConv);
   saveConversations();
@@ -1399,7 +1433,7 @@ function renderConvList(){
 function renderMessages(){
   const msgs = document.getElementById('messages');
   if(chatHistory.length === 0){
-    msgs.innerHTML = '<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Je suis ton IA principale &#129302;</div></div>';
+    msgs.innerHTML = '<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Moi c\'est Nomar &#128293; Je suis la pour toi !</div></div>';
     return;
   }
   msgs.innerHTML = '';
@@ -1666,6 +1700,9 @@ async function sendChat(){
   }
 }
 
+function openDiscordModal(){ document.getElementById('discordOverlay').classList.add('open'); }
+function closeDiscordModal(){ document.getElementById('discordOverlay').classList.remove('open'); }
+
 document.addEventListener('click', function(e){
   const modalDD = document.getElementById('modalBrainrotDropdown');
   const modalInput = document.getElementById('modalBrainrotInput');
@@ -1674,9 +1711,12 @@ document.addEventListener('click', function(e){
   }
 });
 
+
+function openDiscordModal(){ document.getElementById('discordOverlay').classList.add('open'); }
+function closeDiscordModal(e){ if(!e || e.target===document.getElementById('discordOverlay')) document.getElementById('discordOverlay').classList.remove('open'); }
+
 window.addEventListener('load', function(){
   initAuth();
-  fetchBrainrotList();
 });
 </script>
 
@@ -1773,5 +1813,91 @@ document.addEventListener('click', function(e){
   }
 });
 </script>
+
+<!-- DISCORD MODAL -->
+<div class="discord-overlay" id="discordOverlay" onclick="closeDiscordModal()">
+  <div class="discord-box" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:#5865F2;">&#127908; Serveur Discord</div>
+      <button onclick="closeDiscordModal()" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;">&#x2715;</button>
+    </div>
+    <iframe src="https://discord.com/widget?id=1472157386243313705&theme=dark" width="100%" height="450" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" style="border-radius:12px;"></iframe>
+    <a href="https://discord.gg/nomar3d" target="_blank" style="display:block;margin-top:12px;padding:12px;background:#5865F2;color:#fff;text-align:center;border-radius:10px;text-decoration:none;font-weight:700;font-family:'Orbitron',monospace;font-size:0.82rem;letter-spacing:1px;">REJOINDRE LE SERVEUR &#128640;</a>
+  </div>
+</div>
+
+<style>
+.discord-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(6px);
+  z-index: 3000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.discord-overlay.open { display: flex; }
+.discord-box {
+  background: var(--bg2);
+  border: 1px solid rgba(88,101,242,0.4);
+  border-radius: 16px;
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+  animation: fadeUp 0.25s ease;
+}
+
+.discord-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(6px);
+  z-index: 3000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.discord-overlay.open { display: flex; }
+.discord-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  animation: fadeUp 0.25s ease;
+}
+.discord-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+</style>
+
+
+<!-- DISCORD MODAL -->
+<div class="discord-overlay" id="discordOverlay" onclick="closeDiscordModal(event)">
+  <div class="discord-box">
+    <div class="discord-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.4rem;">&#127760;</span>
+        <div>
+          <div style="font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:700;color:var(--accent2);">Serveur Discord</div>
+          <div style="font-size:0.75rem;color:var(--muted);">Rejoins la communaute Nomar3D !</div>
+        </div>
+      </div>
+      <button onclick="closeDiscordModal()" style="background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;">&#x2715;</button>
+    </div>
+    <div style="display:flex;justify-content:center;padding:16px 0 8px;">
+      <iframe src="https://discord.com/widget?id=1472157386243313705&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" style="border-radius:12px;"></iframe>
+    </div>
+    <div style="text-align:center;padding:0 16px 16px;">
+      <a href="https://discord.gg/nomar3d" target="_blank" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#5865f2,#7289da);color:#fff;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.9rem;">&#128279; Rejoindre le serveur</a>
+    </div>
+  </div>
+</div>
 </body>
 </html>
