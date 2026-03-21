@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nomar_IA</title>
-<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
@@ -35,9 +34,7 @@ body {
   overflow: hidden;
 }
 
-/* ═══════════════════════════════════════════
-   SIDEBAR
-═══════════════════════════════════════════ */
+/* SIDEBAR */
 .sidebar {
   width: var(--sidebar-w);
   background: var(--bg2);
@@ -47,7 +44,6 @@ body {
   flex-shrink: 0;
   transition: transform 0.3s ease;
   z-index: 100;
-  position: relative;
 }
 
 .sidebar-header {
@@ -81,7 +77,6 @@ body {
 }
 .new-chat-btn:hover { background: var(--accent2); transform: scale(1.05); }
 
-/* Nav tabs */
 .sidebar-nav {
   padding: 12px 8px;
   border-bottom: 1px solid var(--border);
@@ -111,11 +106,11 @@ body {
 .nav-item.active { background: rgba(124,58,237,0.2); color: var(--accent2); }
 .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
 
-/* Conversations list */
 .conversations {
   flex: 1;
   overflow-y: auto;
   padding: 8px;
+  min-height: 0;
 }
 .conversations::-webkit-scrollbar { width: 3px; }
 .conversations::-webkit-scrollbar-thumb { background: var(--border); }
@@ -139,17 +134,10 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  position: relative;
-  group: true;
 }
 .conv-item:hover { background: rgba(124,58,237,0.1); color: var(--text); }
 .conv-item.active-conv { background: rgba(124,58,237,0.15); color: var(--text); }
-.conv-item .conv-title {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.conv-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .conv-delete {
   opacity: 0;
   background: none;
@@ -160,11 +148,9 @@ body {
   padding: 2px 4px;
   border-radius: 4px;
   flex-shrink: 0;
-  transition: opacity 0.15s;
 }
 .conv-item:hover .conv-delete { opacity: 1; }
 
-/* Sidebar footer */
 .sidebar-footer {
   padding: 12px 8px;
   border-top: 1px solid var(--border);
@@ -200,13 +186,10 @@ body {
   font-size: 1rem;
   padding: 4px;
   border-radius: 6px;
-  transition: color 0.15s;
 }
 .user-settings-btn:hover { color: var(--text); }
 
-/* ═══════════════════════════════════════════
-   MAIN CONTENT
-═══════════════════════════════════════════ */
+/* MAIN */
 .main {
   flex: 1;
   display: flex;
@@ -215,7 +198,6 @@ body {
   min-width: 0;
 }
 
-/* Mobile header */
 .mobile-header {
   display: none;
   background: var(--bg2);
@@ -224,7 +206,6 @@ body {
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
-  z-index: 50;
 }
 .mobile-menu-btn {
   background: none;
@@ -241,30 +222,21 @@ body {
   color: var(--accent2);
   flex: 1;
 }
-.mobile-new-btn {
-  background: none;
-  border: none;
-  color: var(--accent2);
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 4px;
-}
 
-/* Panels */
-.panels { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-.panel { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.panels { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+.panel { display: none; flex: 1; flex-direction: column; overflow: hidden; min-height: 0; }
 .panel.active { display: flex; }
 
-/* ═══════════════════════════════════════════
-   CHAT PANEL
-═══════════════════════════════════════════ */
+/* CHAT */
 .messages {
   flex: 1;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 20px 24px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
 }
 .messages::-webkit-scrollbar { width: 4px; }
 .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -279,10 +251,7 @@ body {
   flex-shrink: 0;
 }
 .avatar.ai { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
-.avatar.user-av {
-  background: linear-gradient(135deg, #0ea5e9, #06b6d4);
-  font-size: 0.8rem;
-}
+.avatar.user-av { background: linear-gradient(135deg, #0ea5e9, #06b6d4); font-size: 0.8rem; }
 .bubble {
   padding: 10px 14px;
   border-radius: 14px;
@@ -302,7 +271,6 @@ body {
   border-top-right-radius: 4px;
 }
 
-/* Typing */
 .typing-dots { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent2); animation: bounce 1.2s infinite; }
 .dot:nth-child(2) { animation-delay: 0.2s; }
@@ -310,7 +278,6 @@ body {
 @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-8px)} }
 @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-/* Redirect chips */
 .redirect-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .redirect-chip {
   background: rgba(124,58,237,0.2);
@@ -324,9 +291,8 @@ body {
   font-weight: 600;
   transition: all 0.15s;
 }
-.redirect-chip:hover { background: rgba(124,58,237,0.4); transform: translateY(-1px); }
+.redirect-chip:hover { background: rgba(124,58,237,0.4); }
 
-/* Input */
 .input-bar {
   padding: 12px 16px;
   background: var(--bg2);
@@ -354,12 +320,10 @@ body {
   border-radius: 12px;
   width: 42px; height: 42px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   color: var(--text);
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 300;
   opacity: 0.6;
   transition: all 0.2s;
@@ -377,10 +341,9 @@ body {
 }
 .send-btn:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(124,58,237,0.4); }
 .send-btn svg { width: 18px; height: 18px; fill: white; }
+.web-badge { margin-top:8px; padding:4px 10px; background:rgba(139,92,246,0.15); border:1px solid rgba(139,92,246,0.4); border-radius:6px; font-size:0.78rem; color:#a78bfa; display:inline-block; }
 
-/* ═══════════════════════════════════════════
-   TRADE PANEL
-═══════════════════════════════════════════ */
+/* TRADE PANEL */
 .trade-panel {
   flex: 1;
   overflow-y: auto;
@@ -414,7 +377,6 @@ body {
   padding: 7px 10px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   font-size: 0.8rem;
   animation: fadeUp 0.2s ease;
 }
@@ -432,7 +394,6 @@ body {
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   margin-left: 6px;
-  transition: background 0.15s;
 }
 .slot-remove:hover { background: rgba(239,68,68,0.4); }
 .add-brainrot-btn {
@@ -476,7 +437,6 @@ body {
 .analyze-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(124,58,237,0.4); }
 .analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-/* Result */
 .result-box { display: none; background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
 .result-box.show { display: block; animation: fadeUp 0.3s ease; }
 .verdict { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
@@ -489,17 +449,9 @@ body {
 .stat-box { background: var(--bg3); border-radius: 10px; padding: 10px; text-align: center; }
 .stat-box .val { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; color: var(--accent2); }
 .stat-box .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
-.ai-analysis {
-  font-size: 0.88rem;
-  line-height: 1.6;
-  color: var(--muted);
-  border-left: 3px solid var(--accent);
-  padding-left: 12px;
-  white-space: pre-wrap;
-}
+.ai-analysis { font-size: 0.88rem; line-height: 1.6; color: var(--muted); border-left: 3px solid var(--accent); padding-left: 12px; white-space: pre-wrap; }
 .loading-analysis { display: flex; gap: 6px; align-items: center; color: var(--muted); font-size: 0.85rem; }
 
-/* Rarity colors */
 .rarity-common { background: rgba(100,116,139,0.2); color: #94a3b8; }
 .rarity-rare { background: rgba(59,130,246,0.2); color: #60a5fa; }
 .rarity-epic { background: rgba(139,92,246,0.2); color: #a78bfa; }
@@ -509,7 +461,7 @@ body {
 .rarity-secret { background: rgba(6,182,212,0.2); color: #22d3ee; }
 .rarity-og { background: rgba(16,185,129,0.2); color: #34d399; }
 
-/* Modal */
+/* MODAL */
 .modal-overlay {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.75);
@@ -550,7 +502,6 @@ body {
   font-size: 0.8rem;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  transition: all 0.15s;
 }
 .modal-close:hover { background: rgba(239,68,68,0.2); color: var(--red); }
 .modal-section { display: flex; flex-direction: column; gap: 6px; }
@@ -629,7 +580,6 @@ body {
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s;
 }
 .modal-cancel:hover { border-color: var(--accent2); }
 .modal-add {
@@ -642,14 +592,11 @@ body {
   font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s;
   letter-spacing: 1px;
 }
 .modal-add:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(245,158,11,0.4); }
 
-/* ═══════════════════════════════════════════
-   URBEX PANEL
-═══════════════════════════════════════════ */
+/* URBEX */
 .urbex-panel {
   flex: 1;
   overflow-y: auto;
@@ -686,7 +633,6 @@ body {
   font-weight: 700;
   padding: 11px 16px;
   cursor: pointer;
-  transition: all 0.2s;
   white-space: nowrap;
 }
 .urbex-btn:hover { transform: translateY(-1px); }
@@ -723,31 +669,17 @@ body {
 }
 .urbex-result-title { font-family: 'Orbitron', monospace; font-size: 0.88rem; font-weight: 700; }
 .urbex-danger-bar { display: flex; gap: 8px; flex-wrap: wrap; }
-.danger-badge {
-  font-size: 0.72rem;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-weight: 700;
-}
+.danger-badge { font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; font-weight: 700; }
 .danger-high { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
 .danger-med { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
 .danger-low { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
-.urbex-content {
-  padding: 16px;
-  font-size: 0.9rem;
-  line-height: 1.7;
-  color: var(--text);
-  white-space: pre-wrap;
-  word-break: break-word;
-}
+.urbex-content { padding: 16px; font-size: 0.9rem; line-height: 1.7; color: var(--text); white-space: pre-wrap; word-break: break-word; max-height: 400px; overflow-y: auto; }
 .urbex-loading { display: flex; gap: 6px; align-items: center; color: var(--gold); font-size: 0.85rem; }
 .dot-orange { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); animation: bounce 1.2s infinite; }
 .dot-orange:nth-child(2) { animation-delay: 0.2s; }
 .dot-orange:nth-child(3) { animation-delay: 0.4s; }
 
-/* ═══════════════════════════════════════════
-   AUTH MODAL
-═══════════════════════════════════════════ */
+/* AUTH MODAL */
 .auth-overlay {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.8);
@@ -821,10 +753,7 @@ body {
 }
 .auth-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,58,237,0.4); }
 .auth-error { color: var(--red); font-size: 0.82rem; margin-top: 8px; text-align: center; }
-.auth-guest {
-  text-align: center;
-  margin-top: 14px;
-}
+.auth-guest { text-align: center; margin-top: 14px; }
 .auth-guest button {
   background: none; border: none;
   color: var(--muted); font-size: 0.82rem;
@@ -833,9 +762,7 @@ body {
 }
 .auth-guest button:hover { color: var(--text); }
 
-/* ═══════════════════════════════════════════
-   SETTINGS MODAL
-═══════════════════════════════════════════ */
+/* SETTINGS MODAL */
 .settings-overlay {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.75);
@@ -876,7 +803,6 @@ body {
   cursor: pointer;
   font-size: 0.8rem;
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
 }
 .settings-close:hover { background: rgba(239,68,68,0.2); color: var(--red); }
 .settings-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; }
@@ -918,7 +844,6 @@ body {
   outline: none;
   resize: vertical;
   min-height: 80px;
-  transition: border-color 0.2s;
 }
 .custom-prompt-area:focus { border-color: var(--accent2); }
 .settings-save {
@@ -951,7 +876,35 @@ body {
 }
 .logout-btn:hover { background: rgba(239,68,68,0.2); }
 
-/* Sidebar overlay on mobile */
+/* PRO MODAL */
+.pro-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 2500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.pro-overlay.open { display: flex; }
+.pro-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  animation: fadeUp 0.25s ease;
+}
+.pro-close {
+  position: absolute; top: 12px; right: 16px;
+  background: none; border: none;
+  color: var(--muted); font-size: 1.2rem; cursor: pointer;
+}
+
+/* SIDEBAR OVERLAY */
 .sidebar-overlay {
   display: none;
   position: fixed; inset: 0;
@@ -959,9 +912,7 @@ body {
   z-index: 99;
 }
 
-/* ═══════════════════════════════════════════
-   RESPONSIVE MOBILE
-═══════════════════════════════════════════ */
+/* RESPONSIVE */
 @media (max-width: 768px) {
   .sidebar {
     position: fixed;
@@ -987,25 +938,20 @@ body {
 </head>
 <body>
 
-<!-- SIDEBAR OVERLAY (mobile) -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <div class="logo-small">NOMAR_<span>IA</span></div>
-    <button class="new-chat-btn" onclick="newConversation()" title="Nouvelle conversation">✏️</button>
+    <button class="new-chat-btn" onclick="newConversation()" title="Nouvelle conversation">&#9998;</button>
   </div>
 
   <div class="sidebar-nav">
     <button class="nav-item active" id="nav-chat" onclick="selectTab('chat')">
-      <span class="nav-icon">💬</span> IA Principale
-    </button>
-    <button class="nav-item" id="nav-trade" onclick="selectTab('trade')">
-      <span class="nav-icon">🔄</span> Trade Analyzer
+      <span class="nav-icon">&#128172;</span> IA Principale
     </button>
     <button class="nav-item" id="nav-urbex" onclick="selectTab('urbex')">
-      <span class="nav-icon">🏚️</span> Urbex Explorer
+      <span class="nav-icon">&#127962;</span> Urbex Explorer
     </button>
   </div>
 
@@ -1018,46 +964,40 @@ body {
     <div class="user-card" id="userCard" onclick="openSettings()">
       <div class="user-avatar" id="userAvatar">?</div>
       <div class="user-info">
-        <div class="user-name" id="userName">Invité</div>
+        <div class="user-name" id="userName">Invite</div>
         <div class="user-role" id="userRole">Connexion pour sauvegarder</div>
       </div>
-      <button class="user-settings-btn" onclick="openSettings(); event.stopPropagation()">⚙️</button>
+      <button class="user-settings-btn" onclick="openSettings(); event.stopPropagation()">&#9881;</button>
     </div>
   </div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
-  <!-- Mobile header -->
   <div class="mobile-header">
-    <button class="mobile-menu-btn" onclick="openSidebar()">☰</button>
+    <button class="mobile-menu-btn" onclick="openSidebar()">&#9776;</button>
     <div class="mobile-title" id="mobileTitle">IA Principale</div>
-    <button class="mobile-new-btn" onclick="newConversation()">✏️</button>
   </div>
 
   <div class="panels">
-    <!-- CHAT PANEL -->
     <div class="panel active" id="panel-chat">
       <div class="messages" id="messages">
         <div class="msg assistant">
           <div class="avatar ai">AI</div>
           <div class="bubble">
-            Yo ! Je suis ton IA principale 🤖 Tu peux me parler de n'importe quoi. Si la conversation tourne autour de <strong>Steal a Brainrot</strong>, je te proposerai de switcher vers l'<strong>analyseur de trades</strong> 🔄
+            Yo ! Je suis ton IA principale &#129302; Tu peux me parler de n'importe quoi. Si la conversation tourne autour de <strong>Steal a Brainrot</strong>, je te proposerai de switcher vers l'<strong>analyseur de trades</strong> &#128260;
           </div>
         </div>
       </div>
       <div class="input-bar">
         <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.csv,.json,.md" style="display:none" onchange="handleFileUpload(event)">
-        <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Joindre">
-          <span style="font-size:1.4rem;font-weight:300;line-height:1;">+</span>
-        </button>
+        <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Joindre">+</button>
         <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
           <div id="filePreview" style="display:none;padding:6px 8px;background:rgba(139,92,246,0.15);border-radius:8px;font-size:0.78rem;color:#a78bfa;align-items:center;gap:8px;">
             <img id="filePreviewImg" style="display:none;width:48px;height:48px;object-fit:cover;border-radius:6px;">
             <span id="filePreviewName" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-            <button onclick="clearFile()" style="background:none;border:none;color:#a78bfa;cursor:pointer;">✕</button>
+            <button onclick="clearFile()" style="background:none;border:none;color:#a78bfa;cursor:pointer;">&#x2715;</button>
           </div>
-          <input type="text" id="chatInput" placeholder="Écris ton message..." onkeydown="if(event.key==='Enter')sendChat()">
+          <input type="text" id="chatInput" placeholder="Ecris ton message..." onkeydown="if(event.key==='Enter')sendChat()">
         </div>
         <button class="send-btn" onclick="sendChat()">
           <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
@@ -1065,67 +1005,24 @@ body {
       </div>
     </div>
 
-    <!-- TRADE PANEL -->
-    <div class="panel" id="panel-trade">
-      <div class="trade-panel">
-        <div id="brainrotLoading" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);font-size:0.8rem;color:var(--muted);">
-          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-          <span id="loadingText">Chargement des brainrots...</span>
-        </div>
-        <div class="offers-grid">
-          <div class="offer-card">
-            <div class="offer-header your">Your Offer</div>
-            <div class="offer-subtitle">Add up to 4 brainrots</div>
-            <div class="offer-slots" id="yourSlots"></div>
-            <button class="add-brainrot-btn" onclick="openModal('your')" id="yourAddBtn"><span>+</span> Add Brainrot</button>
-            <div class="offer-value" id="yourValue">Value: ---</div>
-          </div>
-          <div class="offer-card">
-            <div class="offer-header their">Their Offer</div>
-            <div class="offer-subtitle">Add up to 4 brainrots</div>
-            <div class="offer-slots" id="theirSlots"></div>
-            <button class="add-brainrot-btn" onclick="openModal('their')" id="theirAddBtn"><span>+</span> Add Brainrot</button>
-            <div class="offer-value" id="theirValue">Value: ---</div>
-          </div>
-        </div>
-        <button class="analyze-btn" onclick="analyzeTrade()" id="analyzeBtn">⚡ Analyser le Trade</button>
-        <div class="result-box" id="resultBox">
-          <div class="verdict">
-            <div class="verdict-icon" id="verdictIcon"></div>
-            <div>
-              <div class="verdict-label" id="verdictLabel"></div>
-              <div style="font-size:0.78rem;color:var(--muted);margin-top:2px" id="verdictSub"></div>
-            </div>
-          </div>
-          <div class="stats-row">
-            <div class="stat-box"><div class="val" id="myEffRps">-</div><div class="lbl">Ton offre</div></div>
-            <div class="stat-box" style="background:transparent;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">⚔️</div>
-            <div class="stat-box"><div class="val" id="theirEffRps">-</div><div class="lbl">Leur offre</div></div>
-          </div>
-          <div class="ai-analysis" id="aiAnalysis"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- URBEX PANEL -->
     <div class="panel" id="panel-urbex">
       <div class="urbex-panel">
         <div>
-          <div class="urbex-title">🏚️ Urbex Explorer</div>
-          <div class="urbex-subtitle">Explore des lieux abandonnés, dangers et légalité</div>
+          <div class="urbex-title">&#127962; Urbex Explorer</div>
+          <div class="urbex-subtitle">Explore des lieux abandonnes, dangers et legalite</div>
         </div>
         <div class="urbex-input-row">
-          <input type="text" id="urbexInput" placeholder="Ex: usine abandonnée Nord France..." onkeydown="if(event.key==='Enter')searchUrbex()">
-          <button class="urbex-btn" onclick="searchUrbex()" id="urbexBtn">🔍 Explorer</button>
+          <input type="text" id="urbexInput" placeholder="Ex: usine abandonnee Nord France..." onkeydown="if(event.key==='Enter')searchUrbex()">
+          <button class="urbex-btn" onclick="searchUrbex()" id="urbexBtn">&#128269; Explorer</button>
         </div>
         <div class="quick-tags">
-          <span class="quick-tag" onclick="quickSearch('lieux abandonnés France')">🇫🇷 France</span>
-          <span class="quick-tag" onclick="quickSearch('lieux abandonnés Belgique')">🇧🇪 Belgique</span>
-          <span class="quick-tag" onclick="quickSearch('usines abandonnées')">🏭 Usines</span>
-          <span class="quick-tag" onclick="quickSearch('hôpitaux abandonnés')">🏥 Hôpitaux</span>
-          <span class="quick-tag" onclick="quickSearch('châteaux abandonnés')">🏰 Châteaux</span>
-          <span class="quick-tag" onclick="quickSearch('conseils sécurité urbex')">🦺 Sécurité</span>
-          <span class="quick-tag" onclick="quickSearch('légalité urbex France')">⚖️ Légalité</span>
+          <span class="quick-tag" onclick="quickSearch('lieux abandonnes France')">&#127467;&#127479; France</span>
+          <span class="quick-tag" onclick="quickSearch('lieux abandonnes Belgique')">&#127463;&#127466; Belgique</span>
+          <span class="quick-tag" onclick="quickSearch('usines abandonnees')">&#127981; Usines</span>
+          <span class="quick-tag" onclick="quickSearch('hopitaux abandonnes')">&#127973; Hopitaux</span>
+          <span class="quick-tag" onclick="quickSearch('chateaux abandonnes')">&#127984; Chateaux</span>
+          <span class="quick-tag" onclick="quickSearch('conseils securite urbex')">&#129466; Securite</span>
+          <span class="quick-tag" onclick="quickSearch('legalite urbex France')">&#9878; Legalite</span>
         </div>
         <div class="urbex-result" id="urbexResult">
           <div class="urbex-result-header">
@@ -1135,51 +1032,6 @@ body {
           <div class="urbex-content" id="urbexContent"></div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL ADD BRAINROT -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">Add Brainrot</div>
-        <div class="modal-subtitle" id="modalSide">Your Offer</div>
-      </div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-section">
-      <div class="modal-label">BRAINROT</div>
-      <div class="searchable-select">
-        <input type="text" class="search-input" id="modalBrainrotInput" placeholder="Search brainrot..." oninput="filterModalDropdown()" onfocus="openModalDropdown()" autocomplete="off">
-        <div class="select-dropdown" id="modalBrainrotDropdown"></div>
-      </div>
-    </div>
-    <div class="modal-section">
-      <div class="modal-label">MUTATION (MAX 1)</div>
-      <select class="search-input" id="modalMutation" style="cursor:pointer;">
-        <option value="none">🚫 No mutation</option>
-        <option value="Gold">🟡 Gold (x1.25)</option>
-        <option value="Diamond">💎 Diamond (x2)</option>
-        <option value="Rainbow">🌈 Rainbow (x10)</option>
-        <option value="Bloodrot">🩸 Bloodrot (x8)</option>
-        <option value="Candy">🍬 Candy (x3)</option>
-        <option value="Lava">🔥 Lava (x6)</option>
-        <option value="Radioactive">☢️ Radioactive (x4)</option>
-        <option value="Divine">✨ Divine (x10)</option>
-        <option value="Galaxy">🌌 Galaxy (x5)</option>
-        <option value="Yin Yang">☯️ Yin Yang (x7)</option>
-      </select>
-    </div>
-    <div class="modal-section">
-      <div class="modal-label">TRAITS</div>
-      <input type="text" class="search-input" id="modalTraitFilter" placeholder="Filter traits..." oninput="filterModalTraits()" style="margin-bottom:8px;">
-      <div class="traits-chips-grid" id="modalTraitsGrid"></div>
-    </div>
-    <div class="modal-actions">
-      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
-      <button class="modal-add" onclick="addBrainrotToOffer()">Add</button>
     </div>
   </div>
 </div>
@@ -1199,18 +1051,18 @@ body {
         <input type="text" id="authUsername" placeholder="Ton pseudo...">
       </div>
       <div class="auth-field" id="authEmailField" style="display:none;">
-        <label>Email (optionnel)</label>
+        <label>Email *</label>
         <input type="email" id="authEmail" placeholder="ton@email.com">
       </div>
       <div class="auth-field">
         <label>Mot de passe</label>
-        <input type="password" id="authPassword" placeholder="••••••••">
+        <input type="password" id="authPassword" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;">
       </div>
       <div class="auth-error" id="authError"></div>
       <button class="auth-submit" onclick="submitAuth()">Se connecter</button>
     </div>
     <div class="auth-guest">
-      <button onclick="continueAsGuest()">Continuer sans compte →</button>
+      <button onclick="continueAsGuest()">Continuer sans compte &#8594;</button>
     </div>
   </div>
 </div>
@@ -1219,104 +1071,91 @@ body {
 <div class="settings-overlay" id="settingsOverlay">
   <div class="settings-box">
     <div class="settings-header">
-      <div class="settings-title">⚙️ Paramètres</div>
-      <button class="settings-close" onclick="closeSettings()">✕</button>
+      <div class="settings-title">&#9881; Parametres</div>
+      <button class="settings-close" onclick="closeSettings()">&#x2715;</button>
     </div>
     <div class="settings-body">
-
       <div>
         <div class="settings-section-title">Compte</div>
         <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border-radius:10px;border:1px solid var(--border);">
           <div class="user-avatar" id="settingsAvatar" style="width:42px;height:42px;font-size:1rem;">?</div>
           <div>
-            <div style="font-weight:600" id="settingsName">Invité</div>
-            <div style="font-size:0.78rem;color:var(--muted)" id="settingsEmail">Non connecté</div>
+            <div style="font-weight:600" id="settingsName">Invite</div>
+            <div style="font-size:0.78rem;color:var(--muted)" id="settingsEmail">Non connecte</div>
           </div>
         </div>
+        <button id="authActionBtn" onclick="openAuthModal()" style="width:100%;margin-top:10px;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;">&#128272; Se connecter / S'inscrire</button>
+        <button id="proActionBtn" onclick="openProModal()" style="width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;display:none;">&#9889; Passer Pro - 4/mois</button>
       </div>
 
       <div>
-        <div class="settings-section-title">Personnalité de l'IA</div>
+        <div class="settings-section-title">Personnalite de l'IA</div>
         <div class="persona-grid" id="personaGrid">
           <button class="persona-btn selected" data-persona="cool" onclick="selectPersona(this)">
-            <span class="persona-emoji">😎</span>Cool & Détendu
+            <span class="persona-emoji">&#128526;</span>Cool & Detendu
           </button>
           <button class="persona-btn" data-persona="ado" onclick="selectPersona(this)">
-            <span class="persona-emoji">🔥</span>Ado / Gamer
+            <span class="persona-emoji">&#128293;</span>Ado / Gamer
           </button>
           <button class="persona-btn" data-persona="formel" onclick="selectPersona(this)">
-            <span class="persona-emoji">👔</span>Formel
+            <span class="persona-emoji">&#128084;</span>Formel
           </button>
           <button class="persona-btn" data-persona="humour" onclick="selectPersona(this)">
-            <span class="persona-emoji">😂</span>Humouristique
+            <span class="persona-emoji">&#128514;</span>Humouristique
           </button>
           <button class="persona-btn" data-persona="sage" onclick="selectPersona(this)">
-            <span class="persona-emoji">🧙</span>Sage & Profond
+            <span class="persona-emoji">&#129497;</span>Sage & Profond
           </button>
           <button class="persona-btn" data-persona="custom" onclick="selectPersona(this)">
-            <span class="persona-emoji">✏️</span>Personnalisé
+            <span class="persona-emoji">&#9998;</span>Personnalise
           </button>
         </div>
         <div id="customPromptDiv" style="margin-top:10px;display:none;">
-          <textarea class="custom-prompt-area" id="customPrompt" placeholder="Décris le comportement de l'IA... Ex: Tu es un expert en crypto qui parle de façon directe et technique."></textarea>
+          <textarea class="custom-prompt-area" id="customPrompt" placeholder="Decris le comportement de l'IA..."></textarea>
         </div>
       </div>
 
-      <button class="settings-save" onclick="saveSettings()">💾 Sauvegarder</button>
+      <button class="settings-save" onclick="saveSettings()">&#128190; Sauvegarder</button>
 
       <div>
-        <button class="logout-btn" onclick="logout()" id="logoutBtn">🚪 Se déconnecter</button>
+        <button class="logout-btn" onclick="logout()" id="logoutBtn">&#128682; Se deconnecter</button>
       </div>
-
     </div>
   </div>
 </div>
 
-
-<!-- Modal Connect -->
-<div id="connectOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;">
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:400px;width:90%;text-align:center;position:relative;">
-    <button onclick="closeConnectPopup()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;">✕</button>
-    <div style="font-size:2.5rem;margin-bottom:12px;">😎</div>
-    <h2 style="margin:0 0 8px;color:var(--text);">Tu kiffes Nomar ?</h2>
-    <p style="color:var(--muted);font-size:0.9rem;margin:0 0 20px;">Connecte-toi pour sauvegarder tes conversations !</p>
-    <button onclick="openAuthFromConnectPopup()" style="width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:10px;">🔐 Se connecter / S'inscrire</button>
-    <button onclick="closeConnectPopup()" style="width:100%;padding:10px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:10px;font-size:0.9rem;cursor:pointer;">Continuer sans compte</button>
-  </div>
-</div>
-<!-- Modal Pro -->
-<div id="proOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:2500;align-items:center;justify-content:center;">
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;position:relative;">
-    <button onclick="closeProModal()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;">✕</button>
-    <div style="font-size:2.5rem;margin-bottom:12px;">⚡</div>
-    <h2 style="color:var(--accent);margin:0 0 8px;">Nomar Pro</h2>
-    <p style="color:var(--muted);font-size:0.9rem;margin:0 0 20px;">Débloque toutes les fonctionnalités premium</p>
+<!-- PRO MODAL -->
+<div class="pro-overlay" id="proOverlay">
+  <div class="pro-box">
+    <button class="pro-close" onclick="closeProModal()">&#x2715;</button>
+    <div style="font-size:2.5rem;margin-bottom:12px;">&#9889;</div>
+    <h2 style="color:var(--accent);margin:0 0 8px;font-family:'Orbitron',monospace;">Nomar Pro</h2>
+    <p style="color:var(--muted);font-size:0.9rem;margin:0 0 20px;">Debloque toutes les fonctionnalites premium</p>
     <div style="background:var(--bg3);border-radius:10px;padding:16px;text-align:left;margin-bottom:20px;">
-      <div style="margin-bottom:8px;">🔍 <strong>Recherche web en temps réel</strong></div>
-      <div style="margin-bottom:8px;">💬 <strong>Messages illimités</strong></div>
-      <div style="margin-bottom:8px;">🎭 <strong>Tous les personas</strong></div>
-      <div style="margin-bottom:8px;">📚 <strong>Conversations illimitées</strong></div>
-      <div>🚀 <strong>Réponses plus longues</strong></div>
+      <div style="margin-bottom:8px;">&#128269; <strong>Recherche web en temps reel</strong></div>
+      <div style="margin-bottom:8px;">&#128172; <strong>Messages illimites</strong></div>
+      <div style="margin-bottom:8px;">&#127917; <strong>Tous les personas</strong></div>
+      <div style="margin-bottom:8px;">&#128218; <strong>Conversations illimitees</strong></div>
+      <div>&#128640; <strong>Reponses plus longues</strong></div>
     </div>
-    <div style="font-size:1.8rem;font-weight:800;color:var(--accent);margin-bottom:4px;">4€ <span style="font-size:1rem;font-weight:400;color:var(--muted);">/ mois</span></div>
-    <button onclick="closeProModal()" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;">Bientôt disponible 🚀</button>
+    <div style="font-size:1.8rem;font-weight:800;color:var(--accent);margin-bottom:4px;">4&#8364; <span style="font-size:1rem;font-weight:400;color:var(--muted);">/ mois</span></div>
+    <button onclick="closeProModal()" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;">Bientot disponible &#128640;</button>
   </div>
 </div>
+
 <script>
 const WORKER = 'https://nomar-ai-proxy.lucas-nomme29.workers.dev';
 const BACKEND = 'https://nomar-ia-backend-production.up.railway.app';
 
-// ─── PERSONAS ────────────────────────────────────────────────
 const PERSONAS = {
-  cool: "Tu t'appelles Nomar. Tu es un pote sympa et stylé, tu parles en français avec un ton naturel et détendu. Tu réponds comme un ami qui sait tout, jamais comme un robot ou un assistant. Tu ne dis JAMAIS que tu es une IA. Tu écris toujours en français correct, sans fautes d'orthographe.",
-  ado: "Tu t'appelles Nomar. Tu parles comme un ado gamer français, tu utilises le verlan, les expressions gaming, des emojis. T'es enthousiaste, tu connais tous les mèmes et les jeux vidéo. Tu ne dis JAMAIS que tu es une IA. Malgré le style familier, tu fais attention à l'orthographe.",
-  formel: "Tu t'appelles Nomar. Tu es un conseiller compétent et professionnel, tu parles en français avec un vocabulaire soutenu. Tu vouvoies l'utilisateur. Tu ne mentionnes JAMAIS être une IA. Tu écris toujours en français parfait, sans aucune faute.",
-  humour: "Tu t'appelles Nomar. T'es un pote marrant, tu fais des blagues et des jeux de mots. T'es drôle mais utile. Tu ne dis JAMAIS que tu es une IA. Tu écris en français correct malgré le ton décontracté.",
-  sage: "Tu t'appelles Nomar. Tu es quelqu'un de sage et réfléchi, tu parles avec profondeur et calme. Tu ne mentionnes JAMAIS être une IA. Tu écris toujours en français parfait.",
+  cool: "Tu t'appelles Nomar. Tu es un pote sympa et style, tu parles en francais avec un ton naturel et detendu. Tu reponds comme un ami qui sait tout, jamais comme un robot. Tu ne dis JAMAIS que tu es une IA. Tu ecris toujours en francais correct.",
+  ado: "Tu t'appelles Nomar. Tu parles comme un ado gamer francais, tu utilises le verlan, les expressions gaming, des emojis. T'es enthousiaste. Tu ne dis JAMAIS que tu es une IA. Tu fais attention a l'orthographe malgre le style familier.",
+  formel: "Tu t'appelles Nomar. Tu es un conseiller competent et professionnel, tu parles en francais avec un vocabulaire soutenu. Tu vouvoies l'utilisateur. Tu ne mentionnes JAMAIS etre une IA. Tu ecris toujours en francais parfait.",
+  humour: "Tu t'appelles Nomar. T'es un pote marrant, tu fais des blagues et des jeux de mots. T'es drole mais utile. Tu ne dis JAMAIS que tu es une IA. Tu ecris en francais correct.",
+  sage: "Tu t'appelles Nomar. Tu es quelqu'un de sage et reflechi, tu parles avec profondeur et calme. Tu ne mentionnes JAMAIS etre une IA. Tu ecris toujours en francais parfait.",
   custom: ""
 };
 
-// ─── STATE ───────────────────────────────────────────────────
 let currentUser = null;
 let currentPersona = 'cool';
 let customPersonaText = '';
@@ -1324,12 +1163,27 @@ let chatHistory = [];
 let conversations = [];
 let currentConvId = null;
 let currentTab = 'chat';
+let attachedFile = null;
+let attachedFileContent = null;
 
-// ─── LOCAL STORAGE HELPERS ───────────────────────────────────
 function saveToStorage(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
 function loadFromStorage(key){ try{ const v=localStorage.getItem(key); return v?JSON.parse(v):null; }catch(e){ return null; } }
 
-// ─── AUTH ────────────────────────────────────────────────────
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderMarkdown(text){
+  let h = escHtml(text);
+  h = h.replace(/[*][*](.*?)[*][*]/g, '<strong>$1</strong>');
+  h = h.replace(/[*](.*?)[*]/g, '<em>$1</em>');
+  h = h.replace(/`(.*?)`/g, '<code style="background:rgba(255,255,255,0.1);padding:1px 4px;border-radius:3px;">$1</code>');
+  h = h.split('\n').join('<br>');
+  if(text.indexOf('Reponse basee sur une recherche web') !== -1 || text.indexOf('Réponse basée sur une recherche web') !== -1){
+    h = h + '<div class="web-badge">&#128269; Reponse basee sur une recherche web</div>';
+  }
+  return h;
+}
+
+// AUTH
 function initAuth(){
   const saved = loadFromStorage('nomar_user');
   if(saved){
@@ -1357,16 +1211,17 @@ async function submitAuth(){
   const mode = document.querySelector('.auth-submit').dataset.mode || 'login';
   const errEl = document.getElementById('authError');
   const btn = document.querySelector('.auth-submit');
-  const email = document.getElementById('authEmail')?.value?.trim() || '';
+  const emailEl = document.getElementById('authEmail');
+  const email = emailEl ? emailEl.value.trim() : '';
+
   if(!username || !password){ errEl.textContent = 'Remplis tous les champs !'; return; }
   if(mode === 'register'){
     if(!email){ errEl.textContent = 'Email obligatoire !'; return; }
-    if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){ errEl.textContent = 'Email invalide !'; return; }
-    if(password.length < 5){ errEl.textContent = 'Mot de passe trop court (min 5 caractères)'; return; }
-    if(!/[a-zA-Z]/.test(password)){ errEl.textContent = 'Le mot de passe doit contenir des lettres'; return; }
-    if(!/[0-9]/.test(password)){ errEl.textContent = 'Le mot de passe doit contenir des chiffres'; return; }
+    if(password.length < 5){ errEl.textContent = 'Mot de passe min 5 caracteres'; return; }
+    if(!/[a-zA-Z]/.test(password)){ errEl.textContent = 'Doit contenir des lettres'; return; }
+    if(!/[0-9]/.test(password)){ errEl.textContent = 'Doit contenir des chiffres'; return; }
   }
-  btn.textContent = '⏳...'; btn.disabled = true;
+  btn.textContent = '...'; btn.disabled = true;
   try {
     const res = await fetch(BACKEND + (mode==='register' ? '/register' : '/login'), {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -1381,7 +1236,9 @@ async function submitAuth(){
     document.getElementById('authOverlay').style.display = 'none';
     onLogin();
   } catch(e) {
-    errEl.textContent = 'Erreur serveur'; btn.textContent = mode==='login'?'Se connecter':"S'inscrire"; btn.disabled=false;
+    errEl.textContent = 'Erreur serveur';
+    btn.textContent = mode==='login'?'Se connecter':"S'inscrire";
+    btn.disabled = false;
   }
 }
 
@@ -1394,7 +1251,7 @@ function continueAsGuest(){
 function onLogin(){
   currentUser.is_pro = currentUser.is_pro === true || currentUser.is_pro === 'true';
   currentPersona = currentUser.persona || 'cool';
-  customPersonaText = currentUser.custom_prompt || '';
+  customPersonaText = currentUser.custom_prompt || currentUser.customPrompt || '';
   updateUserUI();
   loadConversations();
 }
@@ -1403,7 +1260,7 @@ function onGuest(){
   currentPersona = loadFromStorage('nomar_persona') || 'cool';
   customPersonaText = loadFromStorage('nomar_custom_prompt') || '';
   updateUserUI();
-  renderConvList();
+  loadConversations();
 }
 
 function logout(){
@@ -1412,41 +1269,45 @@ function logout(){
   chatHistory = [];
   saveToStorage('nomar_user', null);
   closeSettings();
-  renderConvList();
   updateUserUI();
   newConversation();
   document.getElementById('authOverlay').style.display = 'flex';
 }
 
 function updateUserUI(){
-  const name = currentUser ? currentUser.username : 'Invité';
-  const role = currentUser ? (currentUser.is_pro ? '⚡ Compte Pro' : 'Compte gratuit') : 'Mode invité';
-  const proBtn = document.getElementById('proActionBtn');
-  if(proBtn) proBtn.style.display = (currentUser && !currentUser.is_pro) ? 'block' : 'none';
-  const authBtn = document.getElementById('authActionBtn');
-  if(authBtn) authBtn.style.display = currentUser ? 'none' : 'block';
+  const name = currentUser ? currentUser.username : 'Invite';
+  const role = currentUser ? (currentUser.is_pro ? 'Compte Pro' : 'Compte gratuit') : 'Mode invite';
   const letter = name[0].toUpperCase();
   document.getElementById('userName').textContent = name;
   document.getElementById('userRole').textContent = role;
   document.getElementById('userAvatar').textContent = letter;
   document.getElementById('settingsAvatar').textContent = letter;
   document.getElementById('settingsName').textContent = name;
-  document.getElementById('settingsEmail').textContent = currentUser ? 'Connecté' : 'Non connecté';
+  document.getElementById('settingsEmail').textContent = currentUser ? 'Connecte' : 'Non connecte';
   document.getElementById('logoutBtn').style.display = currentUser ? 'block' : 'none';
+  const authBtn = document.getElementById('authActionBtn');
+  if(authBtn) authBtn.style.display = currentUser ? 'none' : 'block';
+  const proBtn = document.getElementById('proActionBtn');
+  if(proBtn) proBtn.style.display = (currentUser && !currentUser.is_pro) ? 'block' : 'none';
 }
 
-// ─── CONVERSATIONS ───────────────────────────────────────────
-function loadConversations(){
-  if(currentUser){
-    const users = loadFromStorage('nomar_users') || {};
-    const userData = users[currentUser.username];
-    conversations = userData?.conversations || [];
+// CONVERSATIONS
+async function loadConversations(){
+  if(currentUser && currentUser.id){
+    try {
+      const res = await fetch(BACKEND + '/conversations/' + currentUser.id);
+      const data = await res.json();
+      conversations = data.conversations || [];
+    } catch(e) { conversations = []; }
   } else {
     conversations = loadFromStorage('nomar_guest_convs') || [];
   }
   renderConvList();
   if(conversations.length > 0){
-    loadConversation(conversations[0].id);
+    const conv = conversations[0];
+    currentConvId = conv.id;
+    chatHistory = conv.messages || [];
+    renderMessages();
   } else {
     newConversation();
   }
@@ -1466,7 +1327,9 @@ async function saveConversations(){
 }
 
 function newConversation(){
-  if(currentUser && !currentUser.is_pro && conversations.length >= 5){ openProModal(); return; }
+  if(currentUser && !currentUser.is_pro && conversations.length >= 5){
+    openProModal(); return;
+  }
   if(currentConvId && chatHistory.length > 0){
     const conv = conversations.find(c => c.id === currentConvId);
     if(conv){ conv.messages = [...chatHistory]; conv.title = getConvTitle(); saveConversations(); }
@@ -1474,7 +1337,7 @@ function newConversation(){
   currentConvId = 'conv_' + Date.now();
   chatHistory = [];
   const msgs = document.getElementById('messages');
-  msgs.innerHTML = `<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Je suis ton IA principale 🤖 Tu peux me parler de n'importe quoi. Si la conversation tourne autour de <strong>Steal a Brainrot</strong>, je te proposerai de switcher vers l'<strong>analyseur de trades</strong> 🔄</div></div>`;
+  msgs.innerHTML = '<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Je suis ton IA principale &#129302; Tu peux me parler de n\'importe quoi. Si la conversation tourne autour de <strong>Steal a Brainrot</strong>, je te proposerai de switcher vers l\'<strong>analyseur de trades</strong> &#128260;</div></div>';
   const newConv = { id: currentConvId, title: 'Nouvelle conversation', messages: [], date: Date.now() };
   conversations.unshift(newConv);
   saveConversations();
@@ -1485,7 +1348,6 @@ function newConversation(){
 function loadConversation(id){
   const conv = conversations.find(c => c.id === id);
   if(!conv) return;
-  // Save current first
   if(currentConvId && currentConvId !== id && chatHistory.length > 0){
     const cur = conversations.find(c => c.id === currentConvId);
     if(cur){ cur.messages = [...chatHistory]; cur.title = getConvTitle(); saveConversations(); }
@@ -1495,6 +1357,8 @@ function loadConversation(id){
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-chat').classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const nc = document.getElementById('nav-chat');
+  if(nc) nc.classList.add('active');
   currentTab = 'chat';
   renderMessages();
   renderConvList();
@@ -1518,50 +1382,42 @@ function getConvTitle(){
 function renderConvList(){
   const el = document.getElementById('convItems');
   if(conversations.length === 0){
-    el.innerHTML = '<div style="padding:8px 8px;font-size:0.78rem;color:var(--muted);">Aucune conversation</div>';
+    el.innerHTML = '<div style="padding:8px;font-size:0.78rem;color:var(--muted);">Aucune conversation</div>';
     return;
   }
-  el.innerHTML = conversations.slice(0,20).map(c => `
-    <div class="conv-item ${c.id===currentConvId?'active-conv':''}" onclick="loadConversation('${c.id}')">
-      <span class="conv-title">💬 ${escHtml(c.title||'Conversation')}</span>
-      <button class="conv-delete" onclick="deleteConversation('${c.id}',event)">✕</button>
-    </div>
-  `).join('');
+  el.innerHTML = '';
+  conversations.slice(0,20).forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'conv-item' + (c.id===currentConvId?' active-conv':'');
+    div.innerHTML = '<span class="conv-title">&#128172; ' + escHtml(c.title||'Conversation') + '</span><button class="conv-delete">&#x2715;</button>';
+    div.addEventListener('click', function(ev){ if(!ev.target.classList.contains('conv-delete')) loadConversation(c.id); });
+    div.querySelector('.conv-delete').addEventListener('click', function(ev){ ev.stopPropagation(); deleteConversation(c.id, ev); });
+    el.appendChild(div);
+  });
 }
-
-function renderMarkdown(text){
-  let h = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  h = h.replace(/[*][*](.*?)[*][*]/g, '<strong>$1</strong>');
-  h = h.replace(/[*](.*?)[*]/g, '<em>$1</em>');
-  h = h.replace(/`(.*?)`/g, '<code>$1</code>');
-  h = h.split('\n').join('<br>');
-  if(text.indexOf('Réponse basée sur une recherche web') !== -1){
-    var parts = h.split('<br>');
-    h = parts.map(function(p){ return p.indexOf('Réponse basée sur une recherche web') !== -1 ? '<div class="web-badge">🔍 Réponse basée sur une recherche web</div>' : p; }).join('<br>');
-  }
-  return h;
-}
-
-function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function renderMessages(){
   const msgs = document.getElementById('messages');
   if(chatHistory.length === 0){
-    msgs.innerHTML = `<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Je suis ton IA principale 🤖</div></div>`;
+    msgs.innerHTML = '<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Je suis ton IA principale &#129302;</div></div>';
     return;
   }
-  msgs.innerHTML = chatHistory.map(m => `
-    <div class="msg ${m.role==='user'?'user':'assistant'}">
-      ${m.role==='user' ? `<div class="avatar user-av">${currentUser?currentUser.username[0].toUpperCase():'T'}</div>` : '<div class="avatar ai">AI</div>'}
-      <div class="bubble">${escHtml(m.content)}</div>
-    </div>
-  `).join('');
+  msgs.innerHTML = '';
+  chatHistory.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (m.role==='user'?'user':'assistant');
+    const letter = currentUser ? currentUser.username[0].toUpperCase() : 'T';
+    const avatarHtml = m.role==='user'
+      ? '<div class="avatar user-av">'+letter+'</div>'
+      : '<div class="avatar ai">AI</div>';
+    div.innerHTML = avatarHtml + '<div class="bubble">' + renderMarkdown(m.content) + '</div>';
+    msgs.appendChild(div);
+  });
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-// ─── SETTINGS ────────────────────────────────────────────────
+// SETTINGS
 function openSettings(){
-  // Sync UI with current state
   document.querySelectorAll('.persona-btn').forEach(b => {
     b.classList.toggle('selected', b.dataset.persona === currentPersona);
   });
@@ -1574,7 +1430,11 @@ function closeSettings(){ document.getElementById('settingsOverlay').classList.r
 
 function selectPersona(btn){
   const p = btn.dataset.persona;
-  if(!currentUser?.is_pro && p !== 'cool'){ openProModal(); return; }
+  if(currentUser && !currentUser.is_pro && p !== 'cool'){
+    closeSettings();
+    openProModal();
+    return;
+  }
   document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   currentPersona = p;
@@ -1599,217 +1459,25 @@ async function saveSettings(){
   }
   closeSettings();
 }
-function logout(){
-  currentUser = null;
-  conversations = [];
-  chatHistory = [];
-  saveToStorage('nomar_user', null);
-  closeSettings();
-  renderConvList();
-  updateUserUI();
-  newConversation();
-  document.getElementById('authOverlay').style.display = 'flex';
-}
-
-function updateUserUI(){
-  const name = currentUser ? currentUser.username : 'Invité';
-  const role = currentUser ? (currentUser.is_pro ? '⚡ Compte Pro' : 'Compte gratuit') : 'Mode invité';
-  const proBtn = document.getElementById('proActionBtn');
-  if(proBtn) proBtn.style.display = (currentUser && !currentUser.is_pro) ? 'block' : 'none';
-  const authBtn = document.getElementById('authActionBtn');
-  if(authBtn) authBtn.style.display = currentUser ? 'none' : 'block';
-  const letter = name[0].toUpperCase();
-  document.getElementById('userName').textContent = name;
-  document.getElementById('userRole').textContent = role;
-  document.getElementById('userAvatar').textContent = letter;
-  document.getElementById('settingsAvatar').textContent = letter;
-  document.getElementById('settingsName').textContent = name;
-  document.getElementById('settingsEmail').textContent = currentUser ? 'Connecté' : 'Non connecté';
-  document.getElementById('logoutBtn').style.display = currentUser ? 'block' : 'none';
-}
-
-// ─── CONVERSATIONS ───────────────────────────────────────────
-function loadConversations(){
-  if(currentUser){
-    const users = loadFromStorage('nomar_users') || {};
-    const userData = users[currentUser.username];
-    conversations = userData?.conversations || [];
-  } else {
-    conversations = loadFromStorage('nomar_guest_convs') || [];
-  }
-  renderConvList();
-  if(conversations.length > 0){
-    loadConversation(conversations[0].id);
-  } else {
-    newConversation();
-  }
-}
-
-async function saveConversations(){
-  if(currentUser && currentUser.id){
-    try {
-      await fetch(BACKEND + '/conversations/save', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({userId: currentUser.id, conversations: conversations.slice(0,20)})
-      });
-    } catch(e) {}
-  } else {
-    saveToStorage('nomar_guest_convs', conversations.slice(0,10));
-  }
-}
-
-function newConversation(){
-  if(currentUser && !currentUser.is_pro && conversations.length >= 5){ openProModal(); return; }
-  if(currentConvId && chatHistory.length > 0){
-    const conv = conversations.find(c => c.id === currentConvId);
-    if(conv){ conv.messages = [...chatHistory]; conv.title = getConvTitle(); saveConversations(); }
-  }
-  currentConvId = 'conv_' + Date.now();
-  chatHistory = [];
-  const msgs = document.getElementById('messages');
-  msgs.innerHTML = `<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Je suis ton IA principale 🤖 Tu peux me parler de n'importe quoi. Si la conversation tourne autour de <strong>Steal a Brainrot</strong>, je te proposerai de switcher vers l'<strong>analyseur de trades</strong> 🔄</div></div>`;
-  const newConv = { id: currentConvId, title: 'Nouvelle conversation', messages: [], date: Date.now() };
-  conversations.unshift(newConv);
-  saveConversations();
-  renderConvList();
-  closeSidebar();
-}
-
-function loadConversation(id){
-  const conv = conversations.find(c => c.id === id);
-  if(!conv) return;
-  // Save current first
-  if(currentConvId && currentConvId !== id && chatHistory.length > 0){
-    const cur = conversations.find(c => c.id === currentConvId);
-    if(cur){ cur.messages = [...chatHistory]; cur.title = getConvTitle(); saveConversations(); }
-  }
-  currentConvId = id;
-  chatHistory = conv.messages || [];
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-chat').classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  currentTab = 'chat';
-  renderMessages();
-  renderConvList();
-  closeSidebar();
-}
-
-function deleteConversation(id, e){
-  e.stopPropagation();
-  conversations = conversations.filter(c => c.id !== id);
-  saveConversations();
-  if(currentConvId === id){ newConversation(); return; }
-  renderConvList();
-}
-
-function getConvTitle(){
-  const first = chatHistory.find(m => m.role === 'user');
-  if(first) return first.content.slice(0,30) + (first.content.length > 30 ? '...' : '');
-  return 'Conversation';
-}
-
-function renderConvList(){
-  const el = document.getElementById('convItems');
-  if(conversations.length === 0){
-    el.innerHTML = '<div style="padding:8px 8px;font-size:0.78rem;color:var(--muted);">Aucune conversation</div>';
-    return;
-  }
-  el.innerHTML = conversations.slice(0,20).map(c => `
-    <div class="conv-item ${c.id===currentConvId?'active-conv':''}" onclick="loadConversation('${c.id}')">
-      <span class="conv-title">💬 ${escHtml(c.title||'Conversation')}</span>
-      <button class="conv-delete" onclick="deleteConversation('${c.id}',event)">✕</button>
-    </div>
-  `).join('');
-}
-
-function renderMarkdown(text){
-  let h = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  h = h.replace(/[*][*](.*?)[*][*]/g, '<strong>$1</strong>');
-  h = h.replace(/[*](.*?)[*]/g, '<em>$1</em>');
-  h = h.replace(/`(.*?)`/g, '<code>$1</code>');
-  h = h.split('\n').join('<br>');
-  if(text.indexOf('Réponse basée sur une recherche web') !== -1){
-    var parts = h.split('<br>');
-    h = parts.map(function(p){ return p.indexOf('Réponse basée sur une recherche web') !== -1 ? '<div class="web-badge">🔍 Réponse basée sur une recherche web</div>' : p; }).join('<br>');
-  }
-  return h;
-}
-
-function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function renderMessages(){
-  const msgs = document.getElementById('messages');
-  if(chatHistory.length === 0){
-    msgs.innerHTML = `<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Je suis ton IA principale 🤖</div></div>`;
-    return;
-  }
-  msgs.innerHTML = chatHistory.map(m => `
-    <div class="msg ${m.role==='user'?'user':'assistant'}">
-      ${m.role==='user' ? `<div class="avatar user-av">${currentUser?currentUser.username[0].toUpperCase():'T'}</div>` : '<div class="avatar ai">AI</div>'}
-      <div class="bubble">${escHtml(m.content)}</div>
-    </div>
-  `).join('');
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-// ─── SETTINGS ────────────────────────────────────────────────
-function openSettings(){
-  // Sync UI with current state
-  document.querySelectorAll('.persona-btn').forEach(b => {
-    b.classList.toggle('selected', b.dataset.persona === currentPersona);
-  });
-  document.getElementById('customPrompt').value = customPersonaText;
-  document.getElementById('customPromptDiv').style.display = currentPersona==='custom' ? 'block' : 'none';
-  document.getElementById('settingsOverlay').classList.add('open');
-}
-
-function closeSettings(){ document.getElementById('settingsOverlay').classList.remove('open'); }
-
-function selectPersona(btn){
-  const p = btn.dataset.persona;
-  if(!currentUser?.is_pro && p !== 'cool'){ openProModal(); return; }
-  document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  currentPersona = p;
-  document.getElementById('customPromptDiv').style.display = currentPersona==='custom' ? 'block' : 'none';
-}
-
-function saveSettings(){
-  customPersonaText = document.getElementById('customPrompt').value;
-  if(currentUser){
-    const users = loadFromStorage('nomar_users') || {};
-    if(users[currentUser.username]){
-      users[currentUser.username].persona = currentPersona;
-      users[currentUser.username].customPrompt = customPersonaText;
-      saveToStorage('nomar_users', users);
-    }
-    currentUser.persona = currentPersona;
-    currentUser.customPrompt = customPersonaText;
-    saveToStorage('nomar_user', currentUser);
-  } else {
-    saveToStorage('nomar_persona', currentPersona);
-    saveToStorage('nomar_custom_prompt', customPersonaText);
-  }
-  closeSettings();
-}
 
 function getSystemPrompt(){
   const base = currentPersona === 'custom' ? (customPersonaText || PERSONAS.cool) : (PERSONAS[currentPersona] || PERSONAS.cool);
-  const imageRule = "\n- Tu PEUX générer des images ! Si quelqu'un te demande de créer/générer/dessiner une image, réponds brièvement (ex: 'Voilà !') PUIS ajoute obligatoirement à la fin : [GENERATE_IMAGE: detailed english description]. Ex: [GENERATE_IMAGE: cute grey cat sitting on sofa, photorealistic]. Ne dis JAMAIS que tu ne peux pas créer d'images.";
   const noSearch = (!currentUser || !currentUser.is_pro)
-    ? "\n\nRÈGLE ABSOLUE SUR INTERNET : Tu n'as PAS accès à internet. Tu ne peux PAS faire de recherches web. Tu ne connais PAS les données en temps réel. Si on te demande une info en temps réel, réponds EXACTEMENT : 'Je ne peux pas faire de recherche internet en version gratuite. Passe à **Nomar Pro** pour accéder à la recherche web en temps réel ! 🚀' Ne jamais inventer des chiffres."
-    : "";
-  return base + "\n\nRÈGLE ABSOLUE : Ne dis JAMAIS que tu es une IA, un assistant, un modèle ou un programme.\n\nRÈGLE IMPORTANTE :\n- Si la conversation porte sur le jeu Roblox \"Steal a Brainrot\", réponds brièvement PUIS ajoute [REDIRECT_TRADE] à la fin.\n- Si la conversation porte sur l'urbex ou des lieux abandonnés, réponds brièvement PUIS ajoute [REDIRECT_URBEX] à la fin." + imageRule + noSearch;
+    ? '\n\nREGLE ABSOLUE : Tu n\'as PAS acces a internet. Ne connais PAS les donnees en temps reel. Si on demande une info en temps reel, dis que tu ne peux pas faire de recherche internet en version gratuite et qu\'il faut passer a Nomar Pro. Ne jamais inventer des chiffres.'
+    : '';
+  return base + '\n\nREGLE : Ne dis JAMAIS que tu es une IA.\n- Steal a Brainrot -> ajoute [REDIRECT_TRADE] a la fin.\n- Urbex -> ajoute [REDIRECT_URBEX] a la fin.' + noSearch;
 }
 
-function showConnectPopup(){ if(!currentUser) document.getElementById('connectOverlay').style.display = 'flex'; }
-function closeConnectPopup(){ document.getElementById('connectOverlay').style.display = 'none'; }
-function openAuthFromConnectPopup(){ closeConnectPopup(); document.getElementById('authOverlay').style.display = 'flex'; }
-function openAuthFromSettings(){ closeSettings(); document.getElementById('authOverlay').style.display = 'flex'; }
-function openProModal(){ document.getElementById('proOverlay').style.display = 'flex'; }
-function closeProModal(){ document.getElementById('proOverlay').style.display = 'none'; }
+// MODALS
+function openAuthModal(){
+  closeSettings();
+  document.getElementById('authOverlay').style.display = 'flex';
+}
 
-// ─── SIDEBAR MOBILE ──────────────────────────────────────────
+function openProModal(){ document.getElementById('proOverlay').classList.add('open'); }
+function closeProModal(){ document.getElementById('proOverlay').classList.remove('open'); }
+
+// SIDEBAR MOBILE
 function openSidebar(){
   document.getElementById('sidebar').classList.add('open');
   document.getElementById('sidebarOverlay').classList.add('show');
@@ -1819,27 +1487,96 @@ function closeSidebar(){
   document.getElementById('sidebarOverlay').classList.remove('show');
 }
 
-// ─── TAB NAVIGATION ──────────────────────────────────────────
+// TAB NAVIGATION
 const TAB_TITLES = { chat: 'IA Principale', trade: 'Trade Analyzer', urbex: 'Urbex Explorer' };
 function selectTab(tab){
   currentTab = tab;
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
-  const navEl = document.getElementById('nav-'+tab); if(navEl) navEl.classList.add('active');
+  const navEl = document.getElementById('nav-'+tab);
+  if(navEl) navEl.classList.add('active');
   document.getElementById('mobileTitle').textContent = TAB_TITLES[tab];
   closeSidebar();
 }
 
-// ─── CHAT ─────────────────────────────────────────────────────
+// FILE UPLOAD
+function handleFileUpload(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  attachedFile = file;
+  const preview = document.getElementById('filePreview');
+  const nameEl = document.getElementById('filePreviewName');
+  const imgEl = document.getElementById('filePreviewImg');
+  preview.style.display = 'flex';
+  if(file.type.startsWith('image/')){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      attachedFileContent = e.target.result;
+      imgEl.src = e.target.result;
+      imgEl.style.display = 'block';
+      nameEl.textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    imgEl.style.display = 'none';
+    nameEl.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = function(e){ attachedFileContent = e.target.result; };
+    reader.readAsText(file);
+  }
+}
+
+function clearFile(){
+  attachedFile = null;
+  attachedFileContent = null;
+  document.getElementById('filePreview').style.display = 'none';
+  document.getElementById('filePreviewImg').style.display = 'none';
+  document.getElementById('filePreviewImg').src = '';
+  document.getElementById('fileInput').value = '';
+}
+
+// GENERATE IMAGE
+async function generateImage(prompt){
+  const msgs = document.getElementById('messages');
+  const uid = 'imgbubble_' + Date.now();
+  const loadDiv = document.createElement('div');
+  loadDiv.className = 'msg assistant';
+  loadDiv.innerHTML = '<div class="avatar ai">AI</div><div class="bubble" id="' + uid + '">&#127912; Generation en cours<span id="dots_' + uid + '">.</span></div>';
+  msgs.appendChild(loadDiv);
+  msgs.scrollTop = msgs.scrollHeight;
+  let dc = 1;
+  const di = setInterval(function(){ const d = document.getElementById('dots_' + uid); if(d){ dc=(dc%3)+1; d.textContent='.'.repeat(dc); } else clearInterval(di); }, 500);
+  const to = setTimeout(function(){ clearInterval(di); const b = document.getElementById(uid); if(b) b.innerHTML = '&#127912; La generation d\'images arrive bientot sur <strong style="color:var(--accent);">Nomar Pro</strong> !'; }, 90000);
+  try {
+    const resp = await fetch(BACKEND + '/generate-image', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt: prompt + ', high quality, detailed' }) });
+    if(!resp.ok) throw new Error('error');
+    const data = await resp.json();
+    if(data.error) throw new Error(data.error);
+    if(!data.imageUrl) throw new Error('no image');
+    clearInterval(di); clearTimeout(to);
+    const b = document.getElementById(uid);
+    if(b){
+      b.style.cssText = 'background:transparent;padding:0;';
+      b.innerHTML = '<div style="background:#1a1a2e;border-radius:16px;overflow:hidden;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.4);"><img src="' + data.imageUrl + '" style="width:100%;display:block;border-radius:16px 16px 0 0;"><div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="font-size:0.78rem;color:#a78bfa;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">&#127912; ' + escHtml(prompt) + '</div><a href="' + data.imageUrl + '" download="nomar-image.jpg" style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);color:#a78bfa;padding:5px 10px;border-radius:8px;font-size:0.75rem;text-decoration:none;cursor:pointer;">&#11015; Telecharger</a></div></div>';
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+  } catch(e) {
+    clearInterval(di); clearTimeout(to);
+    const b = document.getElementById(uid);
+    if(b) b.innerHTML = '&#127912; La generation d\'images arrive bientot sur <strong style="color:#a78bfa;font-weight:800;">Nomar Pro</strong> !';
+  }
+}
+
+// ADD MESSAGE
 function addMsg(role, content){
   const msgs = document.getElementById('messages');
   const div = document.createElement('div');
   div.className = 'msg ' + (role==='user'?'user':'assistant');
   const letter = currentUser ? currentUser.username[0].toUpperCase() : 'T';
   div.innerHTML = role==='user'
-    ? `<div class="avatar user-av">${letter}</div><div class="bubble">${escHtml(content)}</div>`
-    : `<div class="avatar ai">AI</div><div class="bubble">${content}</div>`;
+    ? '<div class="avatar user-av">'+letter+'</div><div class="bubble">'+escHtml(content)+'</div>'
+    : '<div class="avatar ai">AI</div><div class="bubble">'+renderMarkdown(content)+'</div>';
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
   return div;
@@ -1849,66 +1586,13 @@ function addTyping(){
   const msgs = document.getElementById('messages');
   const div = document.createElement('div');
   div.className = 'msg assistant';
-  div.innerHTML = `<div class="avatar ai">AI</div><div class="bubble"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  div.innerHTML = '<div class="avatar ai">AI</div><div class="bubble"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
   return div;
 }
 
-let attachedFile = null;
-let attachedFileContent = null;
-
-async function generateImage(prompt){
-  const msgs = document.getElementById('messages');
-  const uid = 'imgbubble_' + Date.now();
-  const loadDiv = document.createElement('div');
-  loadDiv.className = 'msg assistant';
-  loadDiv.innerHTML = '<div class="avatar ai">AI</div><div class="bubble" id="' + uid + '">🎨 Génération en cours<span id="dots_' + uid + '">.</span></div>';
-  msgs.appendChild(loadDiv);
-  msgs.scrollTop = msgs.scrollHeight;
-  let dc = 1;
-  const di = setInterval(() => { const d = document.getElementById('dots_' + uid); if(d){ dc=(dc%3)+1; d.textContent='.'.repeat(dc); } else clearInterval(di); }, 500);
-  const to = setTimeout(() => { clearInterval(di); const b = document.getElementById(uid); if(b) b.innerHTML = '❌ Génération trop longue. Réessaie !'; }, 90000);
-
-  const encodedPrompt = encodeURIComponent(prompt + ', high quality, detailed');
-  const seed = Math.floor(Math.random() * 999999);
-  const pollinationsUrl = 'https://image.pollinations.ai/prompt/' + encodedPrompt + '?width=512&height=512&nologo=true&seed=' + seed;
-
-  const img = new Image();
-  img.onload = () => {
-    clearInterval(di); clearTimeout(to);
-    const b = document.getElementById(uid);
-    if(b){ b.innerHTML = '<img src="' + pollinationsUrl + '" style="max-width:100%;border-radius:10px;display:block;margin-bottom:6px;"><div style="font-size:0.75rem;color:var(--muted);">🎨 ' + escHtml(prompt) + '</div>'; msgs.scrollTop = msgs.scrollHeight; }
-  };
-  img.onerror = async () => {
-    try {
-      const resp = await fetch(BACKEND + '/generate-image', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt: prompt + ', high quality, detailed' }) });
-      if(!resp.ok) throw new Error('HTTP ' + resp.status);
-      const data = await resp.json();
-      if(data.error) throw new Error(data.error);
-      if(data.imageUrl){
-        clearInterval(di); clearTimeout(to);
-        const b = document.getElementById(uid);
-        if(b){
-      b.style.cssText = 'background:transparent;padding:0;';
-      b.innerHTML = '<div style="background:#1a1a2e;border-radius:16px;overflow:hidden;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.4);">'
-        + '<img src="' + data.imageUrl + '" style="width:100%;display:block;border-radius:16px 16px 0 0;">'
-        + '<div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;">'
-        + '<div style="font-size:0.78rem;color:#a78bfa;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">🎨 ' + escHtml(prompt) + '</div>'
-        + '<a href="' + data.imageUrl + '" download="nomar-image.jpg" style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);color:#a78bfa;padding:5px 10px;border-radius:8px;font-size:0.75rem;text-decoration:none;white-space:nowrap;cursor:pointer;">⬇️ Télécharger</a>'
-        + '</div></div>';
-      msgs.scrollTop = msgs.scrollHeight;
-    }
-      } else throw new Error('no image');
-    } catch(e2) {
-      clearInterval(di); clearTimeout(to);
-      const b = document.getElementById(uid);
-      if(b) b.innerHTML = '<div style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:12px;padding:14px;color:var(--muted);font-size:0.88rem;">🎨 La génération d'images arrive bientôt sur <strong style="color:var(--accent);">Nomar Pro</strong> !</div>';
-    }
-  };
-  img.src = pollinationsUrl;
-}
-
+// SEND CHAT
 async function sendChat(){
   const input = document.getElementById('chatInput');
   let msg = input.value.trim();
@@ -1916,23 +1600,19 @@ async function sendChat(){
   if(!msg) msg = '(fichier joint)';
   input.value = '';
 
-  // Guest message counter -> popup after 5
   if(!currentUser){
     const gc = (loadFromStorage('nomar_guest_msg_count') || 0) + 1;
     saveToStorage('nomar_guest_msg_count', gc);
-    if(gc === 5) setTimeout(showConnectPopup, 800);
+    if(gc === 5) setTimeout(function(){ document.getElementById('authOverlay').style.display = 'flex'; }, 800);
   }
 
-  // Image request detection - only trigger on explicit requests
   const msgLower = msg.toLowerCase();
-  const hasImageWord = ['image', 'photo', 'dessin', 'illustration'].some(k => msgLower.includes(k));
-  const hasActionWord = ['génère', 'génerer', 'créer', 'dessiner', 'génere', 'cree'].some(k => msgLower.includes(k));
-  const isImageRequest = hasImageWord && hasActionWord && msg.length < 200;
-  if(isImageRequest){
+  const hasImageWord = ['image', 'photo', 'dessin', 'illustration'].some(function(k){ return msgLower.includes(k); });
+  const hasActionWord = ['genere', 'cree', 'fais', 'dessine', 'creer', 'dessiner'].some(function(k){ return msgLower.includes(k); });
+  if(hasImageWord && hasActionWord && msg.length < 200){
     addMsg('user', msg);
     chatHistory.push({role:'user', content:msg});
-    const imgPrompt = msg.replace(/tu peux|peux-tu|est-ce que tu peux|génère|génere|crée|cree|fais|dessine|moi|une|un|de|stp|svp|s'il te plaît/gi,'').trim() || msg;
-    generateImage(imgPrompt);
+    generateImage(msg);
     return;
   }
 
@@ -1948,8 +1628,7 @@ async function sendChat(){
     clearFile();
   }
 
-  if(pendingImage){ addMsgWithImage('user', msg || '(image)', pendingImage); }
-  else { addMsg('user', msg); }
+  addMsg('user', msg);
   chatHistory.push({role:'user', content:fullMsg || msg});
 
   const typingEl = addTyping();
@@ -1960,48 +1639,43 @@ async function sendChat(){
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         model:'llama-3.3-70b-versatile',
-        max_tokens: currentUser?.is_pro ? 2000 : 500,
+        max_tokens: currentUser && currentUser.is_pro ? 2000 : 500,
         system: getSystemPrompt(),
         messages: chatHistory,
-        userId: currentUser?.id || null,
-        isPro: currentUser?.is_pro || false,
+        userId: currentUser ? currentUser.id : null,
+        isPro: currentUser ? (currentUser.is_pro === true) : false,
         imageData: pendingImage || null
       })
     });
     const data = await response.json();
-    let text = data.content?.[0]?.text || 'Désolé, je n\'ai pas pu répondre.';
+    let text = data.content && data.content[0] ? data.content[0].text : 'Desole, impossible de repondre.';
 
-    // Handle redirects
     let redirectType = null;
     if(text.includes('[REDIRECT_TRADE]')){ redirectType='trade'; text=text.replace('[REDIRECT_TRADE]','').trim(); }
     if(text.includes('[REDIRECT_URBEX]')){ redirectType='urbex'; text=text.replace('[REDIRECT_URBEX]','').trim(); }
 
-    // Strip GENERATE_IMAGE tag and trigger generation
     const imgTagMatch = text.match(/\[GENERATE_IMAGE:\s*([^\]]+)\]/i);
     if(imgTagMatch){ text = text.replace(imgTagMatch[0],'').trim(); }
 
-    // Pro modal trigger
     if(text.includes('Nomar Pro') && text.includes('gratuite')){ setTimeout(openProModal, 800); }
 
     typingEl.remove();
-    if(text) addMsg('assistant', text);
-    chatHistory.push({role:'assistant', content: text});
+    if(text){ const msgEl = addMsg('assistant', text);
+      if(redirectType){
+        const chipsDiv = document.createElement('div');
+        chipsDiv.className = 'redirect-chips';
+        if(redirectType==='trade'){
+          chipsDiv.innerHTML = '<button class="redirect-chip" onclick="selectTab(\'trade\')">&#128260; Ouvrir le Trade Analyzer</button>';
+        } else {
+          chipsDiv.innerHTML = '<button class="redirect-chip" onclick="selectTab(\'urbex\')">&#127962; Ouvrir l\'Urbex Explorer</button>';
+        }
+        msgEl.querySelector('.bubble').appendChild(chipsDiv);
+      }
+    }
+    chatHistory.push({role:'assistant', content:text});
     if(imgTagMatch){ generateImage(imgTagMatch[1].trim()); }
 
-    // Add redirect chips
-    if(redirectType){
-      const chipsDiv = document.createElement('div');
-      chipsDiv.className = 'redirect-chips';
-      if(redirectType==='trade'){
-        chipsDiv.innerHTML = `<button class="redirect-chip" onclick="selectTab('trade')">🔄 Ouvrir le Trade Analyzer</button>`;
-      } else {
-        chipsDiv.innerHTML = `<button class="redirect-chip" onclick="selectTab('urbex')">🏚️ Ouvrir l'Urbex Explorer</button>`;
-      }
-      msgEl.querySelector('.bubble').appendChild(chipsDiv);
-    }
-
-    // Auto-save conversation
-    const conv = conversations.find(c => c.id === currentConvId);
+    const conv = conversations.find(function(c){ return c.id === currentConvId; });
     if(conv){
       conv.messages = [...chatHistory];
       conv.title = getConvTitle();
@@ -2011,464 +1685,28 @@ async function sendChat(){
 
   } catch(e){
     typingEl.remove();
-    addMsg('ai', 'Erreur : ' + (e.message||e));
+    addMsg('assistant', 'Erreur : ' + (e.message||e));
   }
 }
 
-</script>
-<script>
-// ─── BRAINROT DATABASE ───────────────────────────────────────
-let brainrotDB = [];
-let traitDB = [
-  'Meowl','Halloween','Rain','Snowy','Starfall','Hat','Water','Galactic',
-  'Bombardiro','Extinct','Spider','Paint','Tie','Strawberry','Taco',
-  'Tung Tung','Crab','Rap Concert','Sombrero','Glitch','Divine','Bloodrot',
-  'Orcalero','La Vacca','Festivo','Sleepy','Radioactive'
-];
-
-const MUTATION_MULT = {
-  none:1, Gold:1.25, Diamond:2, Rainbow:10, Galaxy:5,
-  Lava:6, Radioactive:4, Divine:10, Bloodrot:8, 'Yin Yang':7, Candy:3
-};
-const TRAIT_MULT = {
-  Strawberry:8, Galactic:4, Bombardiro:4, Orcalero:4,
-  'La Vacca':4, Taco:2, Festivo:3, Sleepy:0.5,
-  Meowl:6, 'Tung Tung':3, Glitch:5, Spider:3, Extinct:4
-};
-const RARITY_COLORS = {
-  'Common':'rarity-common','Rare':'rarity-rare','Epic':'rarity-epic',
-  'Legendary':'rarity-legendary','Mythic':'rarity-mythic','Brainrot God':'rarity-god',
-  'Secret':'rarity-secret','OG':'rarity-og'
-};
-
-let yourOffer = [];
-let theirOffer = [];
-let currentModalSide = 'your';
-let modalSelectedTraits = [];
-let modalSelectedBrainrot = null;
-
-function parseRps(str){ if(!str) return 0; str=String(str).trim().replace(',','.'); const m=str.match(/([\d.]+)\s*([KMBTkmbq]?)/i); if(!m) return parseFloat(str)||0; let v=parseFloat(m[1]); const s=m[2].toUpperCase(); if(s==='K')v*=1e3; else if(s==='M')v*=1e6; else if(s==='B')v*=1e9; else if(s==='T')v*=1e12; return v; }
-function formatRps(n){ if(n>=1e12) return (n/1e12).toFixed(2)+'T'; if(n>=1e9) return (n/1e9).toFixed(2)+'B'; if(n>=1e6) return (n/1e6).toFixed(2)+'M'; if(n>=1e3) return (n/1e3).toFixed(1)+'K'; return n.toFixed(0); }
-
-function calcEffective(baseRps, mutation, traits){
-  const mutMult = MUTATION_MULT[mutation]||1;
-  let traitMult = 0;
-  traits.forEach((t,i) => { const base = TRAIT_MULT[t]||1; traitMult += Math.max(0, base - i); });
-  let totalMult = traits.length > 0 ? mutMult + traitMult - 1 : mutMult;
-  return baseRps * Math.max(1, totalMult);
-}
-function calcOfferValue(offer){ return offer.reduce((sum, item) => sum + calcEffective(item.brainrot.rps, item.mutation, item.traits), 0); }
-
-async function fetchBrainrotList(){
-  const loading = document.getElementById('brainrotLoading');
-    const BASE_DB = [
-    // ── COMMON (rps réels wiki) ──────────────────────────────
-    {name:'Noobini Pizzanini',rarity:'Common',rps:1},
-    {name:'Lirilì Larilà',rarity:'Common',rps:3},
-    {name:'Tim Cheese',rarity:'Common',rps:5},
-    {name:'Fluriflura',rarity:'Common',rps:7},
-    {name:'Talpa Di Fero',rarity:'Common',rps:9},
-    {name:'Noobini Santanini',rarity:'Common',rps:11},
-    {name:'Svinina Bombardino',rarity:'Common',rps:10},
-    {name:'Raccooni Jandelini',rarity:'Common',rps:12},
-    {name:'Pipi Kiwi',rarity:'Common',rps:13},
-    {name:'Tartaragno',rarity:'Common',rps:13},
-    {name:'Pipi Corni',rarity:'Common',rps:14},
-    // ── RARE ────────────────────────────────────────────────
-    {name:'Trippi Troppi',rarity:'Rare',rps:15},
-    {name:'Gangster Footera',rarity:'Rare',rps:30},
-    {name:'Bandito Bobritto',rarity:'Rare',rps:35},
-    {name:'Boneca Ambalabu',rarity:'Rare',rps:40},
-    {name:'Cacto Hipopotamo',rarity:'Rare',rps:50},
-    {name:'Ta Ta Ta Ta Sahur',rarity:'Rare',rps:55},
-    {name:'Tric Trac Baraboom',rarity:'Rare',rps:65},
-    {name:'Frogo Elfo',rarity:'Rare',rps:67},
-    {name:'Pipi Avocado',rarity:'Rare',rps:70},
-    {name:'Pinealotto Fruttarino',rarity:'Rare',rps:75},
-    // ── EPIC ────────────────────────────────────────────────
-    {name:'Cappuccino Assassino',rarity:'Epic',rps:75},
-    {name:'Bandito Axolito',rarity:'Epic',rps:90},
-    {name:'Brr Brr Patapim',rarity:'Epic',rps:100},
-    {name:'Avocadini Antilopini',rarity:'Epic',rps:115},
-    {name:'Trulimero Trulicina',rarity:'Epic',rps:125},
-    {name:'Bambini Crostini',rarity:'Epic',rps:135},
-    {name:'Malame Amarele',rarity:'Epic',rps:140},
-    {name:'Bananita Dolphinita',rarity:'Epic',rps:150},
-    {name:'Perochello Lemonchello',rarity:'Epic',rps:160},
-    {name:'Brri Brri Bicus Dicus Bombicus',rarity:'Epic',rps:175},
-    {name:'Avocadini Guffo',rarity:'Epic',rps:225},
-    {name:'Ti Ti Ti Sahur',rarity:'Epic',rps:225},
-    {name:'Mangolini Parrocini',rarity:'Epic',rps:235},
-    {name:'Frogato Pirato',rarity:'Epic',rps:240},
-    {name:'Salamino-Penguino',rarity:'Epic',rps:250},
-    {name:'Doi Doi Do',rarity:'Epic',rps:260},
-    {name:'Penguin Tree',rarity:'Epic',rps:270},
-    {name:'Wombo Rollo',rarity:'Epic',rps:275},
-    {name:'Penguino Cocosino',rarity:'Epic',rps:300},
-    {name:'Mummio Rappitto',rarity:'Epic',rps:325},
-    // ── LEGENDARY ───────────────────────────────────────────
-    {name:'Chimpanzini Bananini',rarity:'Legendary',rps:300},
-    {name:'Tirilikalika Tirilikalako',rarity:'Legendary',rps:450},
-    {name:'Ballerina Cappuccina',rarity:'Legendary',rps:500},
-    {name:'Burbaloni Loliloli',rarity:'Legendary',rps:600},
-    {name:'Chef Crabracadabra',rarity:'Legendary',rps:600},
-    {name:'Lionel Cactuseli',rarity:'Legendary',rps:650},
-    {name:'Glorbo Fruttodrillo',rarity:'Legendary',rps:750},
-    {name:'Quivoli Ameleoni',rarity:'Legendary',rps:900},
-    {name:'Blueberrinni Octopusini',rarity:'Legendary',rps:1000},
-    {name:'Caramello Filtrello',rarity:'Legendary',rps:1000},
-    {name:'Pipi Potato',rarity:'Legendary',rps:1100},
-    {name:'Strawberrelli Flamingelli',rarity:'Legendary',rps:1100},
-    {name:'Cocosini Mama',rarity:'Legendary',rps:1200},
-    {name:'Pandaccini Bananini',rarity:'Legendary',rps:1250},
-    {name:'Quackula',rarity:'Legendary',rps:1200},
-    {name:'Pi Pi Watermelon',rarity:'Legendary',rps:1300},
-    {name:'Signore Carapace',rarity:'Legendary',rps:1300},
-    {name:'Sigma Boy',rarity:'Legendary',rps:1350},
-    {name:'Chocco Bunny',rarity:'Legendary',rps:1400},
-    {name:'Puffaball',rarity:'Legendary',rps:1500},
-    {name:'Sigma Girl',rarity:'Legendary',rps:1600},
-    {name:'Sealo Regalo',rarity:'Legendary',rps:1700},
-    {name:'Buho de Fuego',rarity:'Legendary',rps:1800},
-    // ── MYTHIC ──────────────────────────────────────────────
-    {name:'Frigo Camelo',rarity:'Mythic',rps:1900},
-    {name:'Orangutini Ananassini',rarity:'Mythic',rps:2500},
-    {name:'Rhino Toasterino',rarity:'Mythic',rps:3000},
-    {name:'Bombardiro Crocodilo',rarity:'Mythic',rps:3500},
-    {name:'Bombombini Gusini',rarity:'Mythic',rps:4000},
-    {name:'Cavallo Virtuoso',rarity:'Mythic',rps:4500},
-    {name:'Gorillo Watermelondrillo',rarity:'Mythic',rps:5000},
-    {name:'Lerulerulerule',rarity:'Mythic',rps:5500},
-    {name:'Te Te Te Sahur',rarity:'Mythic',rps:6000},
-    {name:'Tracoducotulu Delapeladustuz',rarity:'Mythic',rps:6500},
-    {name:'Cachorrito Melonito',rarity:'Mythic',rps:7000},
-    {name:'Toiletto Focaccino',rarity:'Mythic',rps:7500},
-    {name:'Avocadorilla',rarity:'Mythic',rps:8000},
-    {name:'Spioniro Golubiro',rarity:'Mythic',rps:8000},
-    {name:'Zibra Zubra Zibralini',rarity:'Mythic',rps:8000},
-    {name:'Tigrilini Watermelini',rarity:'Mythic',rps:8000},
-    {name:'Gorillo Subwoofero',rarity:'Mythic',rps:8500},
-    {name:'Tob Tobi Tobi',rarity:'Mythic',rps:9000},
-    {name:'Ganganzelli Trulala',rarity:'Mythic',rps:9000},
-    {name:'Carloo',rarity:'Mythic',rps:9500},
-    {name:'Carrotini Brainini',rarity:'Mythic',rps:10000},
-    {name:'Centrucci Nuclucci',rarity:'Mythic',rps:10500},
-    {name:'Jacko Spaventosa',rarity:'Mythic',rps:11000},
-    {name:'Bananito Bandito',rarity:'Mythic',rps:11500},
-    {name:'Tree Tree Tree Sahur',rarity:'Mythic',rps:12000},
-    {name:'Elefanto Frigo',rarity:'Mythic',rps:13000},
-    {name:'Jingle Jingle Sahur',rarity:'Mythic',rps:13500},
-    {name:'Fizzy Soda',rarity:'Mythic',rps:17200},
-    // ── BRAINROT GOD ────────────────────────────────────────
-    {name:'Cocofanto Elefanto',rarity:'Brainrot God',rps:17500},
-    {name:'Girafa Celestre',rarity:'Brainrot God',rps:25000},
-    {name:'Tralalero Tralala',rarity:'Brainrot God',rps:40000},
-    {name:'Odin Din Din Dun',rarity:'Brainrot God',rps:50000},
-    {name:'Tralalita Tralala',rarity:'Brainrot God',rps:55000},
-    {name:'Trenostruzzo Turbo 3000',rarity:'Brainrot God',rps:60000},
-    {name:'Trippi Troppi Troppa Trippa',rarity:'Brainrot God',rps:65000},
-    {name:'Ballerino Lololo',rarity:'Brainrot God',rps:70000},
-    {name:'Pakrahmatmamat',rarity:'Brainrot God',rps:75000},
-    {name:'Piccione Macchina',rarity:'Brainrot God',rps:225000},
-    {name:'Tractoro Dinosauro',rarity:'Brainrot God',rps:80000},
-    {name:'Cacasito Satalito',rarity:'Brainrot God',rps:85000},
-    {name:'Aquanaut',rarity:'Brainrot God',rps:90000},
-    {name:'Tartaruga Cisterna',rarity:'Brainrot God',rps:95000},
-    {name:'Gyattatino Nyanino',rarity:'Brainrot God',rps:100000},
-    {name:'Chihuanini Taconini',rarity:'Brainrot God',rps:105000},
-    {name:'Matteo',rarity:'Brainrot God',rps:110000},
-    {name:'Los Crocodilitos',rarity:'Brainrot God',rps:115000},
-    {name:'Tigroligre Frutonni',rarity:'Brainrot God',rps:120000},
-    {name:'Alessio',rarity:'Brainrot God',rps:130000},
-    {name:'Tipi Topi Taco',rarity:'Brainrot God',rps:135000},
-    {name:'Tukanno Bananno',rarity:'Brainrot God',rps:140000},
-    {name:'Vampira Cappuccina',rarity:'Brainrot God',rps:150000},
-    {name:'Espresso Signora',rarity:'Brainrot God',rps:160000},
-    {name:'Orcalero Orcala',rarity:'Brainrot God',rps:165000},
-    {name:'Urubini Flamenguini',rarity:'Brainrot God',rps:175000},
-    {name:'Capi Taco',rarity:'Brainrot God',rps:180000},
-    {name:'Los Chihuaninis',rarity:'Brainrot God',rps:185000},
-    {name:'Gattito Tacoto',rarity:'Brainrot God',rps:190000},
-    {name:'Bulbito Bandito Traktorito',rarity:'Brainrot God',rps:200000},
-    {name:'Los Tungtungtungcitos',rarity:'Brainrot God',rps:205000},
-    {name:'Ballerina Peppermintina',rarity:'Brainrot God',rps:210000},
-    {name:'Los Bombinitos',rarity:'Brainrot God',rps:225000},
-    {name:'Los Orcalitos',rarity:'Brainrot God',rps:230000},
-    {name:'Corn Corn Corn Sahur',rarity:'Brainrot God',rps:240000},
-    {name:'Squalanana',rarity:'Brainrot God',rps:255000},
-    {name:'Dug Dug Dug',rarity:'Brainrot God',rps:260000},
-    {name:'Ginger Globo',rarity:'Brainrot God',rps:265000},
-    {name:'Yeti Claus',rarity:'Brainrot God',rps:270000},
-    {name:'Los Tipi Tacos',rarity:'Brainrot God',rps:275000},
-    {name:'Frio Ninja',rarity:'Brainrot God',rps:280000},
-    {name:'Ginger Cisterna',rarity:'Brainrot God',rps:285000},
-    {name:'Bombardini Tortinii',rarity:'Brainrot God',rps:290000},
-    {name:'Pop Pop Sahur',rarity:'Brainrot God',rps:295000},
-    // ── SECRET ──────────────────────────────────────────────
-    {name:'La Vacca Saturno Saturnita',rarity:'Secret',rps:300000},
-    {name:'Bisonte Giuppitere',rarity:'Secret',rps:350000},
-    {name:'Los Matteos',rarity:'Secret',rps:400000},
-    {name:'Karkerkar Kurkur',rarity:'Secret',rps:450000},
-    {name:'Trenostruzzo Turbo 4000',rarity:'Secret',rps:500000},
-    {name:'Jackorilla',rarity:'Secret',rps:550000},
-    {name:'Chimpanzini Spiderini',rarity:'Secret',rps:600000},
-    {name:'Sammyni Spyderini',rarity:'Secret',rps:650000},
-    {name:'Torrtuginni Dragonfrutini',rarity:'Secret',rps:700000},
-    {name:'Dul Dul Dul',rarity:'Secret',rps:750000},
-    {name:'Blackhole Goat',rarity:'Secret',rps:800000},
-    {name:'Chachechi',rarity:'Secret',rps:850000},
-    {name:'Agarrini La Palini',rarity:'Secret',rps:900000},
-    {name:'Los Spyderinis',rarity:'Secret',rps:950000},
-    {name:'Extinct Tralalero',rarity:'Secret',rps:1000000},
-    {name:'Fragola La La La',rarity:'Secret',rps:1050000},
-    {name:'La Cucaracha',rarity:'Secret',rps:1100000},
-    {name:'Los Tortus',rarity:'Secret',rps:1150000},
-    {name:'Vulturino Skeletono',rarity:'Secret',rps:1200000},
-    {name:'Los Tralaleritos',rarity:'Secret',rps:1250000},
-    {name:'Zombie Tralala',rarity:'Secret',rps:1300000},
-    {name:'Boatito Auratito',rarity:'Secret',rps:1350000},
-    {name:'Guerriro Digitale',rarity:'Secret',rps:1400000},
-    {name:'Yess my examine',rarity:'Secret',rps:1450000},
-    {name:'La Karkerkar Combinasion',rarity:'Secret',rps:1500000},
-    {name:'Reindeer Tralala',rarity:'Secret',rps:1600000},
-    {name:'Extinct Matteo',rarity:'Secret',rps:1700000},
-    {name:'Pumpkini Spyderini',rarity:'Secret',rps:1800000},
-    {name:'Rocco Disco',rarity:'Secret',rps:1900000},
-    {name:'Frankentteo',rarity:'Secret',rps:2000000},
-    {name:'Job Job Job Sahur',rarity:'Secret',rps:2100000},
-    {name:'Los Trios',rarity:'Secret',rps:2200000},
-    {name:'Karker Sahur',rarity:'Secret',rps:2300000},
-    {name:'Los Karkeritos',rarity:'Secret',rps:2400000},
-    {name:'Las Vaquitas Saturnitas',rarity:'Secret',rps:2500000},
-    {name:'Ho Ho Ho Sahur',rarity:'Secret',rps:2600000},
-    {name:'67',rarity:'Secret',rps:2800000},
-    {name:'Rang Ring Bus',rarity:'Secret',rps:2900000},
-    {name:'Noo my Present',rarity:'Secret',rps:3000000},
-    {name:'Los Nooo My Hotspotsitos',rarity:'Secret',rps:5500000},
-    {name:'Arcadopus',rarity:'Secret',rps:4000000},
-    {name:'Noo my Candy',rarity:'Secret',rps:3500000},
-    {name:'Pot Hotspot',rarity:'Secret',rps:3600000},
-    {name:'Los Quesadillas',rarity:'Secret',rps:3700000},
-    {name:'Burrito Bandito',rarity:'Secret',rps:3800000},
-    {name:'Chill Puppy',rarity:'Secret',rps:3900000},
-    {name:'Quesadillo Vampiro',rarity:'Secret',rps:4100000},
-    {name:'Los Mobilis',rarity:'Secret',rps:4200000},
-    {name:'Chimnino',rarity:'Secret',rps:4500000},
-    {name:'Chicleteirina Bicicleteirina',rarity:'Secret',rps:4700000},
-    {name:'Los Combinasionas',rarity:'Secret',rps:5000000},
-    {name:'Chicleteira Noelteira',rarity:'Secret',rps:5200000},
-    {name:'Los 67',rarity:'Secret',rps:5400000},
-    {name:'La Grande Combinasion',rarity:'Secret',rps:5600000},
-    {name:'Los Spooky Combinasionas',rarity:'Secret',rps:5800000},
-    {name:'La Spooky Grande',rarity:'Secret',rps:6000000},
-    {name:'Mieteteira Bicicleteira',rarity:'Secret',rps:6200000},
-    {name:'Chicleteira Bicicleteira',rarity:'Secret',rps:6500000},
-    {name:'Noo my Heart',rarity:'Secret',rps:7000000},
-    {name:'Los 25',rarity:'Secret',rps:7500000},
-    {name:'Chicleteira Cupideira',rarity:'Secret',rps:8000000},
-    {name:'W or L',rarity:'Secret',rps:8500000},
-    {name:'Esok Sekolah',rarity:'Secret',rps:9000000},
-    {name:'Tuff Toucan',rarity:'Secret',rps:9500000},
-    {name:'Spinny Hammy',rarity:'Secret',rps:10000000},
-    {name:'Gobblino Uniciclino',rarity:'Secret',rps:10500000},
-    {name:'Los Puggies',rarity:'Secret',rps:11000000},
-    {name:'Brunito Marsito',rarity:'Secret',rps:11500000},
-    {name:'Money Money Reindeer',rarity:'Secret',rps:12000000},
-    {name:'Eviledon',rarity:'Secret',rps:12500000},
-    {name:'La Extinct Grande',rarity:'Secret',rps:13000000},
-    {name:'Las Sis',rarity:'Secret',rps:13500000},
-    {name:'Swaggy Bros',rarity:'Secret',rps:14000000},
-    {name:'Money Money Puggy',rarity:'Secret',rps:14500000},
-    {name:'La Jolly Grande',rarity:'Secret',rps:15000000},
-    {name:'Los Jolly Combinasionas',rarity:'Secret',rps:15500000},
-    {name:'Los Candies',rarity:'Secret',rps:16000000},
-    {name:'La Romantic Grande',rarity:'Secret',rps:16500000},
-    {name:'List List List Sahur',rarity:'Secret',rps:17000000},
-    {name:'Nuclearo Dinossauro',rarity:'Secret',rps:15000000},
-    {name:'Orcaledon',rarity:'Secret',rps:17500000},
-    {name:'Spaghetti Tualetti',rarity:'Secret',rps:18000000},
-    {name:'Tictac Sahur',rarity:'Secret',rps:18500000},
-    {name:'La Taco Combinasion',rarity:'Secret',rps:19000000},
-    {name:'Los Spaghettis',rarity:'Secret',rps:20000000},
-    {name:'Los Bros',rarity:'Secret',rps:24000000},
-    {name:'Chipso and Queso',rarity:'Secret',rps:22000000},
-    {name:'Tralaledon',rarity:'Secret',rps:27500000},
-    {name:'Tang Tang Keletang',rarity:'Secret',rps:33500000},
-    {name:'Ketupat Kepat',rarity:'Secret',rps:35000000},
-    {name:'Chillin Chili',rarity:'Secret',rps:25000000},
-    {name:'La Ginger Sekolah',rarity:'Secret',rps:26000000},
-    {name:'La Secret Combinasion',rarity:'Secret',rps:30000000},
-    {name:'Jolly Jolly Sahur',rarity:'Secret',rps:32000000},
-    {name:'Rosetti Tualetti',rarity:'Secret',rps:35000000},
-    {name:'Popcuru and Fizzuru',rarity:'Secret',rps:40000000},
-    {name:'La Casa Boo',rarity:'Secret',rps:45000000},
-    {name:'Garama and Madundung',rarity:'Secret',rps:50000000},
-    {name:'Los Primos',rarity:'Secret',rps:55000000},
-    {name:'Fragrama and Chocrama',rarity:'Secret',rps:60000000},
-    {name:'Spooky and Pumpky',rarity:'Secret',rps:65000000},
-    {name:'Burguro And Fryuro',rarity:'Secret',rps:70000000},
-    {name:'Cooki and Milki',rarity:'Secret',rps:80000000},
-    {name:'Reinito Sleighito',rarity:'Secret',rps:90000000},
-    {name:'Capitano Moby',rarity:'Secret',rps:100000000},
-    {name:'La Supreme Combinasion',rarity:'Secret',rps:120000000},
-    {name:'Ginger Gerat',rarity:'Secret',rps:150000000},
-    {name:'Ketupat Bros',rarity:'Secret',rps:200000000},
-    {name:'Rosey and Teddy',rarity:'Secret',rps:220000000},
-    {name:'Cerberus',rarity:'Secret',rps:250000000},
-    {name:'Hydra Dragon Cannelloni',rarity:'Secret',rps:280000000},
-    {name:'Dragon Cannelloni',rarity:'Secret',rps:300000000},
-    {name:'Dragon Gingerini',rarity:'Secret',rps:350000000},
-    // ── OG ──────────────────────────────────────────────────
-    {name:'Skibidi Toilet',rarity:'OG',rps:450000000},
-    {name:'Meowl',rarity:'OG',rps:550000000},
-    {name:'Headless Horseman',rarity:'OG',rps:500000000},
-    {name:'Strawberry Elephant',rarity:'OG',rps:750000000},
-  ];
-  brainrotDB = [...BASE_DB];
-  buildModalDropdown();
-  if(loading){ loading.innerHTML = '<span style="font-size:0.8rem;color:var(--green);">✅ '+brainrotDB.length+' brainrots chargés</span>'; }
-  setTimeout(()=>{ if(loading) loading.style.display='none'; }, 2000);
-}
-
-function openModal(side){
-  currentModalSide = side;
-  const offer = side==='your' ? yourOffer : theirOffer;
-  if(offer.length >= 4) return;
-  modalSelectedBrainrot = null;
-  modalSelectedTraits = [];
-  document.getElementById('modalBrainrotInput').value = '';
-  document.getElementById('modalMutation').value = 'none';
-  document.getElementById('modalSide').textContent = side==='your' ? 'Your Offer' : 'Their Offer';
-  buildModalTraits();
-  document.getElementById('modalOverlay').classList.add('open');
-}
-function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
-function closeModalOutside(e){ if(e.target===document.getElementById('modalOverlay')) closeModal(); }
-
-function buildModalDropdown(){
-  const dd = document.getElementById('modalBrainrotDropdown');
-  dd.innerHTML = '';
-  brainrotDB.forEach(b => {
-    const div = document.createElement('div');
-    div.className = 'dropdown-option';
-    const rarClass = RARITY_COLORS[b.rarity]||'rarity-common';
-    div.innerHTML = `<span class="opt-name">${b.name}</span><span class="opt-rarity ${rarClass}">${b.rarity}</span>`;
-    div.onclick = () => selectModalBrainrot(b);
-    dd.appendChild(div);
-  });
-  const notFound = document.createElement('div');
-  notFound.id = 'notFoundBtn';
-  notFound.className = 'dropdown-option';
-  notFound.style.cssText = 'border-top:1px solid var(--border);color:var(--gold);font-style:italic;';
-  notFound.innerHTML = '🔍 Mon brainrot n\'est pas dans la liste...';
-  notFound.onclick = () => searchNewBrainrot(document.getElementById('modalBrainrotInput').value);
-  dd.appendChild(notFound);
-}
-
-function filterModalDropdown(){
-  const query = document.getElementById('modalBrainrotInput').value.toLowerCase();
-  const dd = document.getElementById('modalBrainrotDropdown');
-  dd.classList.add('open');
-  Array.from(dd.children).forEach(el => {
-    if(el.id==='notFoundBtn'){ el.style.display=''; return; }
-    el.style.display = el.querySelector('.opt-name').textContent.toLowerCase().includes(query) ? '' : 'none';
-  });
-}
-function openModalDropdown(){ document.getElementById('modalBrainrotDropdown').classList.add('open'); }
-function selectModalBrainrot(b){
-  modalSelectedBrainrot = b;
-  document.getElementById('modalBrainrotInput').value = b.name;
-  document.getElementById('modalBrainrotDropdown').classList.remove('open');
-}
-function buildModalTraits(){
-  const grid = document.getElementById('modalTraitsGrid');
-  grid.innerHTML = '';
-  modalSelectedTraits = [];
-  traitDB.forEach(t => {
-    const chip = document.createElement('button');
-    chip.className = 'trait-chip-select';
-    chip.textContent = t;
-    chip.onclick = () => toggleModalTrait(t, chip);
-    grid.appendChild(chip);
-  });
-}
-function filterModalTraits(){
-  const q = document.getElementById('modalTraitFilter').value.toLowerCase();
-  document.querySelectorAll('#modalTraitsGrid .trait-chip-select').forEach(el => {
-    el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
-  });
-}
-function toggleModalTrait(t, el){
-  if(modalSelectedTraits.includes(t)){ modalSelectedTraits=modalSelectedTraits.filter(x=>x!==t); el.classList.remove('selected'); }
-  else { modalSelectedTraits.push(t); el.classList.add('selected'); }
-}
-function addBrainrotToOffer(){
-  if(!modalSelectedBrainrot){ alert('Sélectionne un brainrot !'); return; }
-  const mutation = document.getElementById('modalMutation').value;
-  const item = { brainrot: modalSelectedBrainrot, mutation, traits: [...modalSelectedTraits] };
-  if(currentModalSide==='your') yourOffer.push(item);
-  else theirOffer.push(item);
-  renderOffers();
-  closeModal();
-}
-function removeFromOffer(side, idx){
-  if(side==='your') yourOffer.splice(idx,1);
-  else theirOffer.splice(idx,1);
-  renderOffers();
-}
-function renderOffers(){
-  ['your','their'].forEach(side => {
-    const offer = side==='your' ? yourOffer : theirOffer;
-    const slots = document.getElementById(side+'Slots');
-    const addBtn = document.getElementById(side+'AddBtn');
-    const valueEl = document.getElementById(side+'Value');
-    slots.innerHTML = '';
-    offer.forEach((item, idx) => {
-      const rarClass = RARITY_COLORS[item.brainrot.rarity]||'rarity-common';
-      const mutLabel = item.mutation!=='none' ? `<span class="slot-tag" style="background:rgba(245,158,11,0.2);color:var(--gold)">${item.mutation}</span>` : '';
-      const traitTags = item.traits.map(t=>`<span class="slot-tag" style="background:rgba(124,58,237,0.2);color:var(--accent2)">${t}</span>`).join('');
-      const div = document.createElement('div');
-      div.className = 'offer-slot';
-      div.innerHTML = `<div style="flex:1;min-width:0"><div class="slot-name">${item.brainrot.name}</div><div class="slot-tags"><span class="slot-tag ${rarClass}">${item.brainrot.rarity}</span>${mutLabel}${traitTags}</div></div><button class="slot-remove" onclick="removeFromOffer('${side}',${idx})">✕</button>`;
-      slots.appendChild(div);
-    });
-    addBtn.disabled = offer.length >= 4;
-    const val = calcOfferValue(offer);
-    valueEl.textContent = val > 0 ? 'Value: ' + formatRps(val) : 'Value: ---';
-    valueEl.style.color = val > 0 ? 'var(--text)' : 'var(--muted)';
-  });
-}
-async function searchNewBrainrot(query){
-  if(!query.trim()){ alert('Tape un nom de brainrot !'); return; }
-  const dd = document.getElementById('modalBrainrotDropdown');
-  dd.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:0.85rem;">🔍 Recherche en cours...</div>';
-  dd.classList.add('open');
-  try {
-    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:300,
-        system:'Réponds UNIQUEMENT en JSON valide sans backticks ni commentaires: {"found":true,"name":"NomExact","rarity":"Rarity","rps":1234} ou {"found":false}. Rarity: Common/Rare/Epic/Legendary/Mythic/Brainrot God/Secret/OG.',
-        messages:[{role:'user',content:`Donne-moi les stats du brainrot "${query}" dans le jeu Roblox Steal a Brainrot. JSON uniquement.`}]})});
-    const data = await res.json();
-    const text = data.content?.[0]?.text || '';
-    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
-    buildModalDropdown();
-    if(parsed.found){
-      const b = {name:parsed.name, rarity:parsed.rarity, rps:parsed.rps};
-      brainrotDB.unshift(b);
-      buildModalDropdown();
-      selectModalBrainrot(b);
-    } else {
-      dd.innerHTML = '<div style="padding:12px;color:var(--red);font-size:0.85rem;">❌ Brainrot introuvable !</div>';
-      setTimeout(()=>{ buildModalDropdown(); dd.classList.remove('open'); }, 2000);
-    }
-  } catch(e){
-    dd.innerHTML = '<div style="padding:12px;color:var(--red);font-size:0.85rem;">❌ Erreur de connexion</div>';
-    setTimeout(()=>{ buildModalDropdown(); dd.classList.remove('open'); }, 2000);
+document.addEventListener('click', function(e){
+  const modalDD = document.getElementById('modalBrainrotDropdown');
+  const modalInput = document.getElementById('modalBrainrotInput');
+  if(modalDD && modalInput && !modalInput.contains(e.target) && !modalDD.contains(e.target)){
+    modalDD.classList.remove('open');
   }
-}
+});
+
+window.addEventListener('load', function(){
+  initAuth();
+  fetchBrainrotList();
+});
 </script>
+
+
+
 <script>
-// ─── TRADE ANALYZER ──────────────────────────────────────────
+// TRADE ANALYZER
 async function analyzeTrade(){
   const btn = document.getElementById('analyzeBtn');
   const resultBox = document.getElementById('resultBox');
@@ -2479,32 +1717,32 @@ async function analyzeTrade(){
   document.getElementById('theirEffRps').textContent = formatRps(theirEff);
   const ratio = theirEff / myEff;
   let verdict, icon, color;
-  if(ratio >= 1.15){ verdict='WIN'; icon='✅'; color='win'; }
-  else if(ratio <= 0.85){ verdict='LOSS'; icon='❌'; color='lose'; }
-  else { verdict='FAIR'; icon='⚖️'; color='fair'; }
-  document.getElementById('verdictIcon').textContent = icon;
-  document.getElementById('verdictLabel').textContent = verdict==='WIN'?'Trade Rentable !':verdict==='LOSS'?'Trade Défavorable !':'Trade Équitable';
-  document.getElementById('verdictLabel').className = `verdict-label ${color}`;
-  document.getElementById('verdictSub').textContent = `Ratio: x${ratio.toFixed(2)} en ta faveur`;
+  if(ratio >= 1.15){ verdict='WIN'; icon='&#10003;'; color='win'; }
+  else if(ratio <= 0.85){ verdict='LOSS'; icon='&#10007;'; color='lose'; }
+  else { verdict='FAIR'; icon='&#9878;'; color='fair'; }
+  document.getElementById('verdictIcon').textContent = verdict==='WIN'?'WIN':verdict==='LOSS'?'LOSS':'FAIR';
+  document.getElementById('verdictLabel').textContent = verdict==='WIN'?'Trade Rentable !':verdict==='LOSS'?'Trade Defavorable !':'Trade Equitable';
+  document.getElementById('verdictLabel').className = 'verdict-label ' + color;
+  document.getElementById('verdictSub').textContent = 'Ratio: x'+ratio.toFixed(2)+' en ta faveur';
   resultBox.classList.add('show');
   document.getElementById('aiAnalysis').innerHTML = '<div class="loading-analysis"><div class="dot"></div><div class="dot"></div><div class="dot"></div> Analyse IA en cours...</div>';
   btn.disabled = true;
-  const myName = yourOffer.map(i=>i.brainrot.name).join(', ');
-  const theirName = theirOffer.map(i=>i.brainrot.name).join(', ');
+  const myName = yourOffer.map(function(i){ return i.brainrot.name; }).join(', ');
+  const theirName = theirOffer.map(function(i){ return i.brainrot.name; }).join(', ');
   try {
     const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1000,
-        system:`Tu es un expert en trades du jeu Roblox "Steal a Brainrot". Tu analyses si un trade est avantageux ou non. Tu réponds en français, de façon directe et claire.`,
-        messages:[{role:'user',content:`Analyse ce trade:\nMON OFFRE: ${myName} (valeur: ${formatRps(myEff)})\nLEUR OFFRE: ${theirName} (valeur: ${formatRps(theirEff)})\nRatio: x${ratio.toFixed(2)}\nVerdicts: ${verdict}\nDonne une analyse courte (3-4 lignes max).`}]})});
+        system:'Tu es un expert en trades du jeu Roblox Steal a Brainrot. Tu analyses si un trade est avantageux ou non. Tu reponds en francais, de facon directe et claire.',
+        messages:[{role:'user',content:'Analyse ce trade:\nMON OFFRE: '+myName+' (valeur: '+formatRps(myEff)+')\nLEUR OFFRE: '+theirName+' (valeur: '+formatRps(theirEff)+')\nRatio: x'+ratio.toFixed(2)+'\nVerdicts: '+verdict+'\nDonne une analyse courte (3-4 lignes max).'}]})});
     const data = await res.json();
-    document.getElementById('aiAnalysis').textContent = data.content?.[0]?.text || 'Analyse indisponible.';
+    document.getElementById('aiAnalysis').textContent = data.content && data.content[0] ? data.content[0].text : 'Analyse indisponible.';
   } catch(e){
-    document.getElementById('aiAnalysis').textContent = 'Erreur lors de l\'analyse IA.';
+    document.getElementById('aiAnalysis').textContent = "Erreur lors de l'analyse IA.";
   }
   btn.disabled = false;
 }
 
-// ─── URBEX EXPLORER ──────────────────────────────────────────
+// URBEX EXPLORER
 function quickSearch(query){ document.getElementById('urbexInput').value = query; searchUrbex(); }
 
 async function searchUrbex(){
@@ -2513,56 +1751,49 @@ async function searchUrbex(){
   if(!query) return;
   const btn = document.getElementById('urbexBtn');
   const result = document.getElementById('urbexResult');
-  const content = document.getElementById('urbexContent');
+  const contentEl = document.getElementById('urbexContent');
   const dangerBar = document.getElementById('urbexDangerBar');
   const titleEl = document.getElementById('urbexResultTitle');
   btn.disabled = true;
   result.classList.add('show');
   titleEl.textContent = query;
   dangerBar.innerHTML = '';
-  content.innerHTML = '<div class="urbex-loading"><div class="dot-orange"></div><div class="dot-orange"></div><div class="dot-orange"></div> Recherche en cours...</div>';
+  contentEl.innerHTML = '<div class="urbex-loading"><div class="dot-orange"></div><div class="dot-orange"></div><div class="dot-orange"></div> Recherche en cours...</div>';
   try {
     const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1000,
-        system:`Tu es un expert en urbex (exploration urbaine). Tu parles en français, tu es précis et utile.\nFournis des infos sur les lieux abandonnés : noms, localisations, dangers, légalité, conseils.\nAu début de ta réponse, indique sur deux lignes:\nDANGER_LEVEL: HIGH|MEDIUM|LOW\nLEGAL_STATUS: ILLEGAL|GRAY|LEGAL\nPuis une ligne vide, puis le contenu détaillé.`,
+        system:'Tu es un expert en urbex (exploration urbaine). Tu parles en francais, tu es precis et utile.\nFournis des infos sur les lieux abandonnes : noms, localisations, dangers, legalite, conseils.\nAu debut de ta reponse, indique sur deux lignes:\nDANGER_LEVEL: HIGH|MEDIUM|LOW\nLEGAL_STATUS: ILLEGAL|GRAY|LEGAL\nPuis une ligne vide, puis le contenu detaille.',
         messages:[{role:'user',content:query}]})});
     const data = await res.json();
-    let fullText = data.content?.[0]?.text || 'Aucun résultat.';
+    let fullText = data.content && data.content[0] ? data.content[0].text : 'Aucun resultat.';
     const dangerMatch = fullText.match(/DANGER_LEVEL:\s*(HIGH|MEDIUM|LOW)/i);
     const legalMatch = fullText.match(/LEGAL_STATUS:\s*(ILLEGAL|GRAY|LEGAL)/i);
-    fullText = fullText.replace(/DANGER_LEVEL:.*\n?/i,'').replace(/LEGAL_STATUS:.*\n?/i,'').trim();
+    fullText = fullText.replace(/DANGER_LEVEL:[^\n]*/i,'').replace(/LEGAL_STATUS:[^\n]*/i,'').trim();
     if(dangerMatch){
       const level = dangerMatch[1].toUpperCase();
       const badge = document.createElement('span');
       badge.className = 'danger-badge ' + (level==='HIGH'?'danger-high':level==='MEDIUM'?'danger-med':'danger-low');
-      badge.innerHTML = level==='HIGH'?'⚠️ Danger élevé':level==='MEDIUM'?'⚡ Danger modéré':'✅ Danger faible';
+      badge.textContent = level==='HIGH'?'Danger eleve':level==='MEDIUM'?'Danger modere':'Danger faible';
       dangerBar.appendChild(badge);
     }
     if(legalMatch){
       const status = legalMatch[1].toUpperCase();
       const badge = document.createElement('span');
       badge.className = 'danger-badge ' + (status==='ILLEGAL'?'danger-high':status==='GRAY'?'danger-med':'danger-low');
-      badge.innerHTML = status==='ILLEGAL'?'🚫 Illégal':status==='GRAY'?'⚖️ Zone grise':'✅ Légal';
+      badge.textContent = status==='ILLEGAL'?'Illegal':status==='GRAY'?'Zone grise':'Legal';
       dangerBar.appendChild(badge);
     }
-    content.textContent = fullText;
-  } catch(e){ content.textContent = 'Erreur lors de la recherche.'; }
+    contentEl.textContent = fullText;
+  } catch(e){ contentEl.textContent = 'Erreur lors de la recherche.'; }
   btn.disabled = false;
 }
 
-// ─── CLICK OUTSIDE CLOSE ────────────────────────────────────
 document.addEventListener('click', function(e){
   const modalDD = document.getElementById('modalBrainrotDropdown');
   const modalInput = document.getElementById('modalBrainrotInput');
   if(modalDD && modalInput && !modalInput.contains(e.target) && !modalDD.contains(e.target)){
     modalDD.classList.remove('open');
   }
-});
-
-// ─── INIT ────────────────────────────────────────────────────
-window.addEventListener('load', () => {
-  initAuth();
-  fetchBrainrotList();
 });
 </script>
 </body>
