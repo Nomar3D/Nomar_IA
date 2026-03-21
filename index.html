@@ -1462,10 +1462,9 @@ async function saveSettings(){
 
 function getSystemPrompt(){
   const base = currentPersona === 'custom' ? (customPersonaText || PERSONAS.cool) : (PERSONAS[currentPersona] || PERSONAS.cool);
-  const noSearch = (!currentUser || !currentUser.is_pro)
-    ? '\n\nREGLE ABSOLUE : Tu n\'as PAS acces a internet. Ne connais PAS les donnees en temps reel. Si on demande une info en temps reel, dis que tu ne peux pas faire de recherche internet en version gratuite et qu\'il faut passer a Nomar Pro. Ne jamais inventer des chiffres.'
-    : '';
-  return base + '\n\nREGLE : Ne dis JAMAIS que tu es une IA.\n- Steal a Brainrot -> ajoute [REDIRECT_TRADE] a la fin.\n- Urbex -> ajoute [REDIRECT_URBEX] a la fin.' + noSearch;
+  const imageRule = '\nREGLE IMAGES : Si on demande de generer/creer/dessiner une image, reponds une phrase courte puis ajoute [GENERATE_IMAGE: description en anglais] a la fin. Ne jamais decrire avec des mots.';
+  const noSearch = (!currentUser || !currentUser.is_pro) ? '\nREGLE : Pas internet. Ne jamais inventer. Si info temps reel, dire de passer a Nomar Pro.' : '';
+  return base + '\nREGLE : Ne dis JAMAIS que tu es une IA.' + imageRule + '\n- Urbex -> ajoute [REDIRECT_URBEX] a la fin.' + noSearch;
 }
 
 // MODALS
@@ -1539,33 +1538,11 @@ function clearFile(){
 // GENERATE IMAGE
 async function generateImage(prompt){
   const msgs = document.getElementById('messages');
-  const uid = 'imgbubble_' + Date.now();
-  const loadDiv = document.createElement('div');
-  loadDiv.className = 'msg assistant';
-  loadDiv.innerHTML = '<div class="avatar ai">AI</div><div class="bubble" id="' + uid + '">&#127912; Generation en cours<span id="dots_' + uid + '">.</span></div>';
-  msgs.appendChild(loadDiv);
+  const div = document.createElement('div');
+  div.className = 'msg assistant';
+  div.innerHTML = '<div class="avatar ai">AI</div><div class="bubble" style="background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.4);">&#127912; La creation d\'images arrivera bientot avec <strong style="color:#a78bfa;font-weight:800;">NOMAR PRO</strong> !</div>';
+  msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
-  let dc = 1;
-  const di = setInterval(function(){ const d = document.getElementById('dots_' + uid); if(d){ dc=(dc%3)+1; d.textContent='.'.repeat(dc); } else clearInterval(di); }, 500);
-  const to = setTimeout(function(){ clearInterval(di); const b = document.getElementById(uid); if(b) b.innerHTML = '&#127912; La generation d\'images arrive bientot sur <strong style="color:var(--accent);">Nomar Pro</strong> !'; }, 90000);
-  try {
-    const resp = await fetch(BACKEND + '/generate-image', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt: prompt + ', high quality, detailed' }) });
-    if(!resp.ok) throw new Error('error');
-    const data = await resp.json();
-    if(data.error) throw new Error(data.error);
-    if(!data.imageUrl) throw new Error('no image');
-    clearInterval(di); clearTimeout(to);
-    const b = document.getElementById(uid);
-    if(b){
-      b.style.cssText = 'background:transparent;padding:0;';
-      b.innerHTML = '<div style="background:#1a1a2e;border-radius:16px;overflow:hidden;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.4);"><img src="' + data.imageUrl + '" style="width:100%;display:block;border-radius:16px 16px 0 0;"><div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;"><div style="font-size:0.78rem;color:#a78bfa;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">&#127912; ' + escHtml(prompt) + '</div><a href="' + data.imageUrl + '" download="nomar-image.jpg" style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.4);color:#a78bfa;padding:5px 10px;border-radius:8px;font-size:0.75rem;text-decoration:none;cursor:pointer;">&#11015; Telecharger</a></div></div>';
-      msgs.scrollTop = msgs.scrollHeight;
-    }
-  } catch(e) {
-    clearInterval(di); clearTimeout(to);
-    const b = document.getElementById(uid);
-    if(b) b.innerHTML = '&#127912; La generation d\'images arrive bientot sur <strong style="color:#a78bfa;font-weight:800;">Nomar Pro</strong> !';
-  }
 }
 
 // ADD MESSAGE
@@ -1608,7 +1585,7 @@ async function sendChat(){
 
   const msgLower = msg.toLowerCase();
   const hasImageWord = ['image', 'photo', 'dessin', 'illustration'].some(function(k){ return msgLower.includes(k); });
-  const hasActionWord = ['genere', 'cree', 'fais', 'dessine', 'creer', 'dessiner'].some(function(k){ return msgLower.includes(k); });
+  const hasActionWord = ['genere', 'cree', 'fais', 'dessine', 'creer', 'dessiner', 'faire', 'generer', 'generez'].some(function(k){ return msgLower.includes(k); });
   if(hasImageWord && hasActionWord && msg.length < 200){
     addMsg('user', msg);
     chatHistory.push({role:'user', content:msg});
