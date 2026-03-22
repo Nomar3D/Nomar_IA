@@ -774,6 +774,7 @@ body {
     </svg>
     <div class="logo-text">NOMAR_<span>IA</span></div>
     <button class="new-chat-btn" onclick="newConversation()" title="Nouvelle conversation">&#9998;</button>
+    <button class="new-chat-btn" id="audioBtn" onclick="toggleAudio()" title="Son ambiance" style="font-size:0.75rem;">&#128266;</button>
   </div>
 
   <div class="sidebar-nav">
@@ -1831,5 +1832,157 @@ document.addEventListener('click', function(e){
     </div>
   </div>
 </div>
+
+<script>
+// ─── SYNTHWAVE AMBIENT AUDIO ─────────────────────────────────
+let audioCtx = null;
+let audioPlaying = false;
+let masterGain = null;
+let allNodes = [];
+
+function initAudio(){
+  if(audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  masterGain = audioCtx.createGain();
+  masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+  masterGain.connect(audioCtx.destination);
+}
+
+function createPad(freq, detune, gainVal){
+  const osc1 = audioCtx.createOscillator();
+  const osc2 = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+
+  osc1.type = 'sawtooth';
+  osc1.frequency.value = freq;
+  osc1.detune.value = detune;
+
+  osc2.type = 'sine';
+  osc2.frequency.value = freq * 2;
+  osc2.detune.value = -detune * 0.5;
+
+  filter.type = 'lowpass';
+  filter.frequency.value = 800;
+  filter.Q.value = 2;
+
+  gain.gain.value = gainVal;
+
+  osc1.connect(filter);
+  osc2.connect(filter);
+  filter.connect(gain);
+  gain.connect(masterGain);
+
+  osc1.start();
+  osc2.start();
+  allNodes.push(osc1, osc2);
+  return gain;
+}
+
+function createSpaceDrone(){
+  const freqs = [55, 82.4, 110, 164.8];
+  freqs.forEach(function(f, i){
+    createPad(f, (i - 1.5) * 8, 0.04);
+  });
+
+  // Slow LFO modulation on filter
+  const lfo = audioCtx.createOscillator();
+  const lfoGain = audioCtx.createGain();
+  lfo.frequency.value = 0.08;
+  lfoGain.gain.value = 300;
+  lfo.connect(lfoGain);
+  lfo.start();
+  allNodes.push(lfo);
+}
+
+function createArpNote(freq, startTime, duration){
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+
+  osc.type = 'square';
+  osc.frequency.value = freq;
+
+  filter.type = 'bandpass';
+  filter.frequency.value = freq * 2;
+  filter.Q.value = 3;
+
+  gain.gain.setValueAtTime(0, startTime);
+  gain.gain.linearRampToValueAtTime(0.025, startTime + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(masterGain);
+
+  osc.start(startTime);
+  osc.stop(startTime + duration + 0.1);
+}
+
+function scheduleArp(){
+  if(!audioPlaying) return;
+  const notes = [220, 277.2, 329.6, 440, 329.6, 277.2, 220, 164.8];
+  const now = audioCtx.currentTime;
+  const step = 0.45;
+  notes.forEach(function(n, i){
+    createArpNote(n, now + i * step, step * 0.8);
+    createArpNote(n * 2, now + i * step + step * 0.5, step * 0.4);
+  });
+  setTimeout(scheduleArp, notes.length * step * 1000 - 200);
+}
+
+function fadeIn(){
+  masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+  masterGain.gain.setValueAtTime(masterGain.gain.value, audioCtx.currentTime);
+  masterGain.gain.linearRampToValueAtTime(0.18, audioCtx.currentTime + 2.5);
+}
+
+function fadeOut(){
+  masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+  masterGain.gain.setValueAtTime(masterGain.gain.value, audioCtx.currentTime);
+  masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 2);
+}
+
+function startAudio(){
+  if(audioPlaying) return;
+  if(!audioCtx) initAudio();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  audioPlaying = true;
+  createSpaceDrone();
+  fadeIn();
+  scheduleArp();
+  const btn = document.getElementById('audioBtn');
+  if(btn){ btn.style.color = 'var(--gold)'; btn.style.borderColor = 'var(--border-gold)'; btn.innerHTML = '&#128266;'; }
+  // Remove first-interaction listener once started
+  document.removeEventListener('click', startAudioOnce);
+  document.removeEventListener('keydown', startAudioOnce);
+}
+
+function startAudioOnce(){
+  startAudio();
+}
+
+function toggleAudio(){
+  const btn = document.getElementById('audioBtn');
+  if(!audioPlaying){
+    startAudio();
+  } else {
+    audioPlaying = false;
+    fadeOut();
+    setTimeout(function(){
+      allNodes.forEach(function(n){ try{ n.stop(); }catch(e){} });
+      allNodes = [];
+      if(audioCtx){ audioCtx.close(); audioCtx = null; }
+      masterGain = null;
+    }, 2500);
+    if(btn){ btn.style.color = ''; btn.style.borderColor = ''; btn.innerHTML = '&#128267;'; }
+  }
+}
+
+// Auto-start on first user interaction (browser policy)
+document.addEventListener('click', startAudioOnce);
+document.addEventListener('keydown', startAudioOnce);
+</script>
+
 </body>
 </html>
