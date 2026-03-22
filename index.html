@@ -1908,7 +1908,7 @@ function createArpNote(freq, startTime, duration){
   filter.Q.value = 3;
 
   gain.gain.setValueAtTime(0, startTime);
-  gain.gain.linearRampToValueAtTime(0.025, startTime + 0.02);
+  gain.gain.linearRampToValueAtTime(0.07, startTime + 0.02);
   gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
 
   osc.connect(filter);
@@ -1926,7 +1926,7 @@ function scheduleArp(){
   const step = 0.45;
   notes.forEach(function(n, i){
     createArpNote(n, now + i * step, step * 0.8);
-    createArpNote(n * 2, now + i * step + step * 0.5, step * 0.4);
+    createArpNote(n * 2, now + i * step + step * 0.5, step * 0.5);
   });
   setTimeout(scheduleArp, notes.length * step * 1000 - 200);
 }
@@ -1934,7 +1934,7 @@ function scheduleArp(){
 function fadeIn(){
   masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
   masterGain.gain.setValueAtTime(masterGain.gain.value, audioCtx.currentTime);
-  masterGain.gain.linearRampToValueAtTime(0.18, audioCtx.currentTime + 2.5);
+  masterGain.gain.linearRampToValueAtTime(0.28, audioCtx.currentTime + 2.5);
 }
 
 function fadeOut(){
