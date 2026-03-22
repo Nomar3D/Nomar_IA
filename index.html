@@ -817,9 +817,7 @@ body {
       <div class="messages" id="messages">
         <div class="msg assistant">
           <div class="avatar ai">AI</div>
-          <div class="bubble">
-            Yo ! Moi c'est Nomar &#128293; Pose-moi n'importe quelle question, je suis la pour toi ! &#128640;
-          </div>
+          <div class="bubble" id="initialWelcome">Chargement...</div>
         </div>
       </div>
       <div class="input-area">
@@ -1195,7 +1193,7 @@ function newConversation(){
   currentConvId = 'conv_' + Date.now();
   chatHistory = [];
   const msgs = document.getElementById('messages');
-  msgs.innerHTML = '<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Moi c\'est Nomar &#128293; Pose-moi n\'importe quelle question, je suis la pour toi ! &#128640;</div></div>';
+  msgs.innerHTML = '<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">' + getWelcomeMsg() + '</div></div>';
   const newConv = { id: currentConvId, title: 'Nouvelle conversation', messages: [], date: Date.now() };
   conversations.unshift(newConv);
   saveConversations();
@@ -1257,7 +1255,7 @@ function renderConvList(){
 function renderMessages(){
   const msgs = document.getElementById('messages');
   if(chatHistory.length === 0){
-    msgs.innerHTML = '<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">Yo ! Moi c\'est Nomar &#128293; Je suis la pour toi !</div></div>';
+    msgs.innerHTML = '<div class="msg assistant"><div class="avatar ai">AI</div><div class="bubble">' + getWelcomeMsg() + '</div></div>';
     return;
   }
   msgs.innerHTML = '';
@@ -1538,8 +1536,30 @@ document.addEventListener('click', function(e){
 function openDiscordModal(){ document.getElementById('discordOverlay').classList.add('open'); }
 function closeDiscordModal(e){ if(!e || e.target===document.getElementById('discordOverlay')) document.getElementById('discordOverlay').classList.remove('open'); }
 
+function getWelcomeMsg(){
+  const msgs = [
+    "Yo ! Moi c'est Nomar &#128293; Qu'est-ce que je peux faire pour toi aujourd'hui ?",
+    "Salut ! Je suis la, pret a tout &#128640; C'est quoi le programme ?",
+    "Hey ! Nomar a son service &#127775; Dis-moi tout, j'ecoute.",
+    "Yo ! Pose ta question, j'ai les reponses &#129302; Let's go !",
+    "Bonsoir les amis ! Nomar est dispo &#9196; Qu'est-ce qu'on fait ?",
+    "What's up ! &#128293; Je suis chaud pour t'aider, go !",
+    "Ici Nomar &#127942; Pret au combat. C'est quoi ta question ?",
+    "Coucou ! &#10024; Une question ? Un probleme ? Je suis la pour ca !",
+    "Salut ! Nomar en ligne &#128171; Qu'est-ce qui se passe aujourd'hui ?",
+    "Yo ! J'attends ta question avec impatience &#128064; Vas-y !",
+    "Hey ! &#127775; Qu'est-ce que tu veux savoir ? Je suis tout ouie !",
+    "Bien le bonjour ! &#9728; Nomar pret pour de nouvelles aventures intellectuelles.",
+    "Bonjour ! &#127881; Nouvelle conversation, nouvelles possibilites. C'est quoi ?",
+  ];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
 window.addEventListener('load', function(){
   initAuth();
+  // Set random welcome on initial static message
+  const iw = document.getElementById('initialWelcome');
+  if(iw) iw.innerHTML = getWelcomeMsg();
 });
 </script>
 
