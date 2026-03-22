@@ -2388,14 +2388,48 @@ function createSpaceDrone(){
     createPad(f, (i - 1.5) * 8, 0.04);
   });
 
-  // Slow LFO modulation on filter
-  const lfo = audioCtx.createOscillator();
-  const lfoGain = audioCtx.createGain();
-  lfo.frequency.value = 0.08;
-  lfoGain.gain.value = 300;
-  lfo.connect(lfoGain);
-  lfo.start();
-  allNodes.push(lfo);
+  // LFO 1 - slow filter sweep
+  const lfo1 = audioCtx.createOscillator();
+  const lfoGain1 = audioCtx.createGain();
+  lfo1.type = 'sine';
+  lfo1.frequency.value = 0.06;
+  lfoGain1.gain.value = 280;
+  lfo1.connect(lfoGain1);
+  lfo1.start();
+  allNodes.push(lfo1);
+
+  // LFO 2 - subtle pitch wobble on master gain
+  const lfo2 = audioCtx.createOscillator();
+  const lfoGain2 = audioCtx.createGain();
+  lfo2.type = 'sine';
+  lfo2.frequency.value = 0.13;
+  lfoGain2.gain.value = 0.018;
+  lfo2.connect(lfoGain2);
+  lfoGain2.connect(masterGain.gain);
+  lfo2.start();
+  allNodes.push(lfo2);
+
+  // LFO 3 - very slow volume breath
+  const lfo3 = audioCtx.createOscillator();
+  const lfoGain3 = audioCtx.createGain();
+  lfo3.type = 'sine';
+  lfo3.frequency.value = 0.03;
+  lfoGain3.gain.value = 0.025;
+  lfo3.connect(lfoGain3);
+  lfoGain3.connect(masterGain.gain);
+  lfo3.start();
+  allNodes.push(lfo3);
+
+  // Random subtle frequency shifts every ~8 seconds
+  function randomShift(){
+    if(!audioPlaying) return;
+    const t = audioCtx.currentTime;
+    // Slight random detune on one of the pads
+    const shift = (Math.random() - 0.5) * 6;
+    masterGain.gain.setTargetAtTime(masterGain.gain.value + (Math.random()-0.5)*0.015, t, 2);
+    setTimeout(randomShift, 6000 + Math.random() * 6000);
+  }
+  setTimeout(randomShift, 4000);
 }
 
 function createArpNote(freq, startTime, duration){
