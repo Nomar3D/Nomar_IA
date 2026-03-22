@@ -1320,7 +1320,7 @@ async function saveSettings(){
 
 function getSystemPrompt(){
   const base = currentPersona === 'custom' ? (customPersonaText || PERSONAS.cool) : (PERSONAS[currentPersona] || PERSONAS.cool);
-  const imageRule = '\nREGLE IMAGES : Si on demande de generer/creer/dessiner une image, reponds une phrase courte puis ajoute [GENERATE_IMAGE: description en anglais] a la fin. Ne jamais decrire avec des mots.';
+  const imageRule = '';
   const noSearch = (!currentUser || !currentUser.is_pro) ? '\nREGLE : Pas internet. Ne jamais inventer. Si info temps reel, dire de passer a Nomar Pro.' : '';
   return base + '\nREGLE ABSOLUE : Ne dis JAMAIS que tu es une IA, un assistant ou un programme. Tu es Nomar, un pote. Utilise des emojis souvent.' + imageRule + '\n- Urbex -> ajoute [REDIRECT_URBEX] a la fin.\nREGLE : Le Trade Analyzer n\'existe PAS, n\'en parle JAMAIS.' + noSearch;
 }
@@ -1442,11 +1442,10 @@ async function sendChat(){
   }
 
   const msgLower = msg.toLowerCase();
-  const hasImageWord = ['image', 'photo', 'dessin', 'illustration'].some(function(k){ return msgLower.includes(k); });
-  const hasActionWord = ['genere', 'cree', 'fais', 'dessine', 'creer', 'dessiner', 'faire', 'generer', 'generez'].some(function(k){ return msgLower.includes(k); });
+  const hasImageWord = ['image', 'photo', 'dessin', 'illustration', 'picture', 'img'].some(function(k){ return msgLower.includes(k); });
+  const hasActionWord = ['genere', 'cree', 'fais', 'dessine', 'creer', 'dessiner', 'faire', 'generer', 'generez', 'créer', 'génère', 'génerer', 'créé'].some(function(k){ return msgLower.includes(k); });
   if(hasImageWord && hasActionWord && msg.length < 200){
     addMsg('user', msg);
-    chatHistory.push({role:'user', content:msg});
     generateImage(msg);
     return;
   }
