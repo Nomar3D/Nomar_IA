@@ -129,6 +129,7 @@ body {
   background: var(--gold-dim);
   color: var(--gold2);
   border: 1px solid var(--border-gold);
+  box-shadow: inset 0 0 12px rgba(201,168,76,0.06);
 }
 .nav-item .nav-icon { font-size: 0.8rem; width: 16px; text-align: center; }
 
@@ -229,11 +230,20 @@ body {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(201,168,76,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201,168,76,0.02) 1px, transparent 1px);
+    linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
   background-size: 40px 40px;
   pointer-events: none;
   z-index: 0;
+}
+.main::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.3;
+  z-index: 2;
 }
 
 .panels { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; position: relative; z-index: 1; }
@@ -310,6 +320,7 @@ body {
 .msg.assistant .bubble {
   background: var(--bg3);
   border: 1px solid var(--border);
+  border-left: 2px solid var(--gold);
   color: var(--text);
   border-radius: 3px 12px 12px 12px;
 }
@@ -364,8 +375,8 @@ body {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .input-wrap:focus-within {
-  border-color: var(--border-gold);
-  box-shadow: 0 0 0 3px rgba(201,168,76,0.06);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.1), 0 0 20px rgba(201,168,76,0.08);
 }
 .input-wrap input {
   flex: 1;
@@ -642,20 +653,124 @@ body {
   .urbex-panel { padding:16px; }
   .persona-grid { grid-template-columns:repeat(2,1fr); }
 }
+
+/* LOGO ANIMATION */
+.logo-svg {
+  cursor: pointer;
+  transform-origin: center;
+  animation: logo-breathe 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(201,168,76,0.3));
+  transition: filter 0.3s ease;
+}
+.logo-svg:hover {
+  filter: drop-shadow(0 0 10px rgba(201,168,76,0.7));
+  animation-play-state: paused;
+}
+
+.logo-r1 { animation: logo-color-cycle 6s ease-in-out infinite; }
+.logo-r2 { animation: logo-color-cycle 6s ease-in-out infinite 1.5s; }
+.logo-r3 { animation: logo-color-cycle 6s ease-in-out infinite 3s; }
+.logo-r4 { animation: logo-color-cycle 6s ease-in-out infinite 4.5s; }
+.logo-r5 { animation: logo-center-glow 4s ease-in-out infinite; }
+
+@keyframes logo-breathe {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 3px rgba(201,168,76,0.2)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 8px rgba(201,168,76,0.6)); }
+}
+@keyframes logo-color-cycle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@keyframes logo-center-glow {
+  0%, 100% { opacity: 0.95; fill: #e8c87a; }
+  50% { opacity: 0.7; fill: #ffffff; }
+}
+
+/* Loading splash */
+#loadingSplash {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  animation: splashFadeOut 0.5s ease 1.8s forwards;
+}
+@keyframes splashFadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
+.splash-logo {
+  animation: splashScale 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  opacity: 0;
+}
+@keyframes splashScale {
+  from { opacity: 0; transform: scale(0.5) rotate(-20deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+.splash-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  animation: splashText 0.5s ease 0.4s forwards;
+  opacity: 0;
+}
+@keyframes splashText {
+  to { opacity: 1; }
+}
+.splash-bar {
+  width: 80px;
+  height: 1px;
+  background: var(--border);
+  position: relative;
+  overflow: hidden;
+  animation: splashText 0.5s ease 0.4s forwards;
+  opacity: 0;
+}
+.splash-bar::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  animation: splashBarSlide 1s ease 0.6s forwards;
+}
+@keyframes splashBarSlide {
+  to { left: 100%; }
+}
+
 </style>
 </head>
 <body>
+
+
+<div id="loadingSplash">
+  <div class="splash-logo">
+    <svg width="56" height="56" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect class="logo-r1" x="2" y="2" width="11" height="11" rx="3" fill="#c9a84c"/>
+      <rect class="logo-r2" x="15" y="2" width="11" height="11" rx="3" fill="#6366f1"/>
+      <rect class="logo-r3" x="2" y="15" width="11" height="11" rx="3" fill="#6366f1"/>
+      <rect class="logo-r4" x="15" y="15" width="11" height="11" rx="3" fill="#c9a84c"/>
+      <rect class="logo-r5" x="8" y="8" width="12" height="12" rx="3" fill="#e8c87a"/>
+    </svg>
+  </div>
+  <div class="splash-text">Nomar_IA</div>
+  <div class="splash-bar"></div>
+</div>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <div class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <svg class="logo-svg" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="2" y="2" width="11" height="11" rx="3" fill="#6366f1" opacity="0.9"/>
-      <rect x="15" y="2" width="11" height="11" rx="3" fill="#818cf8" opacity="0.6"/>
-      <rect x="2" y="15" width="11" height="11" rx="3" fill="#818cf8" opacity="0.6"/>
-      <rect x="15" y="15" width="11" height="11" rx="3" fill="#6366f1" opacity="0.9"/>
-      <rect x="8" y="8" width="12" height="12" rx="3" fill="#a5b4fc" opacity="0.95"/>
+      <rect class="logo-r1" x="2" y="2" width="11" height="11" rx="3" fill="#c9a84c"/>
+      <rect class="logo-r2" x="15" y="2" width="11" height="11" rx="3" fill="#6366f1"/>
+      <rect class="logo-r3" x="2" y="15" width="11" height="11" rx="3" fill="#6366f1"/>
+      <rect class="logo-r4" x="15" y="15" width="11" height="11" rx="3" fill="#c9a84c"/>
+      <rect class="logo-r5" x="8" y="8" width="12" height="12" rx="3" fill="#e8c87a"/>
     </svg>
     <div class="logo-text">NOMAR_<span>IA</span></div>
     <button class="new-chat-btn" onclick="newConversation()" title="Nouvelle conversation">&#9998;</button>
@@ -761,11 +876,11 @@ body {
   <div class="auth-box">
     <div class="auth-logo-wrap">
       <svg width="24" height="24" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="2" width="11" height="11" rx="3" fill="#6366f1" opacity="0.9"/>
-        <rect x="15" y="2" width="11" height="11" rx="3" fill="#818cf8" opacity="0.6"/>
-        <rect x="2" y="15" width="11" height="11" rx="3" fill="#818cf8" opacity="0.6"/>
-        <rect x="15" y="15" width="11" height="11" rx="3" fill="#6366f1" opacity="0.9"/>
-        <rect x="8" y="8" width="12" height="12" rx="3" fill="#a5b4fc" opacity="0.95"/>
+        <rect class="logo-r1" x="2" y="2" width="11" height="11" rx="3" fill="#c9a84c"/>
+        <rect class="logo-r2" x="15" y="2" width="11" height="11" rx="3" fill="#6366f1"/>
+        <rect class="logo-r3" x="2" y="15" width="11" height="11" rx="3" fill="#6366f1"/>
+        <rect class="logo-r4" x="15" y="15" width="11" height="11" rx="3" fill="#c9a84c"/>
+        <rect class="logo-r5" x="8" y="8" width="12" height="12" rx="3" fill="#e8c87a"/>
       </svg>
       <div class="auth-logo-text">NOMAR_<span>IA</span></div>
     </div>
@@ -963,7 +1078,21 @@ async function submitAuth(){
     saveToStorage('nomar_user', currentUser);
     saveToStorage('nomar_visited', true);
     document.getElementById('authOverlay').style.display = 'none';
+    // Save guest history before login overwrites it
+    const guestHistory = [...chatHistory];
+    const guestConvId = currentConvId;
     onLogin();
+    // Restore guest conversation after login
+    if(guestHistory.length > 0){
+      setTimeout(function(){
+        chatHistory = guestHistory;
+        const conv = conversations.find(function(c){ return c.id === currentConvId; });
+        if(conv){ conv.messages = guestHistory; conv.title = guestHistory.find(function(m){ return m.role==='user'; }) ? guestHistory.find(function(m){ return m.role==='user'; }).content.slice(0,30) : 'Conversation'; }
+        renderMessages();
+        saveConversations();
+        renderConvList();
+      }, 300);
+    }
   } catch(e) {
     errEl.textContent = 'Erreur serveur';
     btn.textContent = mode==='login'?'Se connecter':"S'inscrire";
@@ -1570,6 +1699,95 @@ document.addEventListener('click', function(e){
   align-items: center;
   justify-content: space-between;
 }
+
+/* LOGO ANIMATION */
+.logo-svg {
+  cursor: pointer;
+  transform-origin: center;
+  animation: logo-breathe 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(201,168,76,0.3));
+  transition: filter 0.3s ease;
+}
+.logo-svg:hover {
+  filter: drop-shadow(0 0 10px rgba(201,168,76,0.7));
+  animation-play-state: paused;
+}
+
+.logo-r1 { animation: logo-color-cycle 6s ease-in-out infinite; }
+.logo-r2 { animation: logo-color-cycle 6s ease-in-out infinite 1.5s; }
+.logo-r3 { animation: logo-color-cycle 6s ease-in-out infinite 3s; }
+.logo-r4 { animation: logo-color-cycle 6s ease-in-out infinite 4.5s; }
+.logo-r5 { animation: logo-center-glow 4s ease-in-out infinite; }
+
+@keyframes logo-breathe {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 3px rgba(201,168,76,0.2)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 8px rgba(201,168,76,0.6)); }
+}
+@keyframes logo-color-cycle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@keyframes logo-center-glow {
+  0%, 100% { opacity: 0.95; fill: #e8c87a; }
+  50% { opacity: 0.7; fill: #ffffff; }
+}
+
+/* Loading splash */
+#loadingSplash {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  animation: splashFadeOut 0.5s ease 1.8s forwards;
+}
+@keyframes splashFadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
+.splash-logo {
+  animation: splashScale 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  opacity: 0;
+}
+@keyframes splashScale {
+  from { opacity: 0; transform: scale(0.5) rotate(-20deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+.splash-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  animation: splashText 0.5s ease 0.4s forwards;
+  opacity: 0;
+}
+@keyframes splashText {
+  to { opacity: 1; }
+}
+.splash-bar {
+  width: 80px;
+  height: 1px;
+  background: var(--border);
+  position: relative;
+  overflow: hidden;
+  animation: splashText 0.5s ease 0.4s forwards;
+  opacity: 0;
+}
+.splash-bar::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  animation: splashBarSlide 1s ease 0.6s forwards;
+}
+@keyframes splashBarSlide {
+  to { left: 100%; }
+}
+
 </style>
 
 
