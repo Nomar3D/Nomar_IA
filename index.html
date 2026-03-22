@@ -1396,7 +1396,7 @@ function startHeartbeat(){
   send();
   setInterval(send, 60000);
   // Check for new broadcast messages every 30 seconds
-  setInterval(checkBroadcast, 30000);
+  setInterval(checkBroadcast, 5000);
 }
 
 let lastConvCheck = Date.now();
