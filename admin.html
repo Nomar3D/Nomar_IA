@@ -494,25 +494,42 @@ async function viewConversations(userId, username){
     return;
   }
 
-  document.getElementById('convSelector').innerHTML = convData.map((c,i) =>
-    `<button class="conv-btn ${i===0?'active':''}" onclick="showConv(${i},this)">${escHtml(c.title||'Conversation '+(i+1))}</button>`
-  ).join('');
-  showConv(0, document.querySelector('.conv-btn'));
+  const sel = document.getElementById('convSelector');
+  sel.innerHTML = '';
+  convData.forEach(function(c, i){
+    const btn = document.createElement('button');
+    btn.className = 'conv-btn' + (i===0?' active':'');
+    btn.textContent = c.title || ('Conversation '+(i+1));
+    const idx = i;
+    btn.addEventListener('click', function(){ showConv(idx, btn); });
+    sel.appendChild(btn);
+  });
+  if(convData.length > 0) showConv(0, sel.querySelector('.conv-btn'));
 }
 
 function showConv(idx, btn){
-  document.querySelectorAll('.conv-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.conv-btn').forEach(function(b){ b.classList.remove('active'); });
   if(btn) btn.classList.add('active');
   const conv = convData[idx];
   const msgs = conv.messages || [];
-  document.getElementById('convModalBody').innerHTML = msgs.length === 0
-    ? '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:20px;">Conversation vide</div>'
-    : msgs.map(m => `
-      <div class="msg-row ${m.role}">
-        <div class="msg-role">${m.role === 'user' ? 'Utilisateur' : 'Nomar'}</div>
-        <div>${escHtml(m.content||'').replace(/\n/g,'<br>')}</div>
-      </div>
-    `).join('');
+  const body = document.getElementById('convModalBody');
+  body.innerHTML = '';
+  if(msgs.length === 0){
+    body.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:20px;">Conversation vide</div>';
+    return;
+  }
+  msgs.forEach(function(m){
+    const row = document.createElement('div');
+    row.className = 'msg-row ' + (m.role||'assistant');
+    const roleDiv = document.createElement('div');
+    roleDiv.className = 'msg-role';
+    roleDiv.textContent = m.role === 'user' ? 'Utilisateur' : 'Nomar';
+    const contentDiv = document.createElement('div');
+    contentDiv.innerHTML = escHtml(m.content||'').replace(/\n/g,'<br>');
+    row.appendChild(roleDiv);
+    row.appendChild(contentDiv);
+    body.appendChild(row);
+  });
 }
 
 function closeConvModal(){ document.getElementById('convModal').classList.remove('open'); }
@@ -579,6 +596,104 @@ function timeSince(ts){
   if(s < 3600) return Math.floor(s/60) + ' min';
   return Math.floor(s/3600) + 'h';
 }
+
+// ── DIRECT MESSAGES ───────────────────────────────────────────
+let currentDirectConv = null;
+let directPollTimer = null;
+
+async function loadDirectConversations(){
+  try {
+    const res = await fetch(BACKEND + '/admin/direct-conversations', { headers:{'x-admin-id': adminId} });
+    const data = await res.json();
+    const list = document.getElementById('directConvList');
+    if(!list) return;
+    if(!data.conversations || data.conversations.length === 0){
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.75rem;text-align:center;padding:20px;">Aucun message direct</div>';
+      const badge = document.getElementById('unreadBadge');
+      if(badge) badge.style.display = 'none';
+      return;
+    }
+    const unreadCount = data.conversations.filter(function(c){ return c.unread; }).length;
+    const badge = document.getElementById('unreadBadge');
+    if(badge){ if(unreadCount > 0){ badge.style.display = 'inline'; badge.textContent = unreadCount; } else { badge.style.display = 'none'; } }
+
+    list.innerHTML = '';
+    data.conversations.forEach(function(c){
+      const div = document.createElement('div');
+      div.style.cssText = 'padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid ' + (c.unread?'var(--border-gold)':'var(--border)') + ';background:' + (c.unread?'var(--gold-glow)':'var(--bg3)') + ';transition:all 0.12s;margin-bottom:4px;';
+      const nameEl = document.createElement('div');
+      nameEl.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;';
+      nameEl.innerHTML = '<span style="font-size:0.82rem;font-weight:500;color:' + (c.unread?'var(--gold2)':'var(--text)') + ';">' + escHtml(c.username) + '</span><span style="font-size:0.65rem;color:var(--muted);font-family:DM Mono,monospace;">' + timeSince((c.lastMsg&&c.lastMsg.ts)||0) + '</span>';
+      const previewEl = document.createElement('div');
+      previewEl.style.cssText = 'font-size:0.72rem;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      previewEl.textContent = '"' + ((c.lastMsg&&c.lastMsg.content)||'Message Nomar').slice(0,40) + '"';
+      div.appendChild(nameEl);
+      div.appendChild(previewEl);
+      (function(uid, cid, uname){ div.addEventListener('click', function(){ openDirectConv(uid, cid, uname, div); }); })(c.userId, c.convId, c.username);
+      list.appendChild(div);
+    });
+  } catch(e){ console.error('loadDirectConversations error:', e); }
+}
+
+async function openDirectConv(userId, convId, username, el){
+  currentDirectConv = { userId: userId, convId: convId, username: username };
+  const header = document.getElementById('directChatHeader');
+  if(header) header.textContent = 'Conversation avec ' + username;
+  const ra = document.getElementById('directReplyArea');
+  if(ra){ ra.style.display = 'flex'; ra.style.alignItems = 'center'; }
+  await loadDirectMessages();
+  if(directPollTimer) clearInterval(directPollTimer);
+  directPollTimer = setInterval(loadDirectMessages, 3000);
+}
+
+async function loadDirectMessages(){
+  if(!currentDirectConv) return;
+  try {
+    const res = await fetch(BACKEND + '/direct/messages/' + currentDirectConv.userId + '/' + currentDirectConv.convId, { headers:{'x-admin-id': adminId} });
+    const data = await res.json();
+    if(!data.messages) return;
+    const container = document.getElementById('directChatMessages');
+    if(!container) return;
+    container.innerHTML = '';
+    data.messages.forEach(function(m){
+      const isFromAdmin = m.fromAdmin || false;
+      const isAI = !m.direct && m.role === 'assistant';
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = 'display:flex;flex-direction:column;align-items:' + (isFromAdmin||isAI?'flex-start':'flex-end') + ';margin-bottom:6px;';
+      const bubble = document.createElement('div');
+      bubble.style.cssText = 'max-width:70%;padding:9px 13px;border-radius:' + (isFromAdmin||isAI?'4px 12px 12px 12px':'12px 4px 12px 12px') + ';font-size:0.82rem;line-height:1.5;background:' + (isFromAdmin||isAI?'var(--bg3)':'linear-gradient(135deg,var(--gold),#b8922a)') + ';color:' + (isFromAdmin||isAI?'var(--text)':'#08080a') + ';border:1px solid ' + (isFromAdmin||isAI?'var(--border)':'transparent') + ';' + (isAI?'border-left:2px solid var(--accent);':'') + (isFromAdmin?'border-left:2px solid var(--gold);':'');
+      if(isAI){ const lbl=document.createElement('div'); lbl.style.cssText='font-size:0.62rem;color:var(--accent);font-family:DM Mono,monospace;margin-bottom:3px;'; lbl.textContent='IA'; bubble.appendChild(lbl); }
+      if(isFromAdmin){ const lbl=document.createElement('div'); lbl.style.cssText='font-size:0.62rem;color:var(--gold);font-family:DM Mono,monospace;margin-bottom:3px;'; lbl.textContent='Nomar (toi)'; bubble.appendChild(lbl); }
+      const txt = document.createElement('div');
+      txt.innerHTML = escHtml(m.content||'').replace(/[\n]/g,'<br>');
+      bubble.appendChild(txt);
+      const ts = document.createElement('div');
+      ts.style.cssText = 'font-size:0.6rem;color:var(--muted);margin-top:2px;';
+      ts.textContent = m.ts ? timeSince(m.ts) : '';
+      wrapper.appendChild(bubble);
+      wrapper.appendChild(ts);
+      container.appendChild(wrapper);
+    });
+    container.scrollTop = container.scrollHeight;
+    loadDirectConversations();
+  } catch(e){ console.error('loadDirectMessages error:', e); }
+}
+
+async function sendAdminReply(){
+  const input = document.getElementById('directReplyInput');
+  const msg = input ? input.value.trim() : '';
+  if(!msg || !currentDirectConv) return;
+  input.value = '';
+  try {
+    await fetch(BACKEND + '/direct/admin-reply', {
+      method:'POST', headers:{'Content-Type':'application/json','x-admin-id':adminId},
+      body: JSON.stringify({ userId: currentDirectConv.userId, convId: currentDirectConv.convId, message: msg, adminName: adminUsername })
+    });
+    await loadDirectMessages();
+  } catch(e){ console.error('sendAdminReply error:', e); }
+}
+
+setInterval(loadDirectConversations, 5000);
 </script>
 </body>
 </html>
