@@ -742,6 +742,148 @@ body {
   to { left: 100%; }
 }
 
+
+/* SCREENSAVER */
+#screensaver {
+  position: fixed; inset: 0;
+  background: #08080a;
+  z-index: 9998;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: none;
+}
+#screensaver.active { display: flex; }
+
+/* Particle stars */
+.ss-stars {
+  position: absolute; inset: 0;
+  overflow: hidden;
+}
+.ss-star {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: #fff;
+  border-radius: 50%;
+  animation: ss-twinkle var(--dur) ease-in-out infinite var(--delay);
+  opacity: 0;
+}
+@keyframes ss-twinkle {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: var(--bright); transform: scale(1.5); }
+}
+
+/* Floating logo */
+.ss-logo-wrap {
+  position: absolute;
+  animation: ss-float-x 17s ease-in-out infinite, ss-float-y 13s ease-in-out infinite;
+  z-index: 2;
+}
+@keyframes ss-float-x {
+  0%, 100% { transform: translateX(-30vw); }
+  50% { transform: translateX(30vw); }
+}
+@keyframes ss-float-y {
+  0%, 100% { transform: translateY(-20vh); }
+  50% { transform: translateY(20vh); }
+}
+
+.ss-logo-svg {
+  width: 120px; height: 120px;
+  animation: ss-spin 20s linear infinite;
+  filter: drop-shadow(0 0 20px rgba(201,168,76,0.8)) drop-shadow(0 0 60px rgba(201,168,76,0.3));
+}
+@keyframes ss-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.ss-logo-r1 { animation: ss-pulse-gold 3s ease-in-out infinite; }
+.ss-logo-r2 { animation: ss-pulse-indigo 3s ease-in-out infinite 0.75s; }
+.ss-logo-r3 { animation: ss-pulse-indigo 3s ease-in-out infinite 1.5s; }
+.ss-logo-r4 { animation: ss-pulse-gold 3s ease-in-out infinite 2.25s; }
+.ss-logo-r5 { animation: ss-pulse-white 4s ease-in-out infinite; }
+
+@keyframes ss-pulse-gold {
+  0%, 100% { fill: #c9a84c; opacity: 1; }
+  50% { fill: #fff8e1; opacity: 0.6; }
+}
+@keyframes ss-pulse-indigo {
+  0%, 100% { fill: #6366f1; opacity: 1; }
+  50% { fill: #c7d2fe; opacity: 0.6; }
+}
+@keyframes ss-pulse-white {
+  0%, 100% { fill: #e8c87a; opacity: 1; }
+  50% { fill: #ffffff; opacity: 0.8; }
+}
+
+/* Rings around logo */
+.ss-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: ss-ring-expand var(--ring-dur) ease-out infinite var(--ring-delay);
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes ss-ring-expand {
+  0% { width: 80px; height: 80px; opacity: 0.8; }
+  100% { width: 400px; height: 400px; opacity: 0; }
+}
+
+/* Gold trails */
+.ss-trail {
+  position: absolute;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--gold), transparent);
+  opacity: 0.15;
+  animation: ss-trail-fall var(--trail-dur) linear infinite var(--trail-delay);
+}
+@keyframes ss-trail-fall {
+  from { transform: translateY(-100vh); opacity: 0.2; }
+  to { transform: translateY(100vh); opacity: 0; }
+}
+
+/* Clock */
+.ss-clock {
+  position: absolute;
+  bottom: 40px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  z-index: 3;
+}
+
+/* Wake hint */
+.ss-hint {
+  position: absolute;
+  bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  opacity: 0.5;
+  z-index: 3;
+  animation: ss-blink 2s ease-in-out infinite;
+}
+@keyframes ss-blink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+/* Fade in/out */
+#screensaver.fade-in { animation: ss-fadein 1s ease forwards; }
+#screensaver.fade-out { animation: ss-fadeout 0.5s ease forwards; }
+@keyframes ss-fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ss-fadeout { from { opacity: 1; } to { opacity: 0; display: none; } }
+
 </style>
 </head>
 <body>
@@ -1808,6 +1950,148 @@ document.addEventListener('click', function(e){
   to { left: 100%; }
 }
 
+
+/* SCREENSAVER */
+#screensaver {
+  position: fixed; inset: 0;
+  background: #08080a;
+  z-index: 9998;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: none;
+}
+#screensaver.active { display: flex; }
+
+/* Particle stars */
+.ss-stars {
+  position: absolute; inset: 0;
+  overflow: hidden;
+}
+.ss-star {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: #fff;
+  border-radius: 50%;
+  animation: ss-twinkle var(--dur) ease-in-out infinite var(--delay);
+  opacity: 0;
+}
+@keyframes ss-twinkle {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: var(--bright); transform: scale(1.5); }
+}
+
+/* Floating logo */
+.ss-logo-wrap {
+  position: absolute;
+  animation: ss-float-x 17s ease-in-out infinite, ss-float-y 13s ease-in-out infinite;
+  z-index: 2;
+}
+@keyframes ss-float-x {
+  0%, 100% { transform: translateX(-30vw); }
+  50% { transform: translateX(30vw); }
+}
+@keyframes ss-float-y {
+  0%, 100% { transform: translateY(-20vh); }
+  50% { transform: translateY(20vh); }
+}
+
+.ss-logo-svg {
+  width: 120px; height: 120px;
+  animation: ss-spin 20s linear infinite;
+  filter: drop-shadow(0 0 20px rgba(201,168,76,0.8)) drop-shadow(0 0 60px rgba(201,168,76,0.3));
+}
+@keyframes ss-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.ss-logo-r1 { animation: ss-pulse-gold 3s ease-in-out infinite; }
+.ss-logo-r2 { animation: ss-pulse-indigo 3s ease-in-out infinite 0.75s; }
+.ss-logo-r3 { animation: ss-pulse-indigo 3s ease-in-out infinite 1.5s; }
+.ss-logo-r4 { animation: ss-pulse-gold 3s ease-in-out infinite 2.25s; }
+.ss-logo-r5 { animation: ss-pulse-white 4s ease-in-out infinite; }
+
+@keyframes ss-pulse-gold {
+  0%, 100% { fill: #c9a84c; opacity: 1; }
+  50% { fill: #fff8e1; opacity: 0.6; }
+}
+@keyframes ss-pulse-indigo {
+  0%, 100% { fill: #6366f1; opacity: 1; }
+  50% { fill: #c7d2fe; opacity: 0.6; }
+}
+@keyframes ss-pulse-white {
+  0%, 100% { fill: #e8c87a; opacity: 1; }
+  50% { fill: #ffffff; opacity: 0.8; }
+}
+
+/* Rings around logo */
+.ss-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: ss-ring-expand var(--ring-dur) ease-out infinite var(--ring-delay);
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes ss-ring-expand {
+  0% { width: 80px; height: 80px; opacity: 0.8; }
+  100% { width: 400px; height: 400px; opacity: 0; }
+}
+
+/* Gold trails */
+.ss-trail {
+  position: absolute;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--gold), transparent);
+  opacity: 0.15;
+  animation: ss-trail-fall var(--trail-dur) linear infinite var(--trail-delay);
+}
+@keyframes ss-trail-fall {
+  from { transform: translateY(-100vh); opacity: 0.2; }
+  to { transform: translateY(100vh); opacity: 0; }
+}
+
+/* Clock */
+.ss-clock {
+  position: absolute;
+  bottom: 40px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  z-index: 3;
+}
+
+/* Wake hint */
+.ss-hint {
+  position: absolute;
+  bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  opacity: 0.5;
+  z-index: 3;
+  animation: ss-blink 2s ease-in-out infinite;
+}
+@keyframes ss-blink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+/* Fade in/out */
+#screensaver.fade-in { animation: ss-fadein 1s ease forwards; }
+#screensaver.fade-out { animation: ss-fadeout 0.5s ease forwards; }
+@keyframes ss-fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ss-fadeout { from { opacity: 1; } to { opacity: 0; display: none; } }
+
 </style>
 
 
@@ -1982,6 +2266,114 @@ function toggleAudio(){
 // Auto-start on first user interaction (browser policy)
 document.addEventListener('click', startAudioOnce);
 document.addEventListener('keydown', startAudioOnce);
+</script>
+
+
+<!-- SCREENSAVER -->
+<div id="screensaver">
+  <div class="ss-stars" id="ssStars"></div>
+
+  <!-- Gold trails -->
+  <div class="ss-trail" style="left:15%;height:60vh;--trail-dur:8s;--trail-delay:0s;"></div>
+  <div class="ss-trail" style="left:35%;height:40vh;--trail-dur:12s;--trail-delay:-3s;"></div>
+  <div class="ss-trail" style="left:60%;height:70vh;--trail-dur:9s;--trail-delay:-6s;"></div>
+  <div class="ss-trail" style="left:80%;height:50vh;--trail-dur:11s;--trail-delay:-1s;"></div>
+
+  <div class="ss-logo-wrap">
+    <!-- Expanding rings -->
+    <div class="ss-ring" style="border-color:rgba(201,168,76,0.6);--ring-dur:3s;--ring-delay:0s;"></div>
+    <div class="ss-ring" style="border-color:rgba(99,102,241,0.4);--ring-dur:3s;--ring-delay:-1s;"></div>
+    <div class="ss-ring" style="border-color:rgba(201,168,76,0.3);--ring-dur:3s;--ring-delay:-2s;"></div>
+
+    <svg class="ss-logo-svg" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect class="ss-logo-r1" x="2" y="2" width="11" height="11" rx="3"/>
+      <rect class="ss-logo-r2" x="15" y="2" width="11" height="11" rx="3"/>
+      <rect class="ss-logo-r3" x="2" y="15" width="11" height="11" rx="3"/>
+      <rect class="ss-logo-r4" x="15" y="15" width="11" height="11" rx="3"/>
+      <rect class="ss-logo-r5" x="8" y="8" width="12" height="12" rx="3"/>
+    </svg>
+  </div>
+
+  <div class="ss-clock" id="ssClock"></div>
+  <div class="ss-hint">Appuie sur une touche pour revenir</div>
+</div>
+
+
+<script>
+// ─── SCREENSAVER ─────────────────────────────────────────────
+let ssTimeout = null;
+let ssActive = false;
+const SS_DELAY = 5 * 60 * 1000; // 5 minutes
+
+function buildStars(){
+  const container = document.getElementById('ssStars');
+  if(!container || container.children.length > 0) return;
+  for(let i = 0; i < 120; i++){
+    const star = document.createElement('div');
+    star.className = 'ss-star';
+    star.style.cssText = [
+      'left:' + Math.random()*100 + '%',
+      'top:' + Math.random()*100 + '%',
+      '--dur:' + (2 + Math.random()*4).toFixed(1) + 's',
+      '--delay:-' + (Math.random()*4).toFixed(1) + 's',
+      '--bright:' + (0.3 + Math.random()*0.7).toFixed(2),
+      'width:' + (Math.random() > 0.9 ? 3 : 1.5) + 'px',
+      'height:' + (Math.random() > 0.9 ? 3 : 1.5) + 'px',
+    ].join(';');
+    container.appendChild(star);
+  }
+}
+
+function updateSsClock(){
+  const el = document.getElementById('ssClock');
+  if(!el) return;
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  el.textContent = h + ':' + m + ':' + s;
+}
+
+function showScreensaver(){
+  if(ssActive) return;
+  ssActive = true;
+  buildStars();
+  const ss = document.getElementById('screensaver');
+  ss.classList.add('active', 'fade-in');
+  ss.classList.remove('fade-out');
+  updateSsClock();
+  ssClockInterval = setInterval(updateSsClock, 1000);
+}
+
+let ssClockInterval = null;
+
+function hideScreensaver(){
+  if(!ssActive) return;
+  ssActive = false;
+  clearInterval(ssClockInterval);
+  const ss = document.getElementById('screensaver');
+  ss.classList.add('fade-out');
+  setTimeout(function(){
+    ss.classList.remove('active', 'fade-in', 'fade-out');
+  }, 500);
+  resetSsTimer();
+}
+
+function resetSsTimer(){
+  clearTimeout(ssTimeout);
+  if(!ssActive){
+    ssTimeout = setTimeout(showScreensaver, SS_DELAY);
+  }
+}
+
+// Wake on any interaction
+document.addEventListener('mousemove', function(){ if(ssActive) hideScreensaver(); else resetSsTimer(); });
+document.addEventListener('keydown', function(){ if(ssActive) hideScreensaver(); else resetSsTimer(); });
+document.addEventListener('click', function(){ if(ssActive) hideScreensaver(); else resetSsTimer(); });
+document.addEventListener('touchstart', function(){ if(ssActive) hideScreensaver(); else resetSsTimer(); });
+
+// Start timer on load
+resetSsTimer();
 </script>
 
 </body>
