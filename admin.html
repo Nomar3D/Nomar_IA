@@ -351,6 +351,7 @@ function switchTab(name){
   document.getElementById('tab-'+name).classList.add('active');
   event.target.classList.add('active');
   if(name === 'online') loadOnline();
+  if(name === 'messages') loadDirectConversations();
 }
 
 // ── REFRESH ALL ───────────────────────────────────────────────
