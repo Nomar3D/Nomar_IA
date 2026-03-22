@@ -1429,10 +1429,15 @@ function closeSettings(){ document.getElementById('settingsOverlay').classList.r
 
 function selectPersona(btn){
   const p = btn.dataset.persona;
-  if(currentUser && !currentUser.is_pro && p !== 'cool'){
-    closeSettings();
-    openProModal();
-    return;
+  if(p !== 'cool'){
+    if(!currentUser){
+      openProModal();
+      return;
+    }
+    if(!currentUser.is_pro){
+      openProModal();
+      return;
+    }
   }
   document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
