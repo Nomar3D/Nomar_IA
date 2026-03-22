@@ -977,7 +977,7 @@ body {
             <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
           </button>
         </div>
-        <div class="input-hint">Nomar_IA peut faire des erreurs. Verifie les informations importantes.</div>
+        <div class="input-hint" id="inputHint">Nomar_IA peut faire des erreurs. Verifie les informations importantes.</div>
       </div>
     </div>
 
@@ -1496,6 +1496,16 @@ function loadConversation(id){
   renderMessages();
   renderConvList();
   closeSidebar();
+  // Start polling if direct conv
+  if(isDirectConv(id)){
+    startDirectPoll();
+    const hint = document.getElementById('inputHint');
+    if(hint) hint.innerHTML = '<span style="color:var(--gold);">&#128172; Conversation directe avec Nomar — il te repondra personnellement</span>';
+  } else {
+    if(directPollInterval){ clearInterval(directPollInterval); directPollInterval = null; }
+    const hint = document.getElementById('inputHint');
+    if(hint) hint.textContent = 'Nomar_IA peut faire des erreurs. Verifie les informations importantes.';
+  }
 }
 
 function deleteConversation(id, e){
@@ -1715,6 +1725,14 @@ async function sendChat(){
   if(!msg) msg = '(fichier joint)';
   input.value = '';
 
+  // Direct conversation - bypass AI
+  if(isDirectConv(currentConvId)){
+    addMsg('user', msg);
+    await sendDirectMessage(msg, currentConvId);
+    startDirectPoll();
+    return;
+  }
+
   if(!currentUser){
     const gc = (loadFromStorage('nomar_guest_msg_count') || 0) + 1;
     saveToStorage('nomar_guest_msg_count', gc);
@@ -1836,6 +1854,67 @@ function getWelcomeMsg(){
     "Bonjour ! &#127881; Nouvelle conversation, nouvelles possibilites. C'est quoi ?",
   ];
   return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+
+// ─── DIRECT MESSAGES ─────────────────────────────────────────
+function isDirectConv(convId){
+  return convId && convId.startsWith('conv_broadcast_');
+}
+
+function getDirectConvUserId(){
+  // For user->admin: target is always admin (we don't know admin id, use special endpoint)
+  return null;
+}
+
+async function sendDirectMessage(msg, convId){
+  if(!currentUser) return;
+  try {
+    // Add message locally first
+    const localMsg = {role:'user', content:msg, from:currentUser.username, fromId:currentUser.id, ts:Date.now(), direct:true};
+    chatHistory.push(localMsg);
+    const conv = conversations.find(c => c.id === convId);
+    if(conv){ conv.messages = [...chatHistory]; saveConversations(); renderConvList(); }
+
+    // Send to backend - admin will see it
+    await fetch(BACKEND + '/conversations/save', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({userId: currentUser.id, conversations: conversations})
+    });
+  } catch(e){ console.error(e); }
+}
+
+// Poll for admin replies in direct conversations
+let directPollInterval = null;
+function startDirectPoll(){
+  if(directPollInterval) clearInterval(directPollInterval);
+  directPollInterval = setInterval(async function(){
+    if(!currentUser || !currentConvId || !isDirectConv(currentConvId)) return;
+    try {
+      const res = await fetch(BACKEND + '/conversations/' + currentUser.id);
+      const data = await res.json();
+      if(!data.conversations) return;
+      const conv = data.conversations.find(c => c.id === currentConvId);
+      if(!conv) return;
+      const currentLen = chatHistory.length;
+      const newLen = (conv.messages || []).length;
+      if(newLen > currentLen){
+        chatHistory = conv.messages;
+        const conv2 = conversations.find(c => c.id === currentConvId);
+        if(conv2) conv2.messages = chatHistory;
+        renderMessages();
+        // Show new message indicator
+        const lastMsg = chatHistory[chatHistory.length-1];
+        if(lastMsg && lastMsg.fromAdmin){
+          const notif = document.createElement('div');
+          notif.style.cssText = 'position:fixed;top:16px;right:16px;background:var(--bg2);border:1px solid var(--border-gold);border-radius:10px;padding:12px 16px;font-size:0.82rem;color:var(--gold2);z-index:9999;animation:fadeUp 0.3s ease;box-shadow:0 8px 24px rgba(0,0,0,0.4);';
+          notif.innerHTML = '<div style="font-weight:600;margin-bottom:3px;">&#128172; Reponse de Nomar</div>';
+          document.body.appendChild(notif);
+          setTimeout(function(){ notif.remove(); }, 3000);
+        }
+      }
+    } catch(e){}
+  }, 3000);
 }
 
 window.addEventListener('load', function(){
