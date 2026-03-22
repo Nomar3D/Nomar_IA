@@ -2462,16 +2462,39 @@ function createSpaceDrone(){
   lfo3.start();
   allNodes.push(lfo3);
 
-  // Random subtle frequency shifts every ~8 seconds
-  function randomShift(){
+  // Pitch variation cycle - shifts between high and low moods
+  const baseFreqs = [55, 82.4, 110, 164.8];
+  const highFreqs = [82.4, 110, 164.8, 220];
+  const lowFreqs  = [41.2, 55, 82.4, 110];
+  let pitchState = 0; // 0=base 1=high 2=low
+
+  function doPitchShift(){
     if(!audioPlaying) return;
     const t = audioCtx.currentTime;
-    // Slight random detune on one of the pads
-    const shift = (Math.random() - 0.5) * 6;
-    masterGain.gain.setTargetAtTime(masterGain.gain.value + (Math.random()-0.5)*0.015, t, 2);
-    setTimeout(randomShift, 6000 + Math.random() * 6000);
+    pitchState = (pitchState + 1) % 3;
+    const target = pitchState === 1 ? highFreqs : pitchState === 2 ? lowFreqs : baseFreqs;
+
+    // Apply to all oscillators via detune (smoother than frequency)
+    const semitones = pitchState === 1 ? 200 : pitchState === 2 ? -200 : 0;
+    allNodes.forEach(function(n){
+      if(n.detune){
+        n.detune.cancelScheduledValues(t);
+        n.detune.setValueAtTime(n.detune.value, t);
+        n.detune.linearRampToValueAtTime(semitones * 0.15 + (Math.random()-0.5)*30, t + 6);
+      }
+    });
+
+    // Slight master volume nudge
+    masterGain.gain.cancelScheduledValues(t);
+    masterGain.gain.setValueAtTime(masterGain.gain.value, t);
+    masterGain.gain.linearRampToValueAtTime(
+      pitchState === 1 ? 0.22 : pitchState === 2 ? 0.32 : 0.28,
+      t + 4
+    );
+
+    setTimeout(doPitchShift, 10000 + Math.random() * 8000);
   }
-  setTimeout(randomShift, 4000);
+  setTimeout(doPitchShift, 8000);
 }
 
 function createArpNote(freq, startTime, duration){
