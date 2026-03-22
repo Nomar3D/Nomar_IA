@@ -1070,6 +1070,7 @@ body {
           </div>
         </div>
         <button id="authActionBtn" onclick="openAuthModal()" style="width:100%;margin-top:10px;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;">&#128272; Se connecter / S'inscrire</button>
+        <button id="accountSettingsBtn" onclick="openAccountSettings()" style="width:100%;margin-top:8px;padding:10px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.85rem;display:none;">&#9881; Parametres du compte</button>
         <button id="proActionBtn" onclick="openProModal()" style="width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;display:none;">&#9889; Passer Pro - 4&euro;/mois</button>
       </div>
 
@@ -1253,6 +1254,7 @@ function onLogin(){
   customPersonaText = currentUser.custom_prompt || currentUser.customPrompt || '';
   updateUserUI();
   loadConversations();
+  startHeartbeat();
 }
 
 function onGuest(){
@@ -1282,12 +1284,93 @@ function updateUserUI(){
   document.getElementById('userAvatar').textContent = letter;
   document.getElementById('settingsAvatar').textContent = letter;
   document.getElementById('settingsName').textContent = name;
-  document.getElementById('settingsEmail').textContent = currentUser ? 'Connecte' : 'Non connecte';
+  document.getElementById('settingsEmail').textContent = currentUser ? (currentUser.email || 'Connecte') : 'Non connecte';
   document.getElementById('logoutBtn').style.display = currentUser ? 'block' : 'none';
   const authBtn = document.getElementById('authActionBtn');
   if(authBtn) authBtn.style.display = currentUser ? 'none' : 'block';
+  const accBtn = document.getElementById('accountSettingsBtn');
+  if(accBtn) accBtn.style.display = currentUser ? 'block' : 'none';
   const proBtn = document.getElementById('proActionBtn');
   if(proBtn) proBtn.style.display = (currentUser && !currentUser.is_pro) ? 'block' : 'none';
+}
+
+function openAccountSettings(){
+  if(!currentUser) return;
+  closeSettings();
+  document.getElementById('accUsername').textContent = currentUser.username;
+  document.getElementById('accEmail').textContent = currentUser.email || 'Non renseigne';
+  document.getElementById('accStatus').innerHTML = currentUser.is_pro
+    ? '<span style="color:var(--gold);font-weight:600;">Pro</span>'
+    : '<span style="color:var(--text2);">Gratuit</span>';
+  document.getElementById('accCreated').textContent = currentUser.created_at ? new Date(currentUser.created_at).toLocaleDateString('fr-FR') : '—';
+  document.getElementById('accConvs').textContent = conversations.length + ' conversation(s)';
+  document.getElementById('usernameMsg').textContent = '';
+  document.getElementById('passwordMsg').textContent = '';
+  document.getElementById('newUsername').value = '';
+  document.getElementById('oldPassword').value = '';
+  document.getElementById('newPassword').value = '';
+  document.getElementById('confirmPassword').value = '';
+  document.getElementById('accountOverlay').classList.add('open');
+}
+
+function closeAccountSettings(){ document.getElementById('accountOverlay').classList.remove('open'); }
+
+async function changeUsername(){
+  const newUsername = document.getElementById('newUsername').value.trim();
+  const msgEl = document.getElementById('usernameMsg');
+  if(!newUsername){ msgEl.style.color='var(--red)'; msgEl.textContent='Entre un pseudo'; return; }
+  if(newUsername.length < 3){ msgEl.style.color='var(--red)'; msgEl.textContent='Pseudo trop court (min 3 caracteres)'; return; }
+  msgEl.style.color='var(--text2)'; msgEl.textContent='Changement...';
+  try {
+    const res = await fetch(BACKEND + '/change-username', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({userId: currentUser.id, newUsername})
+    });
+    const data = await res.json();
+    if(data.error){ msgEl.style.color='var(--red)'; msgEl.textContent=data.error; return; }
+    currentUser.username = newUsername;
+    saveToStorage('nomar_user', currentUser);
+    updateUserUI();
+    document.getElementById('accUsername').textContent = newUsername;
+    document.getElementById('newUsername').value = '';
+    msgEl.style.color='var(--green)'; msgEl.textContent='Pseudo change avec succes !';
+  } catch(e){ msgEl.style.color='var(--red)'; msgEl.textContent='Erreur serveur'; }
+}
+
+async function changePassword(){
+  const oldPwd = document.getElementById('oldPassword').value;
+  const newPwd = document.getElementById('newPassword').value;
+  const confirmPwd = document.getElementById('confirmPassword').value;
+  const msgEl = document.getElementById('passwordMsg');
+  if(!oldPwd || !newPwd || !confirmPwd){ msgEl.style.color='var(--red)'; msgEl.textContent='Remplis tous les champs'; return; }
+  if(newPwd !== confirmPwd){ msgEl.style.color='var(--red)'; msgEl.textContent='Les mots de passe ne correspondent pas'; return; }
+  if(newPwd.length < 5){ msgEl.style.color='var(--red)'; msgEl.textContent='Mot de passe trop court (min 5 caracteres)'; return; }
+  msgEl.style.color='var(--text2)'; msgEl.textContent='Changement...';
+  try {
+    const res = await fetch(BACKEND + '/change-password', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({userId: currentUser.id, oldPassword: oldPwd, newPassword: newPwd})
+    });
+    const data = await res.json();
+    if(data.error){ msgEl.style.color='var(--red)'; msgEl.textContent=data.error; return; }
+    document.getElementById('oldPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+    msgEl.style.color='var(--green)'; msgEl.textContent='Mot de passe change avec succes !';
+  } catch(e){ msgEl.style.color='var(--red)'; msgEl.textContent='Erreur serveur'; }
+}
+
+// Heartbeat pour admin online
+function startHeartbeat(){
+  if(!currentUser) return;
+  const send = function(){
+    fetch(BACKEND + '/heartbeat', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({userId: currentUser.id, username: currentUser.username})
+    }).catch(function(){});
+  };
+  send();
+  setInterval(send, 60000);
 }
 
 // CONVERSATIONS
@@ -1610,6 +1693,7 @@ async function sendChat(){
 
   addMsg('user', msg);
   chatHistory.push({role:'user', content:fullMsg || msg});
+  if(currentUser){ fetch(BACKEND+'/heartbeat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUser.id,username:currentUser.username,currentMsg:msg.slice(0,100)})}).catch(function(){}); }
 
   const typingEl = addTyping();
 
@@ -2380,6 +2464,62 @@ document.addEventListener('touchstart', function(){ if(ssActive) hideScreensaver
 // Start timer on load
 resetSsTimer();
 </script>
+
+
+<!-- ACCOUNT SETTINGS MODAL -->
+<div class="settings-overlay" id="accountOverlay">
+  <div class="settings-box">
+    <div class="settings-header">
+      <div class="settings-title">&#128100; Mon compte</div>
+      <button class="settings-close" onclick="closeAccountSettings()">&#x2715;</button>
+    </div>
+    <div class="settings-body">
+
+      <div>
+        <div class="settings-section-title">Informations</div>
+        <div style="background:var(--bg3);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:0.75rem;color:var(--text2);">Pseudo</span>
+            <span id="accUsername" style="font-size:0.82rem;font-weight:500;"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:0.75rem;color:var(--text2);">Email</span>
+            <span id="accEmail" style="font-size:0.78rem;color:var(--text2);font-family:'DM Mono',monospace;"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:0.75rem;color:var(--text2);">Statut</span>
+            <span id="accStatus" style="font-size:0.75rem;"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:0.75rem;color:var(--text2);">Membre depuis</span>
+            <span id="accCreated" style="font-size:0.72rem;color:var(--muted);font-family:'DM Mono',monospace;"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:0.75rem;color:var(--text2);">Conversations</span>
+            <span id="accConvs" style="font-size:0.78rem;font-family:'DM Mono',monospace;"></span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="settings-section-title">Changer le pseudo</div>
+        <input type="text" id="newUsername" placeholder="Nouveau pseudo..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.875rem;outline:none;margin-bottom:8px;">
+        <button onclick="changeUsername()" style="width:100%;padding:9px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.82rem;transition:all 0.12s;">Changer le pseudo</button>
+        <div id="usernameMsg" style="font-size:0.72rem;margin-top:6px;text-align:center;"></div>
+      </div>
+
+      <div>
+        <div class="settings-section-title">Changer le mot de passe</div>
+        <input type="password" id="oldPassword" placeholder="Ancien mot de passe..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.875rem;outline:none;margin-bottom:8px;">
+        <input type="password" id="newPassword" placeholder="Nouveau mot de passe..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.875rem;outline:none;margin-bottom:8px;">
+        <input type="password" id="confirmPassword" placeholder="Confirmer le mot de passe..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Syne',sans-serif;font-size:0.875rem;outline:none;margin-bottom:8px;">
+        <button onclick="changePassword()" style="width:100%;padding:9px;background:linear-gradient(135deg,var(--gold),#b8922a);color:#08080a;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;">Changer le mot de passe</button>
+        <div id="passwordMsg" style="font-size:0.72rem;margin-top:6px;text-align:center;"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
