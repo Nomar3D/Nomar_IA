@@ -1182,7 +1182,7 @@ async function initAuth(){
       if(accData.user){
         currentUser.email = accData.user.email;
         currentUser.created_at = accData.user.created_at;
-        currentUser.is_admin = accData.user.is_admin;
+        currentUser.is_admin = accData.user.is_admin || accData.user.username === 'Nomar';
         currentUser.is_pro = accData.user.is_pro === true || accData.user.is_pro === 'true';
         saveToStorage('nomar_user', currentUser);
       }
@@ -1236,7 +1236,7 @@ async function submitAuth(){
       if(accData.user) {
         currentUser.email = accData.user.email;
         currentUser.created_at = accData.user.created_at;
-        currentUser.is_admin = accData.user.is_admin;
+        currentUser.is_admin = accData.user.is_admin || accData.user.username === 'Nomar';
       }
     } catch(e) {}
     saveToStorage('nomar_user', currentUser);
