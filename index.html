@@ -671,9 +671,7 @@ body {
     <button class="nav-item" id="nav-discord" onclick="openDiscordModal()">
       <span class="nav-icon">&#127760;</span> Discord
     </button>
-    <button class="nav-item" id="nav-discord" onclick="openDiscordModal()">
-      <span class="nav-icon">&#127908;</span> Discord
-    </button>
+    
   </div>
 
   <div class="conversations" id="conversationList">
@@ -711,10 +709,10 @@ body {
       </div>
       <div class="input-area">
         <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.csv,.json,.md" style="display:none" onchange="handleFileUpload(event)">
-        <div id="filePreview" style="display:none;padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;font-size:0.75rem;color:var(--accent2);align-items:center;gap:8px;margin-bottom:8px;">
-          <img id="filePreviewImg" style="display:none;width:40px;height:40px;object-fit:cover;border-radius:5px;">
+        <div id="filePreview" style="display:none;padding:8px 12px;background:var(--bg3);border:1px solid var(--border-gold);border-radius:8px;font-size:0.75rem;color:var(--gold2);align-items:center;gap:10px;margin-bottom:8px;">
+          <img id="filePreviewImg" style="display:none;width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--border-gold);">
           <span id="filePreviewName" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-          <button onclick="clearFile()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.8rem;">&#x2715;</button>
+          <button onclick="clearFile()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem;transition:color 0.12s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">&#x2715;</button>
         </div>
         <div class="input-wrap">
           <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Joindre un fichier">+</button>
@@ -816,7 +814,7 @@ body {
           </div>
         </div>
         <button id="authActionBtn" onclick="openAuthModal()" style="width:100%;margin-top:10px;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;">&#128272; Se connecter / S'inscrire</button>
-        <button id="proActionBtn" onclick="openProModal()" style="width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;display:none;">&#9889; Passer Pro - 4/mois</button>
+        <button id="proActionBtn" onclick="openProModal()" style="width:100%;margin-top:8px;padding:10px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;display:none;">&#9889; Passer Pro - 4&euro;/mois</button>
       </div>
 
       <div>
@@ -869,7 +867,7 @@ body {
       <div style="margin-bottom:8px;">&#128218; <strong>Conversations illimitees</strong></div>
       <div>&#128640; <strong>Reponses plus longues</strong></div>
     </div>
-    <div style="font-size:1.8rem;font-weight:800;color:var(--accent);margin-bottom:4px;">4&#8364; <span style="font-size:1rem;font-weight:400;color:var(--muted);">/ mois</span></div>
+    <div style="font-size:1.8rem;font-weight:800;color:var(--accent);margin-bottom:4px;">4&euro;/mois</div>
     <button onclick="closeProModal()" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;">Bientot disponible &#128640;</button>
   </div>
 </div>
@@ -1238,7 +1236,7 @@ function handleFileUpload(event){
   const preview = document.getElementById('filePreview');
   const nameEl = document.getElementById('filePreviewName');
   const imgEl = document.getElementById('filePreviewImg');
-  preview.style.display = 'flex';
+  preview.style.display = 'flex'; preview.style.alignItems = 'center';
   if(file.type.startsWith('image/')){
     const reader = new FileReader();
     reader.onload = function(e){
