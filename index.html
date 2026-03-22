@@ -2354,6 +2354,7 @@ function initAudio(){
 function createPad(freq, detune, gainVal){
   const osc1 = audioCtx.createOscillator();
   const osc2 = audioCtx.createOscillator();
+  const osc3 = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   const filter = audioCtx.createBiquadFilter();
 
@@ -2365,20 +2366,61 @@ function createPad(freq, detune, gainVal){
   osc2.frequency.value = freq * 2;
   osc2.detune.value = -detune * 0.5;
 
+  // Sub oscillator - adds the deep rumble
+  osc3.type = 'sine';
+  osc3.frequency.value = freq * 0.5;
+  osc3.detune.value = detune * 0.3;
+
   filter.type = 'lowpass';
-  filter.frequency.value = 800;
-  filter.Q.value = 2;
+  filter.frequency.value = 600;
+  filter.Q.value = 1.5;
 
   gain.gain.value = gainVal;
 
+  // Slow frequency drift on osc1 (the main sawtooth)
+  const freqLfo = audioCtx.createOscillator();
+  const freqLfoGain = audioCtx.createGain();
+  freqLfo.type = 'sine';
+  freqLfo.frequency.value = 0.04 + Math.random() * 0.04; // each pad drifts differently
+  freqLfoGain.gain.value = freq * 0.008; // subtle pitch drift
+  freqLfo.connect(freqLfoGain);
+  freqLfoGain.connect(osc1.frequency);
+  freqLfoGain.connect(osc3.frequency);
+  freqLfo.start();
+  allNodes.push(freqLfo);
+
+  // Slow filter sweep per pad
+  const filterLfo = audioCtx.createOscillator();
+  const filterLfoGain = audioCtx.createGain();
+  filterLfo.type = 'sine';
+  filterLfo.frequency.value = 0.05 + Math.random() * 0.05;
+  filterLfoGain.gain.value = 200;
+  filterLfo.connect(filterLfoGain);
+  filterLfoGain.connect(filter.frequency);
+  filterLfo.start();
+  allNodes.push(filterLfo);
+
+  // Volume swell - each pad breathes at its own rate
+  const gainLfo = audioCtx.createOscillator();
+  const gainLfoGain = audioCtx.createGain();
+  gainLfo.type = 'sine';
+  gainLfo.frequency.value = 0.02 + Math.random() * 0.03;
+  gainLfoGain.gain.value = gainVal * 0.4;
+  gainLfo.connect(gainLfoGain);
+  gainLfoGain.connect(gain.gain);
+  gainLfo.start();
+  allNodes.push(gainLfo);
+
   osc1.connect(filter);
   osc2.connect(filter);
+  osc3.connect(filter);
   filter.connect(gain);
   gain.connect(masterGain);
 
   osc1.start();
   osc2.start();
-  allNodes.push(osc1, osc2);
+  osc3.start();
+  allNodes.push(osc1, osc2, osc3);
   return gain;
 }
 
