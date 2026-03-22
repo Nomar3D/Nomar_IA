@@ -1170,11 +1170,23 @@ function renderMarkdown(text){
 }
 
 // AUTH
-function initAuth(){
+async function initAuth(){
   const saved = loadFromStorage('nomar_user');
   if(saved){
     currentUser = saved;
     currentUser.is_pro = currentUser.is_pro === true || currentUser.is_pro === 'true';
+    // Refresh account info from server
+    try {
+      const accRes = await fetch(BACKEND + '/account/' + currentUser.id);
+      const accData = await accRes.json();
+      if(accData.user){
+        currentUser.email = accData.user.email;
+        currentUser.created_at = accData.user.created_at;
+        currentUser.is_admin = accData.user.is_admin;
+        currentUser.is_pro = accData.user.is_pro === true || accData.user.is_pro === 'true';
+        saveToStorage('nomar_user', currentUser);
+      }
+    } catch(e) {}
     onLogin();
   } else {
     onGuest();
@@ -1217,6 +1229,16 @@ async function submitAuth(){
     if(data.error){ errEl.textContent = data.error; btn.textContent = mode==='login'?'Se connecter':"S'inscrire"; btn.disabled=false; return; }
     currentUser = data.user;
     currentUser.is_pro = currentUser.is_pro === true || currentUser.is_pro === 'true';
+    // Fetch full account info to get email
+    try {
+      const accRes = await fetch(BACKEND + '/account/' + currentUser.id);
+      const accData = await accRes.json();
+      if(accData.user) {
+        currentUser.email = accData.user.email;
+        currentUser.created_at = accData.user.created_at;
+        currentUser.is_admin = accData.user.is_admin;
+      }
+    } catch(e) {}
     saveToStorage('nomar_user', currentUser);
     saveToStorage('nomar_visited', true);
     document.getElementById('authOverlay').style.display = 'none';
@@ -1299,6 +1321,8 @@ function openAccountSettings(){
   closeSettings();
   document.getElementById('accUsername').textContent = currentUser.username;
   document.getElementById('accEmail').textContent = currentUser.email || 'Non renseigne';
+  const adminDiv = document.getElementById('adminLinkDiv');
+  if(adminDiv) adminDiv.style.display = currentUser.is_admin ? 'block' : 'none';
   document.getElementById('accStatus').innerHTML = currentUser.is_pro
     ? '<span style="color:var(--gold);font-weight:600;">Pro</span>'
     : '<span style="color:var(--text2);">Gratuit</span>';
@@ -2499,6 +2523,11 @@ resetSsTimer();
             <span id="accConvs" style="font-size:0.78rem;font-family:'DM Mono',monospace;"></span>
           </div>
         </div>
+      </div>
+
+      <div id="adminLinkDiv" style="display:none;">
+        <div class="settings-section-title">Administration</div>
+        <a href="admin.html" target="_blank" style="display:block;width:100%;padding:10px;background:var(--gold-dim);color:var(--gold2);border:1px solid var(--border-gold);border-radius:8px;text-align:center;text-decoration:none;font-size:0.85rem;font-weight:600;">&#9881; Ouvrir le panel admin</a>
       </div>
 
       <div>
