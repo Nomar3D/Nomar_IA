@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nomar_IA — Admin</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+:root {
+  --bg: #08080a; --bg2: #0e0e12; --bg3: #141418; --bg4: #1a1a20;
+  --gold: #c9a84c; --gold2: #e8c87a; --gold-dim: rgba(201,168,76,0.12); --gold-glow: rgba(201,168,76,0.06);
+  --accent: #6366f1; --green: #10b981; --red: #f43f5e;
+  --text: #f0ede8; --text2: #8a8590; --muted: #3d3b45;
+  --border: rgba(255,255,255,0.05); --border-gold: rgba(201,168,76,0.18);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Syne',sans-serif; font-size:14px; min-height:100vh; }
+::-webkit-scrollbar { width:3px; } ::-webkit-scrollbar-thumb { background:var(--muted); }
+
+/* LOGIN */
+#loginScreen {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background: radial-gradient(ellipse at center, rgba(201,168,76,0.04) 0%, transparent 70%);
+}
+.login-box {
+  background:var(--bg2); border:1px solid var(--border-gold); border-radius:14px;
+  padding:32px; width:340px; position:relative; overflow:hidden;
+  box-shadow:0 0 60px rgba(201,168,76,0.08);
+}
+.login-box::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:0.5; }
+.login-logo { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.login-logo-text { font-family:'DM Mono',monospace; font-size:1rem; color:var(--text); }
+.login-logo-text span { color:var(--gold); }
+.login-sub { font-size:0.75rem; color:var(--text2); margin-bottom:24px; }
+.field { margin-bottom:14px; }
+.field label { display:block; font-size:0.68rem; color:var(--text2); margin-bottom:5px; font-family:'DM Mono',monospace; letter-spacing:0.08em; text-transform:uppercase; }
+.field input { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text); font-family:'Syne',sans-serif; font-size:0.875rem; outline:none; transition:border-color 0.15s; }
+.field input:focus { border-color:var(--border-gold); }
+.btn-gold { width:100%; background:linear-gradient(135deg,var(--gold),#b8922a); border:none; border-radius:8px; color:#08080a; font-family:'Syne',sans-serif; font-size:0.875rem; font-weight:700; padding:11px; cursor:pointer; margin-top:4px; box-shadow:0 4px 16px rgba(201,168,76,0.25); }
+.btn-gold:hover { opacity:0.9; }
+.err { color:var(--red); font-size:0.75rem; margin-top:8px; text-align:center; }
+
+/* ADMIN LAYOUT */
+#adminApp { display:none; min-height:100vh; }
+.admin-header {
+  background:var(--bg2); border-bottom:1px solid var(--border);
+  padding:14px 24px; display:flex; align-items:center; gap:16px; position:sticky; top:0; z-index:100;
+}
+.admin-header-logo { font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--text2); }
+.admin-header-logo span { color:var(--gold); }
+.admin-badge { background:var(--gold-dim); border:1px solid var(--border-gold); color:var(--gold2); font-size:0.65rem; padding:2px 8px; border-radius:20px; font-family:'DM Mono',monospace; letter-spacing:0.08em; }
+.admin-header-right { margin-left:auto; display:flex; gap:8px; align-items:center; }
+.admin-user { font-size:0.75rem; color:var(--text2); }
+.btn-sm { padding:5px 12px; border-radius:6px; border:1px solid var(--border); background:var(--bg3); color:var(--text2); font-size:0.72rem; cursor:pointer; font-family:'Syne',sans-serif; transition:all 0.12s; }
+.btn-sm:hover { border-color:var(--border-gold); color:var(--gold); }
+.btn-sm.danger { border-color:rgba(244,63,94,0.2); color:var(--red); }
+.btn-sm.danger:hover { background:rgba(244,63,94,0.05); }
+.btn-sm.success { border-color:rgba(16,185,129,0.2); color:var(--green); }
+.btn-sm.success:hover { background:rgba(16,185,129,0.05); }
+
+/* TABS */
+.admin-tabs { display:flex; gap:2px; padding:12px 24px 0; border-bottom:1px solid var(--border); background:var(--bg2); }
+.tab-btn { padding:8px 16px; border:none; background:none; color:var(--text2); font-family:'Syne',sans-serif; font-size:0.8rem; font-weight:500; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all 0.12s; }
+.tab-btn.active { color:var(--gold); border-bottom-color:var(--gold); }
+.tab-btn:hover:not(.active) { color:var(--text); }
+
+/* CONTENT */
+.admin-content { padding:24px; max-width:1200px; margin:0 auto; }
+.tab-panel { display:none; } .tab-panel.active { display:block; }
+
+/* STAT CARDS */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:24px; }
+.stat-card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:16px; }
+.stat-card.gold { border-color:var(--border-gold); background:var(--gold-glow); }
+.stat-label { font-size:0.68rem; color:var(--text2); font-family:'DM Mono',monospace; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:8px; }
+.stat-value { font-size:1.8rem; font-weight:700; color:var(--text); font-family:'DM Mono',monospace; }
+.stat-card.gold .stat-value { color:var(--gold2); }
+
+/* TABLE */
+.table-wrap { background:var(--bg2); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.table-header { padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.table-title { font-family:'DM Mono',monospace; font-size:0.78rem; font-weight:500; letter-spacing:0.05em; color:var(--text2); }
+.search-input { background:var(--bg3); border:1px solid var(--border); border-radius:7px; padding:7px 12px; color:var(--text); font-family:'Syne',sans-serif; font-size:0.78rem; outline:none; width:200px; transition:border-color 0.15s; }
+.search-input:focus { border-color:var(--border-gold); }
+table { width:100%; border-collapse:collapse; }
+th { font-size:0.65rem; font-family:'DM Mono',monospace; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); padding:10px 16px; text-align:left; border-bottom:1px solid var(--border); }
+td { padding:11px 16px; border-bottom:1px solid var(--border); font-size:0.8rem; color:var(--text2); vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(255,255,255,0.02); }
+.badge { display:inline-block; font-size:0.62rem; padding:2px 7px; border-radius:20px; font-weight:600; font-family:'DM Mono',monospace; }
+.badge-pro { background:var(--gold-dim); color:var(--gold2); border:1px solid var(--border-gold); }
+.badge-free { background:var(--bg3); color:var(--muted); border:1px solid var(--border); }
+.badge-banned { background:rgba(244,63,94,0.1); color:var(--red); border:1px solid rgba(244,63,94,0.2); }
+.badge-online { background:rgba(16,185,129,0.1); color:var(--green); border:1px solid rgba(16,185,129,0.2); }
+.actions { display:flex; gap:6px; flex-wrap:wrap; }
+
+/* BROADCAST */
+.broadcast-box { background:var(--bg2); border:1px solid var(--border-gold); border-radius:10px; padding:20px; }
+.broadcast-box textarea { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:12px; color:var(--text); font-family:'Syne',sans-serif; font-size:0.875rem; resize:vertical; min-height:100px; outline:none; margin:12px 0; transition:border-color 0.15s; }
+.broadcast-box textarea:focus { border-color:var(--border-gold); }
+
+/* CONV MODAL */
+.modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); z-index:1000; display:none; align-items:center; justify-content:center; padding:16px; }
+.modal-bg.open { display:flex; }
+.modal-box { background:var(--bg2); border:1px solid var(--border); border-radius:14px; width:100%; max-width:680px; max-height:80vh; overflow:hidden; display:flex; flex-direction:column; }
+.modal-head { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.modal-title { font-family:'DM Mono',monospace; font-size:0.85rem; font-weight:500; }
+.modal-close { background:none; border:none; color:var(--muted); font-size:1.1rem; cursor:pointer; }
+.modal-close:hover { color:var(--text); }
+.modal-body { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:8px; }
+.conv-selector { display:flex; gap:6px; flex-wrap:wrap; padding:12px 16px; border-bottom:1px solid var(--border); }
+.conv-btn { padding:5px 10px; border-radius:6px; border:1px solid var(--border); background:var(--bg3); color:var(--text2); font-size:0.72rem; cursor:pointer; transition:all 0.12s; font-family:'DM Mono',monospace; }
+.conv-btn:hover, .conv-btn.active { border-color:var(--border-gold); color:var(--gold); }
+.msg-row { padding:8px 12px; border-radius:8px; font-size:0.8rem; line-height:1.5; }
+.msg-row.user { background:var(--gold-dim); border-left:2px solid var(--gold); }
+.msg-row.assistant { background:var(--bg3); border-left:2px solid var(--accent); }
+.msg-role { font-size:0.65rem; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:3px; }
+.msg-row.user .msg-role { color:var(--gold); }
+.msg-row.assistant .msg-role { color:var(--accent); }
+
+/* ONLINE SECTION */
+.online-grid { display:flex; flex-direction:column; gap:8px; }
+.online-card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; display:flex; align-items:flex-start; gap:12px; }
+.online-dot { width:8px; height:8px; border-radius:50%; background:var(--green); flex-shrink:0; margin-top:4px; animation:pulse-dot 2s ease-in-out infinite; }
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+.online-name { font-weight:500; font-size:0.85rem; }
+.online-msg { font-size:0.75rem; color:var(--text2); margin-top:3px; font-style:italic; }
+.online-time { font-size:0.65rem; color:var(--muted); font-family:'DM Mono',monospace; margin-left:auto; }
+.refresh-bar { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.refresh-indicator { width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse-dot 2s infinite; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+        <rect x="2" y="2" width="11" height="11" rx="3" fill="#c9a84c"/>
+        <rect x="15" y="2" width="11" height="11" rx="3" fill="#6366f1"/>
+        <rect x="2" y="15" width="11" height="11" rx="3" fill="#6366f1"/>
+        <rect x="15" y="15" width="11" height="11" rx="3" fill="#c9a84c"/>
+        <rect x="8" y="8" width="12" height="12" rx="3" fill="#e8c87a"/>
+      </svg>
+      <div class="login-logo-text">NOMAR_<span>ADMIN</span></div>
+    </div>
+    <div class="login-sub">Acces restreint — compte admin uniquement</div>
+    <div class="field">
+      <label>Pseudo</label>
+      <input type="text" id="loginUsername" placeholder="Ton pseudo...">
+    </div>
+    <div class="field">
+      <label>Mot de passe</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="err" id="loginErr"></div>
+    <button class="btn-gold" onclick="doLogin()">Acceder au panel</button>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+  <div class="admin-header">
+    <svg width="20" height="20" viewBox="0 0 28 28" fill="none">
+      <rect x="2" y="2" width="11" height="11" rx="3" fill="#c9a84c"/>
+      <rect x="15" y="2" width="11" height="11" rx="3" fill="#6366f1"/>
+      <rect x="2" y="15" width="11" height="11" rx="3" fill="#6366f1"/>
+      <rect x="15" y="15" width="11" height="11" rx="3" fill="#c9a84c"/>
+      <rect x="8" y="8" width="12" height="12" rx="3" fill="#e8c87a"/>
+    </svg>
+    <div class="admin-header-logo">NOMAR_<span>IA</span></div>
+    <div class="admin-badge">ADMIN</div>
+    <div class="admin-header-right">
+      <div class="admin-user" id="adminUserLabel"></div>
+      <button class="btn-sm" onclick="refreshAll()">Actualiser</button>
+      <button class="btn-sm danger" onclick="logout()">Deconnexion</button>
+    </div>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="tab-btn active" onclick="switchTab('stats')">Stats</button>
+    <button class="tab-btn" onclick="switchTab('users')">Utilisateurs</button>
+    <button class="tab-btn" onclick="switchTab('online')">En ligne</button>
+    <button class="tab-btn" onclick="switchTab('broadcast')">Broadcast</button>
+  </div>
+
+  <div class="admin-content">
+
+    <!-- STATS -->
+    <div class="tab-panel active" id="tab-stats">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-label">Chargement...</div><div class="stat-value">—</div></div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--text2);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px;">Dernieres inscriptions</div>
+        <div id="recentUsers" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="tab-panel" id="tab-users">
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">Tous les utilisateurs</div>
+          <input type="text" class="search-input" placeholder="Rechercher..." oninput="filterUsers(this.value)">
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Pseudo</th>
+                <th>Email</th>
+                <th>Statut</th>
+                <th>Messages</th>
+                <th>Conversations</th>
+                <th>Inscription</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONLINE -->
+    <div class="tab-panel" id="tab-online">
+      <div class="refresh-bar">
+        <div class="refresh-indicator"></div>
+        <div style="font-size:0.75rem;color:var(--text2);">Actualise toutes les 15 secondes</div>
+        <button class="btn-sm" onclick="loadOnline()">Actualiser maintenant</button>
+      </div>
+      <div class="online-grid" id="onlineList">
+        <div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:32px;">Chargement...</div>
+      </div>
+    </div>
+
+    <!-- BROADCAST -->
+    <div class="tab-panel" id="tab-broadcast">
+      <div class="broadcast-box">
+        <div style="font-family:'DM Mono',monospace;font-size:0.8rem;font-weight:500;color:var(--gold);margin-bottom:4px;">Envoyer un message a tous</div>
+        <div style="font-size:0.75rem;color:var(--text2);margin-bottom:12px;">Le message apparaitra dans les conversations de tous les utilisateurs non bannis.</div>
+        <textarea id="broadcastMsg" placeholder="Ecris ton message ici..."></textarea>
+        <button class="btn-gold" onclick="sendBroadcast()" style="width:auto;padding:10px 24px;">Envoyer a tous &#10148;</button>
+        <div id="broadcastResult" style="margin-top:10px;font-size:0.75rem;"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CONV MODAL -->
+<div class="modal-bg" id="convModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title" id="convModalTitle">Conversations</div>
+      <button class="modal-close" onclick="closeConvModal()">&#x2715;</button>
+    </div>
+    <div class="conv-selector" id="convSelector"></div>
+    <div class="modal-body" id="convModalBody"></div>
+  </div>
+</div>
+
+<script>
+const BACKEND = 'https://nomar-ia-backend-production.up.railway.app';
+let adminId = localStorage.getItem('nomar_admin_id');
+let adminUsername = localStorage.getItem('nomar_admin_username');
+let allUsers = [];
+let onlineInterval = null;
+
+// ── AUTH ──────────────────────────────────────────────────────
+async function doLogin(){
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginErr');
+  if(!username || !password){ errEl.textContent = 'Remplis tous les champs'; return; }
+
+  try {
+    const res = await fetch(BACKEND + '/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({username, password})
+    });
+    const data = await res.json();
+    if(data.error){ errEl.textContent = data.error; return; }
+    if(!data.user.is_admin){ errEl.textContent = 'Acces refuse — compte admin requis'; return; }
+
+    adminId = data.user.id;
+    adminUsername = data.user.username;
+    localStorage.setItem('nomar_admin_id', adminId);
+    localStorage.setItem('nomar_admin_username', adminUsername);
+    showAdmin();
+  } catch(e) {
+    errEl.textContent = 'Erreur de connexion au backend';
+  }
+}
+
+function logout(){
+  localStorage.removeItem('nomar_admin_id');
+  localStorage.removeItem('nomar_admin_username');
+  adminId = null;
+  clearInterval(onlineInterval);
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('adminApp').style.display = 'none';
+  document.getElementById('loginErr').textContent = '';
+}
+
+function showAdmin(){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminApp').style.display = 'block';
+  document.getElementById('adminUserLabel').textContent = adminUsername;
+  refreshAll();
+  onlineInterval = setInterval(loadOnline, 15000);
+}
+
+if(adminId && adminUsername) showAdmin();
+
+// ── TABS ──────────────────────────────────────────────────────
+function switchTab(name){
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+  if(name === 'online') loadOnline();
+}
+
+// ── REFRESH ALL ───────────────────────────────────────────────
+function refreshAll(){
+  loadStats();
+  loadUsers();
+  loadOnline();
+}
+
+// ── STATS ─────────────────────────────────────────────────────
+async function loadStats(){
+  try {
+    const res = await fetch(BACKEND + '/admin/stats', { headers:{'x-admin-id': adminId} });
+    const data = await res.json();
+    if(!data.stats) return;
+    const s = data.stats;
+    document.getElementById('statsGrid').innerHTML = `
+      <div class="stat-card gold"><div class="stat-label">Total users</div><div class="stat-value">${s.total_users}</div></div>
+      <div class="stat-card gold"><div class="stat-label">Comptes Pro</div><div class="stat-value">${s.pro_users}</div></div>
+      <div class="stat-card"><div class="stat-label">Gratuit</div><div class="stat-value">${s.free_users}</div></div>
+      <div class="stat-card"><div class="stat-label">Bannis</div><div class="stat-value">${s.banned_users}</div></div>
+      <div class="stat-card"><div class="stat-label">Inscrits aujourd'hui</div><div class="stat-value">${s.new_today}</div></div>
+      <div class="stat-card"><div class="stat-label">Cette semaine</div><div class="stat-value">${s.new_week}</div></div>
+      <div class="stat-card"><div class="stat-label">Total messages</div><div class="stat-value">${s.total_messages}</div></div>
+      <div class="stat-card"><div class="stat-label">Conversations</div><div class="stat-value">${s.total_conversations}</div></div>
+    `;
+
+    // Recent users
+    const usersRes = await fetch(BACKEND + '/admin/users', { headers:{'x-admin-id': adminId} });
+    const usersData = await usersRes.json();
+    if(usersData.users){
+      const recent = usersData.users.slice(0, 5);
+      document.getElementById('recentUsers').innerHTML = recent.map(u => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#b8922a);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#08080a;">${u.username[0].toUpperCase()}</div>
+          <div style="flex:1;">
+            <div style="font-size:0.82rem;font-weight:500;">${escHtml(u.username)}</div>
+            <div style="font-size:0.7rem;color:var(--text2);">${escHtml(u.email)}</div>
+          </div>
+          <span class="badge ${u.is_pro?'badge-pro':'badge-free'}">${u.is_pro?'Pro':'Gratuit'}</span>
+          <div style="font-size:0.68rem;color:var(--muted);font-family:'DM Mono',monospace;">${formatDate(u.created_at)}</div>
+        </div>
+      `).join('');
+    }
+  } catch(e) { console.error(e); }
+}
+
+// ── USERS ─────────────────────────────────────────────────────
+async function loadUsers(){
+  try {
+    const res = await fetch(BACKEND + '/admin/users', { headers:{'x-admin-id': adminId} });
+    const data = await res.json();
+    if(!data.users) return;
+    allUsers = data.users;
+    renderUsers(allUsers);
+  } catch(e) { console.error(e); }
+}
+
+function renderUsers(users){
+  const tbody = document.getElementById('usersTable');
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#b8922a);display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:#08080a;flex-shrink:0;">${u.username[0].toUpperCase()}</div>
+          <span style="font-weight:500;color:var(--text);">${escHtml(u.username)}</span>
+          ${u.is_admin ? '<span class="badge badge-pro" style="font-size:0.55rem;">ADMIN</span>' : ''}
+        </div>
+      </td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.72rem;">${escHtml(u.email)}</td>
+      <td>
+        ${u.banned ? '<span class="badge badge-banned">Banni</span>' : u.is_pro ? '<span class="badge badge-pro">Pro</span>' : '<span class="badge badge-free">Gratuit</span>'}
+      </td>
+      <td style="font-family:'DM Mono',monospace;">${u.msg_count}</td>
+      <td style="font-family:'DM Mono',monospace;">${u.conv_count}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);">${formatDate(u.created_at)}</td>
+      <td>
+        <div class="actions">
+          <button class="btn-sm" onclick="viewConversations('${u.id}','${escHtml(u.username)}')">Convs</button>
+          ${!u.is_admin ? `
+            <button class="btn-sm ${u.is_pro?'danger':'success'}" onclick="togglePro('${u.id}',${!u.is_pro})">${u.is_pro?'Retirer Pro':'Passer Pro'}</button>
+            <button class="btn-sm ${u.banned?'success':'danger'}" onclick="toggleBan('${u.id}',${!u.banned})">${u.banned?'Debannir':'Bannir'}</button>
+            <button class="btn-sm danger" onclick="deleteUser('${u.id}','${escHtml(u.username)}')">Supprimer</button>
+          ` : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterUsers(q){
+  const filtered = allUsers.filter(u =>
+    u.username.toLowerCase().includes(q.toLowerCase()) ||
+    u.email.toLowerCase().includes(q.toLowerCase())
+  );
+  renderUsers(filtered);
+}
+
+async function togglePro(userId, is_pro){
+  await fetch(BACKEND + '/admin/set-pro', {
+    method:'POST', headers:{'Content-Type':'application/json','x-admin-id':adminId},
+    body: JSON.stringify({userId, is_pro})
+  });
+  loadUsers(); loadStats();
+}
+
+async function toggleBan(userId, banned){
+  const msg = banned ? 'Bannir cet utilisateur ?' : 'Debannir cet utilisateur ?';
+  if(!confirm(msg)) return;
+  await fetch(BACKEND + '/admin/ban', {
+    method:'POST', headers:{'Content-Type':'application/json','x-admin-id':adminId},
+    body: JSON.stringify({userId, banned})
+  });
+  loadUsers(); loadStats();
+}
+
+async function deleteUser(userId, username){
+  if(!confirm('Supprimer definitivement ' + username + ' ? Cette action est irreversible.')) return;
+  await fetch(BACKEND + '/admin/delete-user/' + userId, {
+    method:'DELETE', headers:{'x-admin-id':adminId}
+  });
+  loadUsers(); loadStats();
+}
+
+// ── CONVERSATIONS ─────────────────────────────────────────────
+let convData = [];
+async function viewConversations(userId, username){
+  document.getElementById('convModalTitle').textContent = 'Conversations de ' + username;
+  document.getElementById('convSelector').innerHTML = '<div style="color:var(--muted);font-size:0.75rem;">Chargement...</div>';
+  document.getElementById('convModalBody').innerHTML = '';
+  document.getElementById('convModal').classList.add('open');
+
+  const res = await fetch(BACKEND + '/admin/conversations/' + userId, { headers:{'x-admin-id':adminId} });
+  const data = await res.json();
+  convData = data.conversations || [];
+
+  if(convData.length === 0){
+    document.getElementById('convSelector').innerHTML = '<div style="color:var(--muted);font-size:0.75rem;">Aucune conversation</div>';
+    return;
+  }
+
+  document.getElementById('convSelector').innerHTML = convData.map((c,i) =>
+    `<button class="conv-btn ${i===0?'active':''}" onclick="showConv(${i},this)">${escHtml(c.title||'Conversation '+(i+1))}</button>`
+  ).join('');
+  showConv(0, document.querySelector('.conv-btn'));
+}
+
+function showConv(idx, btn){
+  document.querySelectorAll('.conv-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const conv = convData[idx];
+  const msgs = conv.messages || [];
+  document.getElementById('convModalBody').innerHTML = msgs.length === 0
+    ? '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:20px;">Conversation vide</div>'
+    : msgs.map(m => `
+      <div class="msg-row ${m.role}">
+        <div class="msg-role">${m.role === 'user' ? 'Utilisateur' : 'Nomar'}</div>
+        <div>${escHtml(m.content||'').replace(/\n/g,'<br>')}</div>
+      </div>
+    `).join('');
+}
+
+function closeConvModal(){ document.getElementById('convModal').classList.remove('open'); }
+document.getElementById('convModal').addEventListener('click', function(e){ if(e.target===this) closeConvModal(); });
+
+// ── ONLINE ────────────────────────────────────────────────────
+async function loadOnline(){
+  try {
+    const res = await fetch(BACKEND + '/admin/online', { headers:{'x-admin-id':adminId} });
+    const data = await res.json();
+    const list = document.getElementById('onlineList');
+    if(!data.online || data.online.length === 0){
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:32px;">Personne en ligne en ce moment</div>';
+      return;
+    }
+    list.innerHTML = data.online.map(u => `
+      <div class="online-card">
+        <div class="online-dot"></div>
+        <div style="flex:1;">
+          <div class="online-name">${escHtml(u.username)}</div>
+          ${u.currentMsg ? `<div class="online-msg">"${escHtml(u.currentMsg.slice(0,80))}${u.currentMsg.length>80?'...':''}"</div>` : '<div class="online-msg" style="color:var(--muted);">En train de naviguer...</div>'}
+        </div>
+        <div class="online-time">${timeSince(u.lastSeen)}</div>
+      </div>
+    `).join('');
+  } catch(e) { console.error(e); }
+}
+
+// ── BROADCAST ─────────────────────────────────────────────────
+async function sendBroadcast(){
+  const message = document.getElementById('broadcastMsg').value.trim();
+  const result = document.getElementById('broadcastResult');
+  if(!message){ result.style.color = 'var(--red)'; result.textContent = 'Ecris un message !'; return; }
+  if(!confirm('Envoyer ce message a TOUS les utilisateurs ?')) return;
+
+  result.style.color = 'var(--text2)'; result.textContent = 'Envoi en cours...';
+  try {
+    const res = await fetch(BACKEND + '/admin/broadcast', {
+      method:'POST', headers:{'Content-Type':'application/json','x-admin-id':adminId},
+      body: JSON.stringify({message})
+    });
+    const data = await res.json();
+    if(data.success){
+      result.style.color = 'var(--green)';
+      result.textContent = 'Message envoye a ' + data.updated + ' utilisateur(s) !';
+      document.getElementById('broadcastMsg').value = '';
+    } else {
+      result.style.color = 'var(--red)'; result.textContent = data.error || 'Erreur';
+    }
+  } catch(e) {
+    result.style.color = 'var(--red)'; result.textContent = 'Erreur de connexion';
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function formatDate(ts){
+  if(!ts) return '—';
+  return new Date(ts).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});
+}
+function timeSince(ts){
+  const s = Math.floor((Date.now()-ts)/1000);
+  if(s < 60) return 'A l\'instant';
+  if(s < 3600) return Math.floor(s/60) + ' min';
+  return Math.floor(s/3600) + 'h';
+}
+</script>
+</body>
+</html>
