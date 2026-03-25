@@ -2073,6 +2073,24 @@ function addMsg(role, content){
   return div;
 }
 
+function addMsgWithImage(role, text, imageData){
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role==='user'?'user':'assistant');
+  const letter = currentUser ? currentUser.username[0].toUpperCase() : 'T';
+  const avatar = role==='user'
+    ? '<div class="avatar user-av">'+letter+'</div>'
+    : '<div class="avatar ai">AI</div>';
+  const imgHtml = imageData
+    ? '<img src="'+imageData+'" style="max-width:220px;max-height:180px;border-radius:10px;display:block;margin-bottom:6px;border:1px solid var(--border-gold);">'
+    : '';
+  const textHtml = text ? '<div>'+escHtml(text)+'</div>' : '';
+  div.innerHTML = avatar + '<div class="bubble" style="padding:8px;">' + imgHtml + textHtml + '</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
 function addTyping(){
   const msgs = document.getElementById('messages');
   const div = document.createElement('div');
