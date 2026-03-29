@@ -2144,7 +2144,8 @@ async function sendChat(){
     clearFile();
   }
 
-  addMsg('user', msg);
+  if(pendingImage){ addMsgWithImage('user', msg !== '(fichier joint)' ? msg : '', pendingImage); }
+  else { addMsg('user', msg); }
   chatHistory.push({role:'user', content:fullMsg || msg});
   if(currentUser){ fetch(BACKEND+'/heartbeat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUser.id,username:currentUser.username,currentMsg:msg.slice(0,100)})}).catch(function(){}); }
 
